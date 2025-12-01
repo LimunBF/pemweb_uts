@@ -1,10 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TaskController; // <-- Mereka akan impor controller
+use App\Http\Controllers\TaskController; 
+use App\Http\Controllers\DashboardController; // Pastikan baris ini ada
 
-// Ini rute baru untuk halaman utama
+// Route Halaman Utama (Task List)
 Route::get('/', [TaskController::class, 'index']);
 
-// Ini rute untuk semua fitur CRUD (tambah, edit, hapus, dll)
+// Route CRUD Tasks
 Route::resource('tasks', TaskController::class);
+
+// Route Dashboard Admin
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard_admin');
