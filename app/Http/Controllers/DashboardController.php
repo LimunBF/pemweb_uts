@@ -3,28 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Barang; // <--- Import Model Barang
+use App\Models\Item; // Pastikan pakai model Item
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // 1. Ambil data dari database
-        // Pastikan tabel 'barangs' sudah ada isinya
-        $total_barang    = Barang::count();
-        $barang_dipinjam = Barang::where('status', 'dipinjam')->count();
-        $barang_tersedia = Barang::where('status', 'tersedia')->count();
+        // 1. Total Barang (Menghitung jumlah baris data barang)
+        $total_barang = Item::count();
 
-        // 2. Bungkus data ke dalam array
+        // 2. Barang Dipinjam
+        $barang_dipinjam = Item::where('status_ketersediaan', 'Dipinjam')->count();
+
+        // 3. Barang Tersedia
+        $barang_tersedia = Item::where('status_ketersediaan', 'Tersedia')->count();
+
         $data = [
             'total_barang'    => $total_barang,
             'barang_dipinjam' => $barang_dipinjam,
             'barang_tersedia' => $barang_tersedia,
-            'user_name'       => 'Admin' // Nanti bisa diganti Auth::user()->name
+            'user_name'       => 'Admin'
         ];
 
-        // 3. Kirim ke View
-        // Pastikan kamu punya file: resources/views/dashboard_admin.blade.php
-        return view('dashboard_admin', $data);
+        return view('layouts.dashboard_admin', $data);
     }
 }
