@@ -11,10 +11,10 @@
             theme: {
                 extend: {
                     colors: {
-                        'lab-pink': '#FCE7F3', // Pink Muda (Kartu & Hover Sidebar)
-                        'lab-pink-dark': '#FF91A4', // Pink Tua (Menu Aktif/Secondary)
-                        'lab-text': '#590D22', // Merah Gelap (Teks Kontras & Menu Aktif Utama)
-                        'lab-pink-btn': '#DB2777', // Button
+                        'lab-pink': '#FCE7F3', 
+                        'lab-pink-dark': '#FF91A4', 
+                        'lab-text': '#590D22', 
+                        'lab-pink-btn': '#DB2777', 
                     },
                     fontFamily: {
                         'poppins': ['Poppins', 'sans-serif'],
@@ -43,21 +43,20 @@
             <nav class="flex-1 mt-6 px-4 space-y-2">
 
                 {{-- 1. MENU DASHBOARD --}}
-                <a href="{{ route('dashboard_admin') }}"
-                    class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('dashboard_admin') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                <a href="{{ route('dashboard') }}"
+                    class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('dashboard') || request()->routeIs('dashboard_admin') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
 
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2z">
                         </path>
                     </svg>
                     Dashboard
                 </a>
 
-                {{-- 2. MENU INVENTARIS (Perhatikan routeIs('items.*')) --}}
-                {{-- 'items.*' artinya aktif untuk items.index, items.create, items.edit, dll --}}
-                <a href="{{ route('items.index') }}"
-                    class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('items.*') || request()->routeIs('inventaris.index') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                {{-- 2. MENU INVENTARIS --}}
+                <a href="{{ route('tasks.index') }}"
+                    class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('tasks.*') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
 
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,7 +65,17 @@
                     Inventaris
                 </a>
 
-                {{-- 3. MENU PEMINJAMAN --}}
+                {{-- 3. MENU ANGGOTA (Baru Ditambahkan agar tidak error) --}}
+                <a href="{{ route('members.index') }}"
+                    class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('members.*') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    Anggota
+                </a>
+
+                {{-- 4. MENU PEMINJAMAN --}}
                 <a href="{{ route('peminjaman') }}"
                     class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('peminjaman') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
 
@@ -79,18 +88,7 @@
 
             </nav>
 
-            <!-- Tombol Logout (Footer Sidebar) -->
-            <div class="p-4 border-t border-gray-200">
-                <a href="#"
-                    class="flex items-center px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    Logout
-                </a>
-            </div>
+            
         </aside>
 
         <!-- KONTEN UTAMA -->
@@ -112,22 +110,30 @@
                 <!-- Profil Admin -->
                 <div class="flex items-center space-x-4">
                     <div class="flex flex-col text-right">
-                        <span class="text-sm font-semibold text-gray-800">{{ $user_name ?? 'Admin Lab' }}</span>
-                        <span class="text-xs text-gray-500">Administrator</span>
+                        <span class="text-sm font-semibold text-gray-800">{{ Auth::user()->name ?? 'Guest' }}</span>
+                        <span class="text-xs text-gray-500 capitalize">{{ Auth::user()->role ?? 'Visitor' }}</span>
                     </div>
 
                     <!-- Dropdown User -->
-                    <div class="relative group">
+                    <div class="relative group h-full flex items-center">
                         <button class="flex items-center focus:outline-none">
                             <!-- Border avatar disesuaikan dengan palette -->
                             <img class="h-10 w-10 rounded-full object-cover border-2 border-lab-text"
-                                src="https://ui-avatars.com/api/?name=Admin+Lab&background=FFC0CB&color=590D22"
+                                src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'G') }}&background=FFC0CB&color=590D22"
                                 alt="Admin">
                         </button>
-                        <!-- Dropdown Content -->
-                        <div
-                            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block border border-gray-100 z-50">
-                            <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Logout</a>
+                        
+                        
+                        <div class="absolute right-0 top-full pt-4 w-48 hidden group-hover:block z-50">
+                            <div class="bg-white rounded-md shadow-lg py-1 border border-gray-100">
+                                <!-- FORM LOGOUT DROPDOWN -->
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 cursor-pointer">
+                                        Logout
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
