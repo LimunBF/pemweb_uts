@@ -1,17 +1,19 @@
 <?php
 
-use App\Http\Controllers\PeminjamanController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\TaskController; 
-use App\Http\Controllers\DashboardController; // Pastikan baris ini ada
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\ItemController; 
+// --- Route yang Benar ---
 
-// Route Halaman Utama (Task List)
-Route::get('/inventaris', [TaskController::class, 'index']);
-
-// Route CRUD Tasks
-Route::resource('tasks', TaskController::class);
-
-// Route Dashboard Admin
+// 1. Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard_admin');
 
+// 2. Peminjaman
 Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
+
+// 3. Manajemen Barang (Item)
+Route::resource('items', ItemController::class);
+
+// 4. Redirect halaman /inventaris ke index Item
+Route::get('/inventaris', [ItemController::class, 'index'])->name('inventaris.index');

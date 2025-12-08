@@ -25,6 +25,6 @@ class DashboardController extends Controller
             'user_name'       => 'Admin'
         ];
 
-        return view('layouts.dashboard_admin', $data);
+        return view('admin.dashboard_admin', $data);
     }
 }

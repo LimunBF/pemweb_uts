@@ -15,7 +15,7 @@ class PeminjamanController extends Controller
         // Contoh: $data_pinjam = Peminjaman::with('user', 'item')->get();
         
         // Untuk sekarang kita tampilkan view-nya dulu
-        return view('layouts.pinjam');
+        return view('admin.pinjam');
     }
 
     /**
