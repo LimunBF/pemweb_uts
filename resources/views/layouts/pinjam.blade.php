@@ -1,211 +1,125 @@
-{{-- Menggunakan layout utama yang sama --}}
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Inventaris Lab PTIK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lab-pink': '#FCE7F3',       // Pink Muda (Kartu & Hover Sidebar)
+                        'lab-pink-dark': '#FF91A4',  // Pink Tua (Menu Aktif/Secondary)
+                        'lab-text': '#590D22',       // Merah Gelap (Teks Kontras & Menu Aktif Utama)
+                        'lab-pink-btn':'#DB2777',    // Button
+                    },
+                    fontFamily: {
+                        'poppins': ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+    </style>
+</head>
+<body class="bg-white font-poppins antialiased text-gray-800">
 
-{{-- Isi konten utama --}}
-@section('content')
-
-    {{-- HEADER HALAMAN & TOMBOL TAMBAH --}}
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <h2 class="text-3xl font-bold text-pink-800">
-            Data Peminjaman
-        </h2>
+    <div class="flex h-screen overflow-hidden">
         
-        <a href="#" class="inline-flex items-center px-4 py-2 bg-pink-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-pink-700 active:bg-pink-800 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Tambah Peminjam
-        </a>
-    </div>
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+            <!-- Header Sidebar -->
+            <div class="h-16 flex items-center justify-center border-b border-gray-200">
+                <h1 class="text-xl font-bold text-lab-text">Laboratorium PTIK</h1> 
+            </div>
 
-    {{-- KONTAINER TABEL --}}
-    <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-100">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-pink-200">
+            <!-- Menu Navigasi -->
+            <nav class="flex-1 mt-6 px-4 space-y-2">
                 
-                {{-- HEADER TABEL --}}
-                <thead class="bg-pink-100">
-                    <tr>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider w-16">
-                            No
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Nama Peminjam
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Item / Alat
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Tgl Pinjam
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Tgl Kembali
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Status
-                        </th>
-                        <th scope="col" class="relative px-6 py-4">
-                            <span class="sr-only">Aksi</span>
-                        </th>
-                    </tr>
-                </thead>
+                <!-- 1. Menu Dashboard -->
+                <a href="{{ route('dashboard_admin') }}" 
+                   class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('dashboard_admin') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    Dashboard
+                </a>
                 
-                {{-- BODY TABEL --}}
-                <tbody class="bg-white divide-y divide-gray-200">
+                <!-- 2. Menu Inventaris -->
+                <a href="#" 
+                   class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('inventaris') || request()->routeIs('tasks.*') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    Inventaris
+                </a>
 
-                    {{-- 
-                        CATATAN UNTUK PENGEMBANGAN BACKEND:
-                        Nanti ganti bagian ini dengan foreach:
-                        @foreach($peminjaman as $index => $item)
-                        ...
-                        @endforeach
-                    --}}
+                <!-- 3. Menu Peminjaman -->
+                <a href="{{ Route::has('peminjaman') ? route('peminjaman') : '#' }}" 
+                   class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('peminjaman*') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Peminjaman
+                </a>
+   
 
-                    <!-- CONTOH DATA 1: STATUS DIPINJAM -->
-                    <tr class="hover:bg-pink-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            1
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8">
-                                    <img class="h-8 w-8 rounded-full bg-gray-200" src="https://ui-avatars.com/api/?name=Budi+Santoso&background=random" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Budi Santoso</div>
-                                    <div class="text-xs text-gray-500">Mahasiswa</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            Laptop Asus ROG
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            01 Des 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            - {{-- Kosong karena belum kembali --}}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
-                                Dipinjam
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            </button>
-                        </td>
-                    </tr>
+            </nav>
+            
+            <!-- Tombol Logout -->
+            <div class="p-4 border-t border-gray-200">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="flex w-full items-center px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
+                    </button>
+                </form>
+            </div>
+        </aside>
 
-                    <!-- CONTOH DATA 2: STATUS DIKEMBALIKAN -->
-                    <tr class="hover:bg-pink-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            2
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8">
-                                    <img class="h-8 w-8 rounded-full bg-gray-200" src="https://ui-avatars.com/api/?name=Siti+Aminah&background=random" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Siti Aminah</div>
-                                    <div class="text-xs text-gray-500">Dosen</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            Proyektor Epson
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            28 Nov 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            30 Nov 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
-                                Dikembalikan
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-gray-400 hover:text-gray-600 cursor-not-allowed">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </button>
-                        </td>
-                    </tr>
+        <!-- KONTEN UTAMA -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            
+            <!-- HEADER -->
+            <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
+                <!-- Tombol Mobile Menu -->
+                <button class="md:hidden text-gray-500 hover:text-gray-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
 
-                    <!-- CONTOH DATA 3: STATUS TERLAMBAT (Opsional) -->
-                    <tr class="hover:bg-pink-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            3
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8">
-                                    <img class="h-8 w-8 rounded-full bg-gray-200" src="https://ui-avatars.com/api/?name=Rizky+Febian&background=random" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Rizky Febian</div>
-                                    <div class="text-xs text-gray-500">Mahasiswa</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            Arduino Uno Kit
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            15 Okt 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            -
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 border border-red-200">
-                                Terlambat
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-pink-600 hover:text-pink-900 mr-3">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </button>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
-        
-        {{-- PAGINATION FOOTER (Opsional) --}}
-        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-            <div class="flex items-center justify-between">
-                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-sm text-gray-700">
-                            Menampilkan <span class="font-medium">1</span> sampai <span class="font-medium">3</span> dari <span class="font-medium">20</span> data
-                        </p>
+                <div class="flex-1"></div> 
+                
+                <!-- Profil Admin -->
+               <div class="flex items-center space-x-4">
+                    <div class="flex flex-col text-right">
+                        <span class="text-sm font-semibold text-gray-800">{{ $user_name ?? 'Admin Lab' }}</span>
+                        <span class="text-xs text-gray-500">Administrator</span>
                     </div>
-                    <div>
-                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                            <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                <span class="sr-only">Previous</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">1</a>
-                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">2</a>
-                            <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                <span class="sr-only">Next</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        </nav>
+                    
+                    <div class="relative group">
+                        <button class="flex items-center focus:outline-none">
+                            <img class="h-10 w-10 rounded-full object-cover border-2 border-lab-text" 
+                                 src="https://ui-avatars.com/api/?name={{ Auth::user()->name ?? 'Admin' }}&background=FFC0CB&color=590D22" 
+                                 alt="Admin">
+                        </button>
+                        <!-- Dropdown Logout -->
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block border border-gray-100 z-50">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50">Logout</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </header>
+
+            <!-- AREA KONTEN -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-white p-8">
+                <!-- Disini konten dari @section('content') di setiap halaman akan muncul -->
+                @yield('content')
+            </main>
         </div>
     </div>
-
-@endsection
+</body>
+</html>
