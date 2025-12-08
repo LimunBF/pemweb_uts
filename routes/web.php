@@ -1,19 +1,36 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+// Import semua Controller yang dipakai
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PeminjamanController;
-use App\Http\Controllers\ItemController; 
-// --- Route yang Benar ---
 
-// 1. Dashboard
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard_admin');
 
-// 2. Peminjaman
-Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
+// Halaman Login
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+// Proses Login (saat tombol ditekan)
+Route::post('/login', [AuthController::class, 'login']);
+// Proses Logout
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// 3. Manajemen Barang (Item)
-Route::resource('items', ItemController::class);
 
-// 4. Redirect halaman /inventaris ke index Item
-Route::get('/inventaris', [ItemController::class, 'index'])->name('inventaris.index');
+
+Route::middleware(['auth'])->group(function () {
+    
+    // 1. DASHBOARD
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    // Atau bisa juga diakses via /dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard_admin');
+
+    // 2. INVENTARIS (TASKS)
+    Route::resource('tasks', TaskController::class);
+
+    // 3. ANGGOTA (MEMBERS)
+    Route::resource('members', MemberController::class);
+
+    // 4. PEMINJAMAN
+    Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
+});
