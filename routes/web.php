@@ -9,6 +9,7 @@ use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\ItemController; 
 use App\Http\Controllers\UserDashboardController;
+use Illuminate\Http\Request;
 // --- Route yang Benar ---
 
 // 1. Dashboard
@@ -65,3 +66,16 @@ Route::get('/debug/logout', function () {
     Auth::logout();
     return "Berhasil Logout! <a href='/debug/login-admin'>Login Admin</a> | <a href='/debug/login-mhs'>Login Mhs</a>";
 });
+
+// --- RUTE LOGOUT (Wajib ada karena dipanggil di sidebar) ---
+Route::post('/logout', function (Request $request) {
+    // 1. Logout user
+    Auth::logout();
+    
+    // 2. Invalidate session (standar keamanan Laravel)
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    
+    // 3. Redirect (Misal: kembali ke halaman inventaris atau halaman debug)
+    return redirect('/inventaris'); 
+})->name('logout');
