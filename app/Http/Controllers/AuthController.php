@@ -17,21 +17,28 @@ class AuthController extends Controller
     // Proses Login
     public function login(Request $request)
     {
-        // 1. Validasi Input (Email & Password wajib diisi)
+        // 1. Validasi Input
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // 2. Cek apakah email & password cocok dengan database
+        // 2. Cek kredensial
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // 3. Jika cocok, lempar user ke halaman Dashboard (/)
-            return redirect()->intended('/');
+            // 3. CEK ROLE & REDIRECT SESUAI HAK AKSES
+            $user = Auth::user();
+
+            if ($user->role == 'admin') {
+                return redirect()->route('dashboard_admin');
+            } else {
+                // Asumsi role selain admin adalah mahasiswa
+                return redirect()->route('student.dashboard');
+            }
         }
 
-        // 4. Jika salah, kembalikan ke halaman login dengan pesan error
+        // 4. Jika salah
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');

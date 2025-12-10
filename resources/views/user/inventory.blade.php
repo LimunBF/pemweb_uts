@@ -16,7 +16,8 @@
                         <th class="px-6 py-4 text-left text-xs font-bold text-lab-text uppercase tracking-wider">Kode</th>
 
                         {{-- Kolom Informasi Stok --}}
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Total Aset
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Total
+                            Aset
                         </th>
                         <th class="px-6 py-4 text-center text-xs font-bold text-yellow-700 uppercase tracking-wider">Sedang
                             Dipinjam</th>
@@ -33,10 +34,9 @@
 
                             {{-- Nama & Deskripsi --}}
                             <td class="px-6 py-4 relative">
-                                {{-- Wrapper utama dengan class 'group' untuk mendeteksi hover --}}
                                 <div class="relative group cursor-pointer">
 
-                                    {{-- Tampilan Normal (Terpotong) --}}
+                                    {{-- Teks Nama & Deskripsi --}}
                                     <div
                                         class="text-sm font-bold text-gray-900 group-hover:text-lab-pink-btn transition-colors">
                                         {{ $item->nama_alat }}
@@ -45,18 +45,20 @@
                                         {{ $item->deskripsi ?? 'Tidak ada deskripsi' }}
                                     </div>
 
-                                    {{-- POP-UP KECIL (Tooltip) --}}
-                                    {{-- Hidden by default, Block saat group di-hover --}}
+                                    {{-- LOGIKA SMART TOOLTIP --}}
                                     <div
-                                        class="absolute z-50 bottom-full left-0 mb-2 w-72 hidden group-hover:block animate-fade-in-up">
+                                        class="absolute z-50 w-72 hidden group-hover:block animate-fade-in-up 
+                        {{ $loop->first ? 'top-full mt-2' : 'bottom-full mb-2' }} left-0">
 
                                         <div class="bg-white rounded-lg shadow-2xl border border-lab-pink p-4 relative">
-                                            {{-- Panah kecil di bawah --}}
+
+                                            {{-- PANAH TOOLTIP --}}
                                             <div
-                                                class="absolute -bottom-2 left-6 w-4 h-4 bg-white border-b border-r border-lab-pink transform rotate-45">
+                                                class="absolute w-4 h-4 bg-white transform rotate-45 
+                                {{ $loop->first ? '-top-2 left-6 border-t border-l border-lab-pink' : '-bottom-2 left-6 border-b border-r border-lab-pink' }}">
                                             </div>
 
-                                            {{-- Isi Pop-up --}}
+                                            {{-- Isi Konten --}}
                                             <h4 class="text-sm font-bold text-lab-text mb-2 border-b border-pink-100 pb-1">
                                                 {{ $item->nama_alat }}
                                             </h4>
