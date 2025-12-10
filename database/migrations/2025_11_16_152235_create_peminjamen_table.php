@@ -6,37 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
+        // Perhatikan nama tabelnya 'peminjamans' (plural)
+        // Meskipun nama file kamu 'peminjamen', tabel yang dibuat tetap 'peminjamans'
         Schema::create('peminjamans', function (Blueprint $table) {
             $table->id();
             
-            // Siapa yang pinjam
+            // Relasi ke tabel users
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             
-            // Apa yang dipinjam
-            $table->foreignId('item_id')->constrained('items')->onDelete('cascade');
+            // Relasi ke tabel tasks (barang)
+            $table->foreignId('items')->constrained('items')->onDelete('cascade');
             
-            // Kapan [cite: 27, 29]
             $table->date('tanggal_pinjam');
-            $table->date('tanggal_kembali');
+            $table->date('tanggal_kembali')->nullable();
             
-            // Status approval oleh Admin [cite: 31]
-            $table->string('status')->default('pending'); // (pending, disetujui, ditolak, dikembalikan)
-            $table->foreignId('approver_id')->nullable()->constrained('users'); // ID Admin yg approve
+            // Status: dipinjam, dikembalikan, terlambat
+            $table->string('status')->default('dipinjam'); 
             
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('peminjamen');
+        Schema::dropIfExists('peminjamans');
     }
 };

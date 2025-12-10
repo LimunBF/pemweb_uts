@@ -63,3 +63,9 @@ Route::get('/debug/logout', function () {
 
 // -- RUTE DAFTAR ANGGOTA
 Route::get('/members', [MemberController::class, 'index'])->name('members.index');
+
+
+Route::get('/inventaris', [TaskController::class, 'index'])->name('inventaris');
+Route::resource('tasks', TaskController::class);
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard_admin');
+Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
