@@ -1,330 +1,66 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peminjaman - Lab PTIK</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'lab-pink': '#FCE7F3',
-                        'lab-pink-dark': '#FF91A4',
-                        'lab-text': '#590D22',
-                        'lab-pink-btn':'#DB2777',
-                    },
-                    fontFamily: { 'poppins': ['Poppins', 'sans-serif'] }
-                }
-            }
-        }
-    </script>
-    <style>@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');</style>
-</head>
-<body class="bg-white font-poppins antialiased text-gray-800">
+@extends('layouts.app')
 
-    <div class="flex h-screen overflow-hidden">
-        
-<<<<<<< HEAD:resources/views/admin/pinjam.blade.php
-        <a href="#" class="inline-flex it                                                      ems-center px-4 py-2 bg-pink-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-pink-700 active:bg-pink-800 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Tambah Peminjam
-        </a>
+@section('content')
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-3xl font-bold text-lab-text">Daftar Peminjaman</h2>
+    {{-- Jika ingin menambah peminjaman manual via admin --}}
     </div>
 
-    {{-- KONTAINER TABEL --}}
-    <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-100">
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-pink-200">
-                
-                {{-- HEADER TABEL --}}
-                <thead class="bg-pink-100">
-                    <tr>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider w-16">
-                            No
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Nama Peminjam
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Item / Alat
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Tgl Pinjam
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Tgl Kembali
-                        </th>
-                        <th scope="col" class="px-6 py-4 text-center text-xs font-bold text-pink-700 uppercase tracking-wider">
-                            Status
-                        </th>
-                        <th scope="col" class="relative px-6 py-4">
-                            <span class="sr-only">Aksi</span>
-                        </th>
-                    </tr>
-                </thead>
-                
-                {{-- BODY TABEL --}}
-                <tbody class="bg-white divide-y divide-gray-200">
-
-                    {{-- 
-                        CATATAN UNTUK PENGEMBANGAN BACKEND:
-                        Nanti ganti bagian ini dengan foreach:
-                        @foreach($peminjaman as $index => $item)
-                        ...
-                        @endforeach
-                    --}}
-
-                    <!-- CONTOH DATA 1: STATUS DIPINJAM -->
-                    <tr class="hover:bg-pink-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            1
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8">
-                                    <img class="h-8 w-8 rounded-full bg-gray-200" src="https://ui-avatars.com/api/?name=Budi+Santoso&background=random" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Budi Santoso</div>
-                                    <div class="text-xs text-gray-500">Mahasiswa</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            Laptop Asus ROG
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            01 Des 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            - {{-- Kosong karena belum kembali --}}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 border border-yellow-200">
-                                Dipinjam
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-blue-600 hover:text-blue-900 mr-3" title="Edit">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                            </button>
-                        </td>
-                    </tr>
-
-                    <!-- CONTOH DATA 2: STATUS DIKEMBALIKAN -->
-                    <tr class="hover:bg-pink-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            2
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8">
-                                    <img class="h-8 w-8 rounded-full bg-gray-200" src="https://ui-avatars.com/api/?name=Siti+Aminah&background=random" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Siti Aminah</div>
-                                    <div class="text-xs text-gray-500">Dosen</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            Proyektor Epson
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            28 Nov 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            30 Nov 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 border border-green-200">
-                                Dikembalikan
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-gray-400 hover:text-gray-600 cursor-not-allowed">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </button>
-                        </td>
-                    </tr>
-
-                    <!-- CONTOH DATA 3: STATUS TERLAMBAT (Opsional) -->
-                    <tr class="hover:bg-pink-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            3
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-8 w-8">
-                                    <img class="h-8 w-8 rounded-full bg-gray-200" src="https://ui-avatars.com/api/?name=Rizky+Febian&background=random" alt="">
-                                </div>
-                                <div class="ml-4">
-                                    <div class="text-sm font-medium text-gray-900">Rizky Febian</div>
-                                    <div class="text-xs text-gray-500">Mahasiswa</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            Arduino Uno Kit
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            15 Okt 2023
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                            -
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 border border-red-200">
-                                Terlambat
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button class="text-pink-600 hover:text-pink-900 mr-3">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </button>
-                        </td>
-                    </tr>
-
-                </tbody>
-            </table>
-        </div>
-        
-        {{-- PAGINATION FOOTER (Opsional) --}}
-        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-            <div class="flex items-center justify-between">
-                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                    <div>
-                        <p class="text-sm text-gray-700">
-                            Menampilkan <span class="font-medium">1</span> sampai <span class="font-medium">3</span> dari <span class="font-medium">20</span> data
-                        </p>
-                    </div>
-                    <div>
-                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                            <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                <span class="sr-only">Previous</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">1</a>
-                            <a href="#" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">2</a>
-                            <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                                <span class="sr-only">Next</span>
-                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                                </svg>
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-=======
-        <!-- SIDEBAR (Sama seperti sebelumnya) -->
-        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
-            <div class="h-16 flex items-center justify-center border-b border-gray-200">
-                <h1 class="text-xl font-bold text-lab-text">Laboratorium PTIK</h1> 
->>>>>>> feature/menu_peminjaman:resources/views/layouts/pinjam.blade.php
-            </div>
-            <nav class="flex-1 mt-6 px-4 space-y-2">
-                <a href="{{ route('dashboard_admin') }}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-lab-pink hover:text-gray-900 rounded-lg transition-colors">
-                    Dashboard
-                </a>
-                <a href="{{ route('inventaris') }}" class="flex items-center px-4 py-3 text-gray-600 hover:bg-lab-pink hover:text-gray-900 rounded-lg transition-colors">
-                    Inventaris
-                </a>
-                <!-- Menu Peminjaman Aktif -->
-                <a href="#" class="flex items-center px-4 py-3 bg-lab-text text-white rounded-lg shadow-md transition-colors">
-                    Peminjaman
-                </a>
-                <!-- Menu Daftar Anggota -->
-                <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-lab-pink hover:text-gray-900 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-3"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg>
-                    Anggota
-                </a>
-            </nav>
-        </aside>
-
-        <!-- KONTEN UTAMA -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            
-            <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
-                <div class="flex-1"></div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm font-semibold text-gray-800">Admin Lab</span>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-white p-8">
-                
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-lab-text">Daftar Peminjaman Barang</h2>
-                    <button class="px-4 py-2 bg-lab-pink-btn text-white rounded-md text-sm font-semibold hover:bg-pink-700">
-                        + Catat Peminjaman
-                    </button>
-                </div>
-
-                <!-- TABEL DATA PEMINJAMAN -->
-                <div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-100">
-                    <table class="min-w-full divide-y divide-pink-200">
-                        <thead class="bg-lab-pink">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Nama</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">NIM</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Email</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Barang</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Tgl Pinjam</th>
-                                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @forelse($peminjaman as $item)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {{ $item->user->name ?? 'User Tidak Dikenal' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $item->task->name ?? 'Barang Dihapus' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $item->tanggal_pinjam }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if($item->status == 'dipinjam')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                            Dipinjam
-                                        </span>
-                                    @elseif($item->status == 'dikembalikan')
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                            Dikembalikan
-                                        </span>
-                                    @else
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                            {{ ucfirst($item->status) }}
-                                        </span>
-                                    @endif
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                                    Belum ada data peminjaman.
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                <div class="mt-4">
-                    {{ $peminjaman->links() }}
-                </div>
-
-            </main>
-        </div>
-    </div>
-</body>
-</html>
+<div class="bg-white shadow-xl rounded-lg overflow-hidden border border-gray-100">
+    <table class="min-w-full divide-y divide-pink-200">
+        <thead class="bg-lab-pink">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Peminjam</th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Barang</th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Tgl Pinjam</th>
+                <th class="px-6 py-3 text-left text-xs font-bold text-lab-text uppercase">Tgl Kembali (Rencana)</th>
+                <th class="px-6 py-3 text-center text-xs font-bold text-lab-text uppercase">Status</th>
+                <th class="px-6 py-3 text-center text-xs font-bold text-lab-text uppercase">Aksi</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+            @forelse($peminjaman as $item)
+            <tr class="hover:bg-pink-50 transition">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-bold text-gray-900">{{ $item->user->name }}</div>
+                    <div class="text-xs text-gray-500">{{ $item->user->email }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    {{-- Pastikan relasi di model Peminjaman bernama 'item' --}}
+                    <div class="text-sm text-gray-900 font-medium">{{ $item->item->nama_alat ?? 'Item Dihapus' }}</div>
+                    <div class="text-xs text-gray-500">{{ $item->item->kode_alat ?? '-' }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ \Carbon\Carbon::parse($item->tanggal_pinjam)->format('d M Y') }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ \Carbon\Carbon::parse($item->tanggal_kembali)->format('d M Y') }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    @if($item->status == 'disetujui' || $item->status == 'dipinjam')
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">Sedang Dipinjam</span>
+                    @elseif($item->status == 'pending')
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Menunggu</span>
+                    @elseif($item->status == 'dikembalikan')
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Selesai</span>
+                    @elseif($item->status == 'terlambat')
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Terlambat</span>
+                    @endif
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    {{-- Tambahkan tombol aksi (Setujui/Kembalikan) di sini nanti --}}
+                    <button class="text-blue-600 hover:text-blue-900">Detail</button>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Belum ada data peminjaman.</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+<div class="mt-4">
+    {{ $peminjaman->links() }}
+</div>
+@endsection

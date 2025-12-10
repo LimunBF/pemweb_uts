@@ -9,35 +9,25 @@ class Peminjaman extends Model
 {
     use HasFactory;
 
-    // Menentukan nama tabel di database (jamak)
     protected $table = 'peminjamans';
 
-    // Daftar kolom yang boleh diisi secara massal (create/update)
     protected $fillable = [
         'user_id',
-        'task_id',
+        'item_id', // Pastikan pakai item_id, bukan task_id
         'tanggal_pinjam',
         'tanggal_kembali',
         'status',
+        'approver_id' // Opsional jika ada
     ];
 
-    /**
-     * Relasi ke Model User
-     * (Setiap peminjaman dimiliki oleh 1 user)
-     */
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Relasi ke Model Task (Barang)
-     * (Setiap peminjaman terkait dengan 1 barang)
-     */
-    public function task()
+    // GANTI DARI TASK KE ITEM
+    public function item()
     {
-        // Pastikan model barangmu bernama 'Task'. 
-        // Jika modelnya bernama 'Barang' atau 'Item', ganti menjadi 'Barang::class' atau 'Item::class'
-        return $this->belongsTo(Task::class, 'task_id');
+        return $this->belongsTo(Item::class, 'item_id');
     }
 }

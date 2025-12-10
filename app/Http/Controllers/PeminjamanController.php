@@ -13,14 +13,9 @@ class PeminjamanController extends Controller
      */
     public function index()
     {
-        // 1. Ambil data dari database dengan relasi user dan task
-        // Pastikan model Peminjaman memiliki method user() dan task()
-        $peminjaman = Peminjaman::with(['user', 'task'])->latest()->paginate(10);
-
-        // 2. Tampilkan ke layar (View)
-        // KEMBALIKAN KE 'layouts.pinjam'
-        // Ini berarti Laravel akan mencari file di: resources/views/layouts/pinjam.blade.php
-        return view('layouts.pinjam', compact('peminjaman'));
+        // Ambil data dengan relasi 'user' dan 'item' (bukan task)
+        $peminjaman = Peminjaman::with(['user', 'item'])->latest()->paginate(10);
+        return view('admin.pinjam', compact('peminjaman')); // Arahkan ke view admin.pinjam
     }
 
     /**
