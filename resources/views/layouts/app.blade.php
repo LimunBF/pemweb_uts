@@ -41,42 +41,77 @@
 
             <!-- Menu Navigasi -->
             <nav class="flex-1 mt-6 px-4 space-y-2">
+                {{-- MENU KHUSUS ADMIN --}}
+                @if (Auth::check() && Auth::user()->role == 'admin')
+                    {{-- 1. MENU DASHBOARD --}}
+                    <a href="{{ route('dashboard_admin') }}"
+                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('dashboard_admin') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
 
-                {{-- 1. MENU DASHBOARD --}}
-                <a href="{{ route('dashboard_admin') }}"
-                    class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('dashboard_admin') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        Dashboard
+                    </a>
 
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
-                        </path>
-                    </svg>
-                    Dashboard
-                </a>
+                    {{-- 2. MENU INVENTARIS (Perhatikan routeIs('items.*')) --}}
+                    {{-- 'items.*' artinya aktif untuk items.index, items.create, items.edit, dll --}}
+                    <a href="{{ route('items.index') }}"
+                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('items.*') || request()->routeIs('inventaris.index') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
 
-                {{-- 2. MENU INVENTARIS (Perhatikan routeIs('items.*')) --}}
-                {{-- 'items.*' artinya aktif untuk items.index, items.create, items.edit, dll --}}
-                <a href="{{ route('items.index') }}"
-                    class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('items.*') || request()->routeIs('inventaris.index') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                        Inventaris
+                    </a>
 
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                    Inventaris
-                </a>
+                    {{-- 3. MENU PEMINJAMAN --}}
+                    <a href="{{ route('peminjaman') }}"
+                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('peminjaman') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Peminjaman
+                    </a>
+                @endif
 
-                {{-- 3. MENU PEMINJAMAN --}}
-                <a href="{{ route('peminjaman') }}"
-                    class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('peminjaman') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                {{-- MENU KHUSUS MAHASISWA / USER --}}
+                @if (Auth::check() && Auth::user()->role == 'mahasiswa')
+                    {{-- 1. Dashboard (Katalog) --}}
+                    <a href="{{ route('student.dashboard') }}"
+                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('student.dashboard') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        Dashboard Utama
+                    </a>
 
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Peminjaman
-                </a>
+                    {{-- 2. Inventaris (Tabel) --}}
+                    <a href="{{ route('student.inventory') }}"
+                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('student.inventory') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                            </path>
+                        </svg>
+                        Cek Stok Gudang
+                    </a>
 
+                    {{-- 3. Peminjaman Saya --}}
+                    <a href="{{ route('student.loans') }}"
+                        class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('student.loans') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Pinjaman Saya
+                    </a>
+                @endif
             </nav>
 
             <!-- Tombol Logout (Footer Sidebar) -->
