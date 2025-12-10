@@ -6,16 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Peminjaman extends Model
 {
-    // Agar mass assignment aman
+    // --- TAMBAHKAN BARIS INI ---
+    protected $table = 'peminjamans';
+    // ---------------------------
+
     protected $guarded = ['id'];
 
-    // Relasi ke User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke Item
     public function item()
     {
         return $this->belongsTo(Item::class);
