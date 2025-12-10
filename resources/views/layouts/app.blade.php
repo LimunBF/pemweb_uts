@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Inventaris Lab PTIK</title>
+    
+    {{-- Tailwind CSS CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    {{-- Konfigurasi Tema Warna --}}
     <script>
         tailwind.config = {
             theme: {
@@ -22,6 +26,8 @@
             }
         }
     </script>
+    
+    {{-- Font Google Poppins --}}
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
     </style>
@@ -92,6 +98,7 @@
                 <!-- Profil Admin -->
                 <div class="flex items-center space-x-4">
                     <div class="flex flex-col text-right">
+                        {{-- Menggunakan null coalescing operator untuk mencegah error jika variabel belum ada --}}
                         <span class="text-sm font-semibold text-gray-800">{{ $user_name ?? 'Admin Lab' }}</span>
                         <span class="text-xs text-gray-500">Administrator</span>
                     </div>
@@ -99,7 +106,6 @@
                     <!-- Dropdown User -->
                     <div class="relative group">
                         <button class="flex items-center focus:outline-none">
-                            <!-- Border avatar disesuaikan dengan palette -->
                             <img class="h-10 w-10 rounded-full object-cover border-2 border-lab-text" 
                                  src="https://ui-avatars.com/api/?name=Admin+Lab&background=FFC0CB&color=590D22" 
                                  alt="Admin">
