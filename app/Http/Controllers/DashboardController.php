@@ -23,8 +23,6 @@ class DashboardController extends Controller
             'user_name'       => 'Admin' // Nanti bisa diganti Auth::user()->name
         ];
 
-        // 3. Kirim ke View
-        // Pastikan kamu punya file: resources/views/dashboard_admin.blade.php
-        return view('dashboard_admin', $data);
+        return view('admin.dashboard_admin', $data);
     }
 }
