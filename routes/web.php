@@ -10,6 +10,7 @@ use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\ItemController; 
 use App\Http\Controllers\UserDashboardController;
 use Illuminate\Http\Request;
+
 // --- Route yang Benar ---
 
 // 1. Dashboard
@@ -79,3 +80,7 @@ Route::post('/logout', function (Request $request) {
     // 3. Redirect (Misal: kembali ke halaman inventaris atau halaman debug)
     return redirect('/inventaris'); 
 })->name('logout');
+
+
+// -- RUTE DAFTAR ANGGOTA
+Route::get('/members', [MemberController::class, 'index'])->name('members.index');
