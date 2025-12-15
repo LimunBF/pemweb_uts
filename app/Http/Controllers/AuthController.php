@@ -4,54 +4,73 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Tampilkan Halaman Login
+    // --- LOGIN ---
     public function showLoginForm()
     {
-        // Pastikan file view ada di resources/views/auth/login.blade.php
         return view('auth.login');
     }
 
-    // Proses Login
     public function login(Request $request)
     {
-        // 1. Validasi Input
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // 2. Cek kredensial
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // 3. CEK ROLE & REDIRECT SESUAI HAK AKSES
-            $user = Auth::user();
-
-            if ($user->role == 'admin') {
-                return redirect()->route('dashboard_admin');
-            } else {
-                // Asumsi role selain admin adalah mahasiswa
+            // Redirect sesuai role
+            if (Auth::user()->role == 'mahasiswa') {
                 return redirect()->route('student.dashboard');
             }
+            return redirect()->route('dashboard_admin');
         }
 
-        // 4. Jika salah
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
     }
 
-    // Logout
+    // --- REGISTER ---
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'identity_number' => 'required|unique:users,identity_number',
+            'contact' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'identity_number' => $request->identity_number,
+            'contact' => $request->contact,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'mahasiswa',
+        ]);
+
+        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
+    }
+
+    // --- LOGOUT ---
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
-        // Setelah logout, kembali ke halaman login
         return redirect('/login');
     }
 }
