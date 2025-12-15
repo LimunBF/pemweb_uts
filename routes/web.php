@@ -50,6 +50,10 @@ Route::middleware(['auth'])->prefix('student')->name('student.')->group(function
     // Form Peminjaman
     Route::get('/loan-form', [UserDashboardController::class, 'loanForm'])->name('loan.form');
     Route::post('/loan-form', [UserDashboardController::class, 'storeLoan'])->name('loan.store');
+
+    
+    // Route Download Surat
+    Route::get('/my-loans/{id}/print', [UserDashboardController::class, 'printSurat'])->name('loan.print');
 });
 
 

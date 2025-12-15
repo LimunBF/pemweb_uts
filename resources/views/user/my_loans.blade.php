@@ -64,8 +64,10 @@
                         </div>
                     </div>
 
-                    {{-- Kanan: Status Badge --}}
-                    <div class="w-full md:w-1/4 flex justify-end">
+                    {{-- Kanan: Aksi & Status --}}
+                    <div class="w-full md:w-1/4 flex flex-col items-end gap-2">
+                        
+                        {{-- Status Badge --}}
                         @if($loan->status == 'disetujui')
                             <span class="px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-xs font-bold uppercase tracking-wide shadow-sm">
                                 Sedang Dipinjam
@@ -79,6 +81,14 @@
                                 Terlambat
                             </span>
                         @endif
+
+                        {{-- TOMBOL DOWNLOAD SURAT --}}
+                        {{-- Munculkan tombol ini jika status pending atau disetujui --}}
+                        <a href="{{ route('student.loan.print', $loan->id) }}" class="flex items-center text-xs font-medium text-gray-500 hover:text-lab-pink-btn transition mt-2 border border-gray-200 rounded-lg px-3 py-1.5 hover:bg-pink-50">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Unduh Surat Izin
+                        </a>
+
                     </div>
                 </div>
             @empty
