@@ -14,13 +14,14 @@ class Peminjaman extends Model
     protected $fillable = [
         'user_id',
         'item_id',
-        'kode_peminjaman', 
+        'kode_peminjaman',
         'amount',
         'tanggal_pinjam',
         'tanggal_kembali',
         'status',
         'alasan',
-        'approver_id'
+        'approver_id',
+        'file_surat' // <--- Tambahkan ini
     ];
 
     public function user()

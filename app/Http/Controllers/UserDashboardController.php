@@ -28,12 +28,17 @@ class UserDashboardController extends Controller
     // 3. Halaman Pinjaman Saya
     public function myLoans()
     {
-        $loans = Peminjaman::with('item')
+        // Ambil data mentah
+        $rawLoans = Peminjaman::with('item')
                     ->where('user_id', Auth::id())
                     ->orderBy('created_at', 'desc') 
                     ->get();
 
-        return view('user.my_loans', compact('loans'));
+        $groupedLoans = $rawLoans->groupBy(function ($item) {
+            return $item->kode_peminjaman ?? 'SINGLE_' . $item->id;
+        });
+
+        return view('user.my_loans', compact('groupedLoans'));
     }
 
     // 4. Form Peminjaman (FIX ERROR STOK READY)
@@ -59,25 +64,36 @@ class UserDashboardController extends Controller
         $request->validate([
             'items' => 'required|array|min:1|max:5',
             'items.*.item_id' => 'required|exists:items,id',
-            'items.*.amount' => 'required|integer|min:1', // Validasi jumlah
+            'items.*.amount' => 'required|integer|min:1',
             'tanggal_pinjam' => 'required|date|after_or_equal:today',
             'tanggal_kembali' => 'required|date|after:tanggal_pinjam',
             'alasan' => 'nullable|string|max:255',
+            // Validasi File: Opsional, max 2MB, PDF/DOCX
+            'file_surat' => 'nullable|file|mimes:pdf,doc,docx|max:2048', 
         ]);
 
         $kodeUnik = Auth::id() . '-' . time() . '-' . rand(10, 99);
+        
+        // --- LOGIKA UPLOAD FILE ---
+        $filePath = null;
+        if ($request->hasFile('file_surat')) {
+            // Simpan ke folder: storage/app/public/surat_peminjaman
+            $file = $request->file('file_surat');
+            $fileName = 'SURAT_' . $kodeUnik . '.' . $file->getClientOriginalExtension();
+            $filePath = $file->storeAs('surat_peminjaman', $fileName, 'public');
+        }
 
-        // Looping array items
         foreach ($request->items as $itemData) {
             Peminjaman::create([
                 'user_id' => Auth::id(),
                 'item_id' => $itemData['item_id'],
-                'amount' => $itemData['amount'], // Simpan jumlah
+                'amount' => $itemData['amount'], 
                 'kode_peminjaman' => $kodeUnik, 
                 'tanggal_pinjam' => $request->tanggal_pinjam,
                 'tanggal_kembali' => $request->tanggal_kembali,
                 'status' => 'pending',
                 'alasan' => $request->alasan,
+                'file_surat' => $filePath, // <--- Simpan path file (atau null)
             ]);
         }
 
