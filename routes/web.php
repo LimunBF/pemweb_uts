@@ -80,10 +80,6 @@ Route::get('/debug/login-admin', function () {
     return "User admin tidak ditemukan. Jalankan: php artisan migrate:fresh --seed";
 });
 
-    if($user) { Auth::login($user); return redirect()->route('dashboard_admin'); }
-    return "User admin tidak ditemukan. Jalankan: php artisan migrate:fresh --seed";
-});
-
 Route::get('/debug/login-mhs', function () {
     $user = User::where('email', 'mahasiswa@lab.com')->first();
     if($user) { Auth::login($user); return redirect()->route('student.dashboard'); }
