@@ -1,114 +1,124 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 mt-6">
+<div class="container mx-auto">
     
-    <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
+    {{-- Header & Tombol Tambah --}}
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-pink-800">Daftar Anggota</h2>
+            <p class="text-md italic text-pink-500 mt-1">Kelola semua data mahasiswa/anggota di sini.</p>
+        </div>
         
-        <div class="bg-lab-pink-dark px-6 py-4 flex flex-col md:flex-row justify-between items-center">
-            <div class="text-white">
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    Daftar Anggota
-                </h2>
-                <p class="text-sm text-pink-100 mt-1 opacity-90">Kelola data mahasiswa aktif di sini.</p>
-            </div>
+        {{-- Link tombol bisa disesuaikan, misalnya ke route('members.create') jika sudah ada --}}
+        <a href="{{ route('members.create') }}" class="bg-lab-pink-btn hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-lg shadow-md flex items-center transition ease-in-out duration-150">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+            Tambah Anggota Baru
+        </a>
+    </div>
 
-            <a href="#" class="mt-4 md:mt-0 bg-white text-lab-pink-dark hover:bg-gray-50 font-semibold py-2 px-4 rounded-lg shadow-sm flex items-center transition duration-200">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                Tambah Anggota
-            </a>
+    {{-- Notifikasi Sukses --}}
+    @if(session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm" role="alert">
+        <div class="flex items-center">
+            <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <p><strong class="font-bold">Berhasil!</strong> {{ session('success') }}</p>
         </div>
+    </div>
+    @endif
 
-        @if(session('success'))
-        <div class="px-6 pt-4">
-            <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-md shadow-sm flex items-center justify-between" role="alert">
-                <div class="flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>{{ session('success') }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-green-500 hover:text-green-700 font-bold">&times;</button>
-            </div>
-        </div>
-        @endif
-
-        <div class="p-0 overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50 text-gray-600 uppercase text-xs font-bold tracking-wider border-b border-gray-200">
+    {{-- Tabel Data --}}
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-4 text-center w-16">No</th>
-                        <th class="px-6 py-4">Nama Lengkap</th>
-                        <th class="px-6 py-4">NIM</th>
-                        <th class="px-6 py-4">No HP</th>
-                        <th class="px-6 py-4">Email</th>
-                        <th class="px-6 py-4 text-center w-40">Aksi</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">No</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">NIM</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">No HP</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
-
-                <tbody class="divide-y divide-gray-100">
-                    {{-- PERHATIKAN: Variabel di sini adalah $members, bukan $items --}}
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {{-- Menggunakan variabel $members --}}
                     @forelse($members as $index => $member)
-                    <tr class="hover:bg-pink-50 transition duration-150 group">
-                        <td class="px-6 py-4 text-center font-medium text-gray-500">
+                    <tr class="hover:bg-pink-50 transition duration-150 ease-in-out">
+                        {{-- Kolom No --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $loop->iteration }}
                         </td>
-
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-gray-800">{{ $member->name }}</div>
-                            <div class="text-xs text-gray-400 mt-0.5">Bergabung: {{ $member->created_at->format('d M Y') }}</div>
+                        
+                        {{-- Kolom Nama (DITAMBAHKAN AVATAR) --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                {{-- 1. Bagian Gambar Avatar --}}
+                                <div class="flex-shrink-0 h-8 w-8">
+                                    {{-- Menggunakan urlencode($member->name) agar inisial sesuai nama --}}
+                                    <img class="h-8 w-8 rounded-full bg-gray-200" 
+                                         src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=random" 
+                                         alt="{{ $member->name }}">
+                                </div>
+                                
+                                {{-- 2. Bagian Teks Nama --}}
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ $member->name }}</div>
+                                    <div class="text-xs text-gray-400">Bergabung: {{ $member->created_at->format('d M Y') }}</div>
+                                </div>
+                            </div>
                         </td>
 
-                        <td class="px-6 py-4">
+                        {{-- Kolom NIM --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
                             @if($member->identity_number)
-                                <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-mono font-semibold border border-gray-200">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded bg-gray-100 text-gray-800 border border-gray-200">
                                     {{ $member->identity_number }}
                                 </span>
                             @else
-                                <span class="text-gray-400 text-sm italic">-</span>
+                                -
                             @endif
                         </td>
 
-                        <td class="px-6 py-4 text-sm text-gray-600">
+                        {{-- Kolom No HP --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $member->contact ?? '-' }}
                         </td>
 
-                        <td class="px-6 py-4 text-sm text-gray-600">
+                        {{-- Kolom Email --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $member->email }}
                         </td>
 
-                        <td class="px-6 py-4 text-center">
-                            <div class="flex justify-center items-center space-x-2">
-                                <a href="#" class="p-2 text-yellow-600 hover:bg-yellow-100 rounded-lg transition" title="Edit">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 00 2 2h11a2 2 0 00 2-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </a>
-
-                                <form action="#" method="POST" onsubmit="return confirm('Yakin ingin menghapus anggota ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition" title="Hapus">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </form>
-                            </div>
+                        {{-- Kolom Aksi --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                            {{-- Tombol Edit (Link Dummy #) --}}
+                            <a href="{{ route('members.edit', $member->id) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition">Edit</a>
+                            
+                            {{-- Form Hapus --}}
+                            <form action="{{ route('members.destroy', $member->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus anggota ini? Data yang dihapus tidak bisa dikembalikan.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md transition">Hapus</button>
+                            </form>
                         </td>
                     </tr>
                     @empty
+                    {{-- Tampilan Kosong --}}
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-gray-400 bg-gray-50">
-                            <div class="flex flex-col items-center">
-                                <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"></path></svg>
-                                <p class="text-lg font-medium text-gray-500">Data anggota kosong.</p>
-                                <p class="text-sm">Silakan tambahkan data mahasiswa baru.</p>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            <div class="flex flex-col items-center justify-center">
+                                <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+                                <p class="text-lg font-medium">Belum ada data anggota.</p>
+                                <p class="text-sm text-gray-400">Silakan tambahkan anggota baru untuk memulai.</p>
                             </div>
                         </td>
                     </tr>
                     @endforelse
                 </tbody>
             </table>
-        </div>
-
-        <div class="px-6 py-4 bg-white border-t border-gray-100 text-right text-sm text-gray-500">
-            Total Anggota: <strong>{{ $members->count() }}</strong> Mahasiswa
         </div>
     </div>
 </div>
