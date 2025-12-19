@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController; // Pastikan ini ada
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\BarangController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\UserDashboardController;
 use App\Models\User;
@@ -24,14 +25,37 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard_admin');
 
-    // Manajemen Inventaris (GANTI 'tasks' JADI 'items')
+    // Manajemen Inventaris 
     Route::resource('items', ItemController::class);
 
+    // Route khusus untuk ItemController yang Anda buat manual
+    Route::get('/barang', [ItemController::class, 'index'])->name('barang.index');
+    Route::get('/barang/create', [ItemController::class, 'create'])->name('barang.create');
+    Route::post('/barang', [ItemController::class, 'store'])->name('barang.store');
+    
+    // --- TAMBAHAN: Edit & Update Barang ---
+    // Route untuk menampilkan form edit (sesuai ItemController::edit)
+    Route::get('/barang/{id}/edit', [ItemController::class, 'edit'])->name('barang.edit');
+    // Route untuk proses update (sesuai ItemController::update, method PUT)
+    Route::put('/barang/{id}', [ItemController::class, 'update'])->name('barang.update');
+    // Route untuk menghapus barang (opsional, jika tombol delete ada)
+    Route::delete('/barang/{id}', [ItemController::class, 'destroy'])->name('barang.destroy');
+   
     // Anggota (Members)
     Route::resource('members', MemberController::class);
 
-    // Peminjaman Admin
+    // --- PEMINJAMAN ADMIN ---
     Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
+    
+    // [BARU] Route untuk Form Tambah Peminjaman oleh Admin
+    Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
+    
+    // [BARU] Route untuk Simpan Peminjaman oleh Admin
+    Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');
+    
+    // Route untuk update status peminjaman (Approve/Reject/Kembali)
+    Route::patch('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
+    
 });
 
 // --- ROUTE MAHASISWA / USER ---

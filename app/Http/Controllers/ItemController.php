@@ -8,89 +8,87 @@ use Illuminate\Http\Request;
 class ItemController extends Controller
 {
     /**
-     * Menampilkan daftar barang (Read)
+     * Menampilkan daftar barang (Index).
      */
     public function index()
     {
-        // Ambil semua data item, urutkan dari yang terbaru
-        $items = Item::latest()->get();
-        
-        // Kirim ke view resources/views/items/index.blade.php
+        $items = Item::all();
+        // Pastikan file index ada di folder resources/views/items/index.blade.php
         return view('items.index', compact('items'));
     }
 
     /**
-     * Menampilkan form tambah barang (Create View)
+     * Menampilkan form tambah barang (Create).
      */
     public function create()
     {
-        // Pastikan kamu punya file resources/views/items/create.blade.php
-        return view('items.create');
+        // Pastikan file create ada di folder resources/views/items/create_barang.blade.php
+        return view('items.create_barang');
     }
 
     /**
-     * Menyimpan barang baru ke database (Create Process)
+     * Menyimpan data barang ke database (Store).
      */
     public function store(Request $request)
     {
-        // 1. Validasi input
-        $request->validate([
+        $validated = $request->validate([
             'nama_alat' => 'required|string|max:255',
-            'kode_alat' => 'nullable|string|unique:items,kode_alat',
+            'kode_alat' => 'required|string|unique:items,kode_alat',
             'jumlah_total' => 'required|integer|min:1',
             'status_ketersediaan' => 'required|string',
+            'deskripsi' => 'nullable|string',
         ]);
 
-        // 2. Simpan ke database
-        Item::create($request->all());
+        Item::create($validated);
 
-        // 3. Redirect kembali dengan pesan sukses
-        return redirect()->route('items.index')
-                         ->with('success', 'Barang berhasil ditambahkan!');
+        // Redirect ke route 'barang.index' agar sesuai dengan web.php
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil ditambahkan!');
     }
 
     /**
-     * Menampilkan detail satu barang (Show - Opsional)
+     * Menampilkan form edit barang (Edit).
      */
-    public function show(Item $item)
+    public function edit($id)
     {
-        // return view('items.show', compact('item'));
+        // Cari barang berdasarkan ID, jika tidak ketemu akan error 404
+        $barang = Item::findOrFail($id);
+
+        // Pastikan file edit ada di resources/views/items/edit_barang.blade.php
+        return view('items.edit_barang', compact('barang'));
     }
 
     /**
-     * Menampilkan form edit barang (Edit View)
+     * Memperbarui data barang di database (Update).
      */
-    public function edit(Item $item)
+    public function update(Request $request, $id)
     {
-        // Pastikan kamu punya file resources/views/items/edit.blade.php
-        return view('items.edit', compact('item'));
-    }
+        // Cari barang dulu
+        $barang = Item::findOrFail($id);
 
-    /**
-     * Mengupdate data barang di database (Update Process)
-     */
-    public function update(Request $request, Item $item)
-    {
-        $request->validate([
+        // Validasi (perhatikan pengecualian unique untuk kode_alat milik barang ini sendiri)
+        $validated = $request->validate([
             'nama_alat' => 'required|string|max:255',
-            'kode_alat' => 'nullable|string',
+            'kode_alat' => 'required|string|unique:items,kode_alat,'.$barang->id,
             'jumlah_total' => 'required|integer|min:1',
+            'status_ketersediaan' => 'required|string',
+            'deskripsi' => 'nullable|string',
         ]);
 
-        $item->update($request->all());
+        // Update data
+        $barang->update($validated);
 
-        return redirect()->route('items.index')
-                         ->with('success', 'Data barang berhasil diperbarui!');
+        // Redirect kembali ke daftar barang
+        return redirect()->route('barang.index')->with('success', 'Data barang berhasil diperbarui!');
     }
 
     /**
-     * Menghapus barang (Delete Process)
+     * Menghapus barang (Destroy) - Opsional jika dibutuhkan
      */
-    public function destroy(Item $item)
+    public function destroy($id)
     {
-        $item->delete();
+        $barang = Item::findOrFail($id);
+        $barang->delete();
 
-        return redirect()->route('items.index')
-                         ->with('success', 'Barang berhasil dihapus!');
+        return redirect()->route('barang.index')->with('success', 'Barang berhasil dihapus.');
     }
 }

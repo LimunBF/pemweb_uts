@@ -6,7 +6,7 @@
     {{-- 1. Banner Selamat Datang (Gaya Sama dengan Mahasiswa) --}}
     <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg flex items-center justify-between relative overflow-hidden">
         <div class="relative z-10">
-            <h1 class="text-3xl md:text-4xl font-bold">Selamat Datang, Admin {{ Str::words($user_name ?? Auth::user()->name, 1, '') }}! 👋</h1>
+            <h1 class="text-3xl md:text-4xl font-bold">Selamat Datang, {{ Str::words($user_name ?? Auth::user()->name, 1, '') }}! 👋</h1>
             <p class="mt-2 text-pink-100 opacity-90">Ringkasan status inventaris dan aktivitas laboratorium hari ini.</p>
         </div>
         {{-- Hiasan Background Abstrak --}}
