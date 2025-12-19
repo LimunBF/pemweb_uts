@@ -13,21 +13,16 @@ return new class extends Migration
     {
         Schema::create('peminjamans', function (Blueprint $table) {
             $table->id();
-            
-            // Siapa yang pinjam
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            
-            // Apa yang dipinjam
             $table->foreignId('item_id')->constrained('items')->onDelete('cascade');
-            
-            // Kapan [cite: 27, 29]
             $table->date('tanggal_pinjam');
             $table->date('tanggal_kembali');
             
-            // Status approval oleh Admin [cite: 31]
-            $table->string('status')->default('pending'); // (pending, disetujui, ditolak, dikembalikan)
-            $table->foreignId('approver_id')->nullable()->constrained('users'); // ID Admin yg approve
+            // [FIX] Tambahkan kolom alasan agar tidak error saat create peminjaman
+            $table->text('alasan')->nullable(); 
             
+            $table->string('status')->default('pending');
+            $table->foreignId('approver_id')->nullable()->constrained('users');
             $table->timestamps();
         });
     }
