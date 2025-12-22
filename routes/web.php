@@ -65,6 +65,10 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('/my-loans', [UserDashboardController::class, 'myLoans'])->name('loans');
     Route::get('/loan-form', [UserDashboardController::class, 'loanForm'])->name('loan.form');
     Route::post('/loan-form', [UserDashboardController::class, 'storeLoan'])->name('loan.store');
+
+    
+    // Route Download Surat
+    Route::get('/my-loans/{id}/print', [UserDashboardController::class, 'printSurat'])->name('loan.print');
 });
 
 

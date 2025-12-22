@@ -4,10 +4,17 @@
 <div class="container mx-auto">
 
     {{-- Banner Selamat Datang --}}
-    <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg flex items-center justify-between relative overflow-hidden">
+        <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg flex items-center justify-between relative overflow-hidden min-h-[180px]">
         <div class="relative z-10">
             <h1 class="text-3xl md:text-4xl font-bold">Selamat Datang, {{ Auth::user()->name }}! 👋</h1>
             <p class="mt-2 text-pink-100 opacity-90">Selamat datang di Dashboard Peminjaman Laboratorium PTIK.</p>
+        </div>
+        <div class="absolute right-4 -bottom-4 z-20 hidden md:block">
+            <img 
+                src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/People/Person%20Raising%20Hand.png" 
+                alt="Character Waving" 
+                class="w-48 h-auto waving-character filter drop-shadow-xl"
+            >
         </div>
         
         {{-- Hiasan Background Abstrak --}}
