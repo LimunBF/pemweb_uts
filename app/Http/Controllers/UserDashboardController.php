@@ -29,9 +29,9 @@ class UserDashboardController extends Controller
         // Mengambil data peminjaman milik user yang sedang login
         // Pastikan relasi 'item' ada di model Peminjaman
         $loans = Peminjaman::with('item')
-                    ->where('user_id', Auth::id())
-                    ->orderBy('tanggal_kembali', 'asc') // Urutkan deadline terdekat
-                    ->get();
+            ->where('user_id', Auth::id())
+            ->orderBy('tanggal_kembali', 'asc') // Logic pengurutan Anda (Deadline terdekat di atas)
+            ->paginate(10); // GUNAKAN INI pengganti ->get()
 
         return view('user.my_loans', compact('loans'));
     }

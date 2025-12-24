@@ -3,91 +3,63 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Peminjaman; 
+use App\Models\Peminjaman;
 use App\Models\Item;
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class PeminjamanController extends Controller
 {
-    /**
-     * Menampilkan daftar peminjaman.
-     */
+    // --- FITUR ADMIN: LIHAT DAFTAR ---
     public function index()
     {
-        // Mengambil data peminjaman dengan relasi user dan item
-        $loans = Peminjaman::with(['user', 'item'])->latest()->get();
-
-        // PERBAIKAN 1: Arahkan ke folder 'admin', nama file 'pinjam'
-        // Lokasi asli: resources/views/admin/pinjam.blade.php
-        // JANGAN pakai .blade.php di dalam fungsi view()
-        return view('admin.pinjam', compact('loans'));
+        // Ambil data peminjaman urut dari yang terbaru
+        $peminjaman = Peminjaman::with(['user', 'item'])->latest()->paginate(10);
+        return view('admin.pinjam', compact('peminjaman'));
     }
 
-    /**
-     * MENAMPILKAN FORM TAMBAH PEMINJAM (Admin)
-     */
-    public function create()
-    {
-        // 1. Ambil data mahasiswa (selain admin)
-        $users = User::where('role', '!=', 'admin')->get(); 
-
-        // 2. Ambil data barang
-        $items = Item::all();
-
-        // PERBAIKAN 2: Arahkan ke folder 'admin', nama file 'create_peminjaman'
-        // Lokasi asli: resources/views/admin/create_peminjaman.blade.php
-        return view('admin.create_peminjam', compact('users', 'items'));
-    }
-
-    /**
-     * MENYIMPAN DATA PEMINJAMAN (Admin)
-     */
+    // --- FITUR MAHASISWA: AJUKAN PINJAM ---
     public function store(Request $request)
     {
         // 1. Validasi Input
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'item_id' => 'required|exists:items,id',
-            'tanggal_pinjam' => 'required|date',
+            'tanggal_pinjam' => 'required|date|after_or_equal:today',
             'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
-            'alasan' => 'nullable|string',
         ]);
 
-        // 2. Simpan ke Database
-        // Pastikan nama kolom sebelah KIRI sesuai dengan Database kamu.
-        // Jika database pakai bahasa inggris (loan_date), gunakan itu. 
-        // Jika pakai bahasa indonesia (tanggal_pinjam), ganti yang kiri jadi tanggal_pinjam.
-        Peminjaman::create([
-            'user_id' => $request->user_id,
-            'item_id' => $request->item_id,
-            'tanggal_pinjam' => $request->tanggal_pinjam,     
-            'tanggal_kembali' => $request->tanggal_kembali,   
-            'alasan' => $request->alasan,                
-            'status' => 'Approved', // Admin input langsung approved
-        ]);
-
-        // 3. Redirect kembali ke halaman index (admin.pinjam)
-        return redirect()->route('peminjaman')->with('success', 'Data peminjaman berhasil ditambahkan!');
-    }
-
-    /**
-     * UPDATE STATUS (Setujui / Tolak / Kembali)
-     */
-    public function update(Request $request, $id)
-    {
-        $loan = Peminjaman::findOrFail($id);
-        
-        if ($request->has('status')) {
-            $loan->status = $request->status;
-            
-            // Opsional: Jika status 'returned', set tanggal pengembalian aktual
-            // if ($request->status == 'returned') {
-            //     $loan->actual_return_date = now();
-            // }
-
-            $loan->save();
+        // 2. Cek Stok Barang
+        $item = Item::findOrFail($request->item_id);
+        if ($item->jumlah_total < 1 || $item->status_ketersediaan != 'Tersedia') {
+            return back()->withErrors(['item_id' => 'Stok barang habis atau sedang tidak tersedia.'])->withInput();
         }
 
-        return redirect()->back()->with('success', 'Status peminjaman diperbarui.');
+        // 3. Simpan ke Database
+        Peminjaman::create([
+            'user_id' => Auth::id(),
+            'item_id' => $request->item_id,
+            'tanggal_pinjam' => $request->tanggal_pinjam,
+            'tanggal_kembali' => $request->tanggal_kembali,
+            'status' => 'menunggu_persetujuan',
+        ]);
+
+        // 4. Kembali ke halaman riwayat
+        return redirect()->route('student.loans')->with('success', 'Pengajuan berhasil! Menunggu persetujuan Admin.');
+    }
+
+    // --- FITUR ADMIN: KONFIRMASI (TERIMA/TOLAK) ---
+    public function confirm(Request $request, $id)
+    {
+        $peminjaman = Peminjaman::findOrFail($id);
+        
+        // Validasi status yang dikirim tombol
+        $request->validate(['status' => 'required|in:disetujui,ditolak,kembali']);
+
+        // Update status & catat siapa adminnya
+        $peminjaman->update([
+            'status' => $request->status,
+            'approver_id' => Auth::id()
+        ]);
+
+        return back()->with('success', 'Status peminjaman berhasil diperbarui.');
     }
 }
