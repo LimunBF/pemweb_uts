@@ -48,18 +48,30 @@ class PeminjamanController extends Controller
 
     // --- FITUR ADMIN: KONFIRMASI (TERIMA/TOLAK) ---
     public function confirm(Request $request, $id)
-    {
-        $peminjaman = Peminjaman::findOrFail($id);
-        
-        // Validasi status yang dikirim tombol
-        $request->validate(['status' => 'required|in:disetujui,ditolak,kembali']);
+{
+    $peminjaman = Peminjaman::findOrFail($id);
+    
+    // Validasi input
+    $request->validate(['status' => 'required|in:disetujui,ditolak,kembali']);
 
-        // Update status & catat siapa adminnya
-        $peminjaman->update([
-            'status' => $request->status,
-            'approver_id' => Auth::id()
-        ]);
-
-        return back()->with('success', 'Status peminjaman berhasil diperbarui.');
+    // LOGIKA STOK OTOMATIS
+    if ($request->status == 'disetujui' && $peminjaman->status != 'disetujui') {
+        // Cek stok lagi sebelum mengurangi
+        if($peminjaman->item->jumlah_total < 1) {
+             return back()->withErrors(['error' => 'Gagal setujui: Stok barang habis!']);
+        }
+        $peminjaman->item->decrement('jumlah_total'); // Kurangi Stok
+    } 
+    elseif ($request->status == 'kembali' && $peminjaman->status == 'disetujui') {
+        $peminjaman->item->increment('jumlah_total'); // Balikin Stok
     }
+
+    // Update status & pencatat
+    $peminjaman->update([
+        'status' => $request->status,
+        'approver_id' => Auth::id()
+    ]);
+
+    return back()->with('success', 'Status diperbarui & stok disesuaikan.');
+}
 }
