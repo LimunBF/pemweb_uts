@@ -10,12 +10,25 @@ use Illuminate\Support\Facades\Auth;
 class PeminjamanController extends Controller
 {
     // --- FITUR ADMIN: LIHAT DAFTAR ---
-    public function index()
-    {
-        // Ambil data peminjaman urut dari yang terbaru
-        $peminjaman = Peminjaman::with(['user', 'item'])->latest()->paginate(10);
-        return view('admin.pinjam', compact('peminjaman'));
+    public function index(Request $request)
+{
+    $query = Peminjaman::with(['user', 'item']);
+
+    // Filter Berdasarkan Status
+    if ($request->has('status') && $request->status != '') {
+        $query->where('status', $request->status);
     }
+
+    // Filter Berdasarkan Tanggal (Range)
+    if ($request->start_date && $request->end_date) {
+        $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
+    }
+
+    // Eksekusi
+    $peminjaman = $query->latest()->paginate(10);
+    
+    return view('admin.pinjam', compact('peminjaman'));
+}
 
     // --- FITUR MAHASISWA: AJUKAN PINJAM ---
     public function store(Request $request)
