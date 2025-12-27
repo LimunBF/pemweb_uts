@@ -62,6 +62,8 @@ Route::middleware(['auth'])->group(function () {
     
     // Route untuk update status peminjaman (Approve/Reject/Kembali)
     Route::patch('/peminjaman/{id}', [PeminjamanController::class, 'update'])->name('peminjaman.update');
+
+    Route::patch('/peminjaman/{id}/confirm', [App\Http\Controllers\PeminjamanController::class, 'confirm'])->name('peminjaman.confirm');
     
 });
 
@@ -71,11 +73,15 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('/inventory', [UserDashboardController::class, 'inventory'])->name('inventory');
     Route::get('/my-loans', [UserDashboardController::class, 'myLoans'])->name('loans');
     Route::get('/loan-form', [UserDashboardController::class, 'loanForm'])->name('loan.form');
+<<<<<<< HEAD
     Route::post('/loan-form', [UserDashboardController::class, 'storeLoan'])->name('loan.store');
 
     
     // Route Download Surat
     Route::get('/my-loans/{id}/print', [UserDashboardController::class, 'printSurat'])->name('loan.print');
+=======
+    Route::post('/loan-form', [App\Http\Controllers\PeminjamanController::class, 'store'])->name('loan.store');
+>>>>>>> feature/feature_member
 });
 
 
