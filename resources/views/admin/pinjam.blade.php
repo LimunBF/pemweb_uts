@@ -42,7 +42,7 @@
             </div>
         @endif
 
-        {{-- HEADER --}}
+        {{-- HEADER (DARI SKRIP LAMA) --}}
         <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg relative overflow-hidden">
             <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10 pointer-events-none"></div>
 
@@ -55,8 +55,6 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    {{-- Pastikan route 'peminjaman.create' ada di web.php jika ingin menggunakan tombol ini, jika tidak, arahkan ke # atau hapus --}}
-                    {{-- <a href="{{ route('peminjaman.create') }}" ... --}}
                     <button class="inline-flex items-center px-5 py-2.5 bg-white border border-transparent rounded-xl font-bold text-xs text-lab-pink-btn uppercase tracking-widest hover:bg-pink-50 transition shadow-lg opacity-50 cursor-not-allowed" title="Fitur Tambah Manual (Coming Soon)">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -67,7 +65,82 @@
             </div>
         </div>
 
-        {{-- FILTER --}}
+        {{-- ========================================================= --}}
+        {{-- BAGIAN TAMBAHAN: NOTIFIKASI PERMINTAAN BARU (PENDING) --}}
+        {{-- ========================================================= --}}
+        @if(isset($pendingLoans) && $pendingLoans->count() > 0)
+            <div class="mb-10 animate-fade-in-down">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-yellow-100 p-2 rounded-lg text-yellow-600 animate-pulse">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800">
+                        Permintaan Baru 
+                        <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2 shadow-sm">{{ $pendingLoans->count() }}</span>
+                    </h3>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-lg border-2 border-yellow-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-100">
+                        <thead class="bg-yellow-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Peminjam</th>
+                                <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 uppercase">Barang</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase">Durasi</th>
+                                <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 uppercase">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($pendingLoans as $loan)
+                            <tr class="hover:bg-yellow-50/50 transition">
+                                <td class="px-6 py-4">
+                                    <div class="font-bold text-gray-800">{{ $loan->user->name ?? 'User dihapus' }}</div>
+                                    <div class="text-xs text-gray-500">{{ $loan->user->identity_number ?? '-' }}</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="font-medium text-gray-800">{{ $loan->item->nama_alat ?? 'Item dihapus' }}</div>
+                                    <div class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded inline-block mt-1">Jumlah: {{ $loan->amount }}</div>
+                                    <div class="text-xs text-gray-500 italic mt-1">"{{ $loan->alasan }}"</div>
+                                </td>
+                                <td class="px-6 py-4 text-center text-sm text-gray-600">
+                                    {{ \Carbon\Carbon::parse($loan->tanggal_pinjam)->format('d/m') }} 
+                                    <span class="text-gray-400 mx-1">-</span>
+                                    {{ \Carbon\Carbon::parse($loan->tanggal_kembali)->format('d/m') }}
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex justify-center gap-3">
+                                        {{-- Form TERIMA --}}
+                                        <form action="{{ route('peminjaman.update', $loan->id) }}" method="POST" onsubmit="return confirm('Setujui peminjaman ini?');">
+                                            @csrf @method('PATCH')
+                                            <input type="hidden" name="status" value="disetujui">
+                                            <button type="submit" class="flex items-center gap-1 bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                Terima
+                                            </button>
+                                        </form>
+                                        
+                                        {{-- Form TOLAK --}}
+                                        <form action="{{ route('peminjaman.update', $loan->id) }}" method="POST" onsubmit="return confirm('Tolak permintaan ini?')">
+                                            @csrf @method('PATCH')
+                                            <input type="hidden" name="status" value="ditolak">
+                                            <button type="submit" class="flex items-center gap-1 bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                Tolak
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+        {{-- ========================================================= --}}
+
+
+        {{-- FILTER (DARI SKRIP LAMA) --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
             <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
@@ -88,10 +161,10 @@
                         <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
                         <select name="status" class="w-full text-sm border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn">
                             <option value="">-- Semua Status --</option>
-                            <option value="menunggu_persetujuan" {{ request('status') == 'menunggu_persetujuan' ? 'selected' : '' }}>Menunggu Konfirmasi</option>
-                            <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
+                            {{-- Option disesuaikan dengan Controller baru --}}
+                            <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui (Sedang Dipinjam)</option>
+                            <option value="dikembalikan" {{ request('status') == 'dikembalikan' ? 'selected' : '' }}>Dikembalikan</option>
                             <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                            <option value="kembali" {{ request('status') == 'kembali' ? 'selected' : '' }}>Selesai</option>
                         </select>
                     </div>
                     <div class="flex items-end gap-2">
@@ -103,113 +176,86 @@
             </form>
         </div>
 
-        {{-- AKTIVITAS PEMINJAMAN --}}
-        <div class="mb-10">
-            <div class="flex items-center mb-6">
-                <div class="bg-lab-pink-btn bg-pink-600 p-2 rounded-lg mr-3 shadow-sm text-white">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-gray-800">Aktivitas Peminjaman</h2>
-                    <p class="text-sm text-gray-500">Pantau request masuk dan barang yang sedang keluar.</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 gap-5">
-                {{-- LOOPING DATA DARI DATABASE --}}
-                @forelse($peminjaman as $pinjam)
-                <div class="bg-white rounded-xl shadow-md border-l-8 
-                    {{ $pinjam->status == 'menunggu_persetujuan' ? 'border-yellow-400' : 
-                      ($pinjam->status == 'disetujui' ? 'border-green-500' : 
-                      ($pinjam->status == 'ditolak' ? 'border-red-500' : 'border-blue-500')) }} 
-                    p-6 flex flex-col md:flex-row justify-between items-center hover:shadow-lg transition-all duration-200 relative overflow-hidden group">
-                    
-                    {{-- User Info --}}
-                    <div class="flex items-center w-full md:w-1/4 mb-4 md:mb-0 relative z-10">
-                        <div class="flex-shrink-0 h-10 w-10 mr-3">
-                            <img class="h-10 w-10 rounded-full border-2 border-gray-200" src="https://ui-avatars.com/api/?name={{ urlencode($pinjam->user->name ?? 'X') }}&background=random" alt="">
-                        </div>
-                        <div>
+        {{-- TABEL DATA RIWAYAT (DARI SKRIP LAMA) --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peminjam</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Barang</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($peminjaman as $pinjam)
+                    <tr class="hover:bg-gray-50 transition">
+                        
+                        {{-- User Info --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-bold text-gray-900">{{ $pinjam->user->name ?? 'User Terhapus' }}</div>
-                            <div class="text-xs text-gray-500">{{ $pinjam->user->role ?? 'Anggota' }}</div>
-                        </div>
-                    </div>
+                            <div class="text-xs text-gray-500">{{ $pinjam->user->identity_number ?? '-' }}</div>
+                        </td>
 
-                    {{-- Item Info --}}
-                    <div class="flex items-center w-full md:w-1/3 mb-4 md:mb-0 relative z-10">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center text-xl mr-3 border border-gray-100">📦</div>
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-800">{{ $pinjam->item->nama_alat ?? 'Barang Terhapus' }}</h3>
-                            <div class="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-0.5 rounded inline-block mt-1">{{ $pinjam->item->kode_alat ?? '-' }}</div>
-                            <div class="text-[10px] text-gray-400 mt-1">
-                                {{ $pinjam->tanggal_pinjam }} s/d {{ $pinjam->tanggal_kembali }}
+                        {{-- Item Info --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 font-medium">{{ $pinjam->item->nama_alat ?? 'Barang Terhapus' }}</div>
+                            <div class="text-xs text-gray-500">
+                                {{ \Carbon\Carbon::parse($pinjam->tanggal_pinjam)->format('d/m') }} s/d {{ \Carbon\Carbon::parse($pinjam->tanggal_kembali)->format('d/m') }}
                             </div>
-                        </div>
-                    </div>
+                        </td>
 
-                    {{-- Status Badge --}}
-                    <div class="w-full md:w-1/4 text-left mb-4 md:mb-0 relative z-10 border-l border-gray-100 pl-4">
-                        <span class="block text-[10px] text-gray-400 uppercase tracking-wider font-bold">Status</span>
-                        @if($pinjam->status == 'menunggu_persetujuan')
-                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700">MENUNGGU KONFIRMASI</span>
-                        @elseif($pinjam->status == 'disetujui')
-                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-green-100 text-green-700">DISETUJUI (DIPINJAM)</span>
-                        @elseif($pinjam->status == 'ditolak')
-                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-red-100 text-red-700">DITOLAK</span>
-                        @elseif($pinjam->status == 'kembali')
-                            <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">SELESAI</span>
-                        @endif
-                    </div>
+                        {{-- Status Badge --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            @if($pinjam->status == 'menunggu_persetujuan' || $pinjam->status == 'pending')
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    Pending
+                                </span>
+                            @elseif($pinjam->status == 'disetujui')
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Dipinjam
+                                </span>
+                            @elseif($pinjam->status == 'ditolak')
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    Ditolak
+                                </span>
+                            @elseif($pinjam->status == 'dikembalikan' || $pinjam->status == 'kembali')
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    Selesai
+                                </span>
+                            @endif
+                        </td>
 
-                    {{-- Action Buttons --}}
-                    <div class="w-full md:w-1/6 flex justify-end gap-2 relative z-10">
-                        @if($pinjam->status == 'menunggu_persetujuan')
-                            {{-- Button TERIMA --}}
-                            <form action="{{ route('peminjaman.confirm', $pinjam->id) }}" method="POST">
-                                @csrf @method('PATCH')
-                                <input type="hidden" name="status" value="disetujui">
-                                <button type="submit" title="Terima" class="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-600 hover:text-white transition-colors shadow-sm">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                </button>
-                            </form>
-                            {{-- Button TOLAK --}}
-                            <form action="{{ route('peminjaman.confirm', $pinjam->id) }}" method="POST">
-                                @csrf @method('PATCH')
-                                <input type="hidden" name="status" value="ditolak">
-                                <button type="submit" title="Tolak" class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors shadow-sm">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                </button>
-                            </form>
-                        @elseif($pinjam->status == 'disetujui')
-                            {{-- Button TANDAI KEMBALI --}}
-                            <form action="{{ route('peminjaman.confirm', $pinjam->id) }}" method="POST">
-                                @csrf @method('PATCH')
-                                <input type="hidden" name="status" value="kembali">
-                                <button type="submit" title="Tandai Sudah Kembali" class="flex items-center gap-1 px-3 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors shadow-sm text-xs font-bold">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                                    Kembali
-                                </button>
-                            </form>
-                        @else
-                            {{-- No Action --}}
-                            <span class="text-gray-300">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            </span>
-                        @endif
-                    </div>
-                </div>
-                @empty
-                <div class="bg-white rounded-xl shadow-sm p-8 text-center">
-                    <div class="text-gray-400 mb-2">📭</div>
-                    <p class="text-gray-500 font-medium">Belum ada data peminjaman.</p>
-                </div>
-                @endforelse
-            </div>
-            
-            {{-- PAGINATION LINKS --}}
-            <div class="mt-6">
-                {{ $peminjaman->links() }}
-            </div>
+                        {{-- Aksi (Update Status ke Kembali) --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            @if($pinjam->status == 'disetujui')
+                                <form action="{{ route('peminjaman.update', $pinjam->id) }}" method="POST">
+                                    @csrf @method('PATCH')
+                                    <input type="hidden" name="status" value="dikembalikan">
+                                    <button type="submit" class="text-blue-600 hover:text-blue-900 font-bold text-xs bg-blue-50 px-3 py-1 rounded border border-blue-200 hover:bg-blue-100 transition">
+                                        Tandai Kembali
+                                    </button>
+                                </form>
+                            @else
+                                <span class="text-gray-400">-</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                            Tidak ada data peminjaman.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+        
+        {{-- PAGINATION --}}
+        <div class="mt-6">
+            {{ $peminjaman->links() }}
+        </div>
+
     </div>
 @endsection

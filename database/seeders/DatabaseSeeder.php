@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Item;
-use App\Models\Peminjaman; // Pastikan ini di-import!
-use Illuminate\Database\Seeder;
+use App\Models\Peminjaman;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 
@@ -13,129 +13,99 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ---------------------------------------------------
-        // 1. SEEDER USER (Akun Login)
-        // ---------------------------------------------------
+        // ==========================================
+        // 1. BUAT AKUN PENGGUNA (USERS)
+        // ==========================================
         
+        // 1. ADMIN (admin@lab.com)
         $admin = User::create([
             'name' => 'Administrator Lab',
             'email' => 'admin@lab.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password123'),
             'role' => 'admin',
             'identity_number' => 'ADM001',
-            'contact' => '081234567890',
+            'contact' => '081234567890'
         ]);
 
-        $student = User::create([
-            'name' => 'Budi Santoso',
-            'email' => 'mahasiswa@lab.com',
-            'password' => Hash::make('password'),
+        // 2. DOSEN (budi@dosen.com)
+        $dosen = User::create([
+            'name' => 'Budi Santoso, M.Kom',
+            'email' => 'budi@dosen.com',
+            'password' => Hash::make('password123'),
+            'role' => 'dosen',
+            'identity_number' => 'NIP19850101',
+            'contact' => '081122334455'
+        ]);
+
+        // 3. MAHASISWA (siti@mhs.com)
+        $mahasiswa = User::create([
+            'name' => 'Siti Aminah',
+            'email' => 'siti@mhs.com',
+            'password' => Hash::make('password123'),
             'role' => 'mahasiswa',
-            'identity_number' => 'MHS12345',
-            'contact' => '089876543210',
+            'identity_number' => 'M0519001',
+            'contact' => '089876543210'
         ]);
 
-        // ---------------------------------------------------
-        // 2. SEEDER BARANG (Inventaris Lab)
-        // ---------------------------------------------------
-
-        $items_data = [
-            [
-                'nama_alat' => 'Mikroskop Binokuler Olympus',
-                'kode_alat' => 'LAB-BIO-001',
-                'deskripsi' => 'Mikroskop optik dengan pembesaran hingga 1000x, cocok untuk pengamatan sel biologi.',
-                'jumlah_total' => 10,
-                'status_ketersediaan' => 'Tersedia',
-            ],
-            [
-                'nama_alat' => 'Arduino Uno R3 Kit',
-                'kode_alat' => 'LAB-ELKA-005',
-                'deskripsi' => 'Microcontroller board berbasis ATmega328P lengkap dengan kabel USB.',
-                'jumlah_total' => 25,
-                'status_ketersediaan' => 'Tersedia',
-            ],
-            [
-                'nama_alat' => 'Multimeter Digital Fluke',
-                'kode_alat' => 'LAB-ELKA-012',
-                'deskripsi' => 'Alat ukur tegangan, arus, dan hambatan listrik dengan presisi tinggi.',
-                'jumlah_total' => 5,
-                'status_ketersediaan' => 'Tersedia', 
-            ],
-            [
-                'nama_alat' => 'Laptop ASUS ROG Strix',
-                'kode_alat' => 'LAB-KOM-003',
-                'deskripsi' => 'Laptop spesifikasi tinggi untuk rendering dan pemrograman berat. Core i7, RTX 3060.',
-                'jumlah_total' => 3,
-                'status_ketersediaan' => 'Tersedia',
-            ],
-            [
-                'nama_alat' => 'Proyektor Epson EB-X400',
-                'kode_alat' => 'LAB-UMUM-001',
-                'deskripsi' => 'Proyektor LCD XGA 3300 Lumens, cocok untuk presentasi ruang kelas.',
-                'jumlah_total' => 2,
-                'status_ketersediaan' => 'Tersedia',
-            ],
-            // ... item lainnya (opsional)
-        ];
-
-        // Simpan items ke variabel agar mudah diambil ID-nya
-        foreach ($items_data as $data) {
-            Item::create($data);
-        }
-
-        // Ambil data item yang baru saja dibuat untuk keperluan relasi peminjaman
-        $arduino = Item::where('nama_alat', 'Arduino Uno R3 Kit')->first();
-        $mikroskop = Item::where('nama_alat', 'Mikroskop Binokuler Olympus')->first();
-        $multimeter = Item::where('nama_alat', 'Multimeter Digital Fluke')->first();
-        $laptop = Item::where('nama_alat', 'Laptop ASUS ROG Strix')->first();
-
-        // ---------------------------------------------------
-        // 3. SEEDER PEMINJAMAN (Riwayat & Aktif)
-        // ---------------------------------------------------
-
-        // KASUS A: Sedang Dipinjam (Status: disetujui)
-        // Peminjaman normal, belum deadline
-        Peminjaman::create([
-            'user_id' => $student->id,
-            'item_id' => $arduino->id,
-            'tanggal_pinjam' => Carbon::now()->subDays(2), // Pinjam 2 hari lalu
-            'tanggal_kembali' => Carbon::now()->addDays(5), // Deadline 5 hari lagi
-            'status' => 'disetujui',
-            'approver_id' => $admin->id,
-        ]);
-
-        // KASUS B: Menunggu Konfirmasi (Status: pending)
-        // Baru diajukan hari ini
-        Peminjaman::create([
-            'user_id' => $student->id,
-            'item_id' => $mikroskop->id,
-            'tanggal_pinjam' => Carbon::now()->addDay(), // Rencana pinjam besok
-            'tanggal_kembali' => Carbon::now()->addDays(2), 
-            'status' => 'pending',
-            'approver_id' => null, // Belum disetujui admin
-        ]);
-
-        // KASUS C: Terlambat (Status: terlambat)
-        // Seharusnya kembali kemarin
-        Peminjaman::create([
-            'user_id' => $student->id,
-            'item_id' => $multimeter->id,
-            'tanggal_pinjam' => Carbon::now()->subDays(10), // Pinjam 10 hari lalu
-            'tanggal_kembali' => Carbon::now()->subDay(),   // Deadline KEMARIN (Terlambat)
-            'status' => 'terlambat', 
-            'approver_id' => $admin->id,
-        ]);
+        // ==========================================
+        // 2. BUAT DATA BARANG (ITEMS)
+        // ==========================================
         
-        // KASUS D: Sudah Dikembalikan (Status: dikembalikan) - Opsional, untuk riwayat
-        // Peminjaman bulan lalu
-        Peminjaman::create([
-            'user_id' => $student->id,
-            'item_id' => $laptop->id,
-            'tanggal_pinjam' => Carbon::now()->subMonth(),
-            'tanggal_kembali' => Carbon::now()->subMonth()->addDays(3),
-            'status' => 'dikembalikan',
-            'approver_id' => $admin->id,
+        $laptop = Item::create([
+            'kode_alat' => 'LPT-001',
+            'nama_alat' => 'Laptop ASUS ROG',
+            'deskripsi' => 'Laptop spesifikasi tinggi untuk praktikum multimedia dan rendering.',
+            'jumlah_total' => 10,
+            'status_ketersediaan' => 'Tersedia',
+            'status_tugas' => 'Selesai'
         ]);
 
+        $proyektor = Item::create([
+            'kode_alat' => 'PRJ-002',
+            'nama_alat' => 'Proyektor Epson',
+            'deskripsi' => 'Proyektor HDMI untuk presentasi di ruang sidang.',
+            'jumlah_total' => 5,
+            'status_ketersediaan' => 'Tersedia',
+            'status_tugas' => 'Selesai'
+        ]);
+
+        $kamera = Item::create([
+            'kode_alat' => 'CAM-003',
+            'nama_alat' => 'Kamera DSLR Canon',
+            'deskripsi' => 'Kamera untuk dokumentasi kegiatan himpunan.',
+            'jumlah_total' => 3,
+            'status_ketersediaan' => 'Tersedia',
+            'status_tugas' => 'Selesai'
+        ]);
+
+        // ==========================================
+        // 3. BUAT DATA PEMINJAMAN CONTOH
+        // ==========================================
+        
+        // Contoh: Mahasiswa meminjam Laptop (Pending)
+        Peminjaman::create([
+            'user_id' => $mahasiswa->id,
+            'item_id' => $laptop->id,
+            'kode_peminjaman' => 'LOAN-' . $mahasiswa->id . '-' . time(),
+            'amount' => 1,
+            'tanggal_pinjam' => Carbon::today(),
+            'tanggal_kembali' => Carbon::today()->addDays(3),
+            'status' => 'pending',
+            'alasan' => 'Untuk pengerjaan Skripsi',
+            'file_surat' => null 
+        ]);
+
+        // Contoh: Mahasiswa meminjam Kamera (Disetujui Admin)
+        Peminjaman::create([
+            'user_id' => $mahasiswa->id,
+            'item_id' => $kamera->id,
+            'kode_peminjaman' => 'LOAN-' . $mahasiswa->id . '-' . (time() - 1000),
+            'amount' => 1,
+            'tanggal_pinjam' => Carbon::yesterday(),
+            'tanggal_kembali' => Carbon::tomorrow(),
+            'status' => 'disetujui', 
+            'alasan' => 'Dokumentasi acara seminar',
+            'approver_id' => $admin->id
+        ]);
     }
 }

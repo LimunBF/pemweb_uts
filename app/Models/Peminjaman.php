@@ -9,18 +9,13 @@ class Peminjaman extends Model
 {
     use HasFactory;
 
-<<<<<<< HEAD
+    // Menentukan nama tabel agar tidak dianggap 'peminjamen' oleh Laravel
     protected $table = 'peminjamans';
-=======
-    // --- TAMBAHKAN BARIS INI ---
-    // Memberitahu Laravel bahwa nama tabelnya adalah 'peminjamans', bukan 'peminjamen'
-    protected $table = 'peminjamans'; 
->>>>>>> feature/feature_member
 
+    // Daftar kolom yang boleh diisi (Mass Assignment)
     protected $fillable = [
         'user_id',
         'item_id',
-<<<<<<< HEAD
         'kode_peminjaman',
         'amount',
         'tanggal_pinjam',
@@ -28,21 +23,16 @@ class Peminjaman extends Model
         'status',
         'alasan',
         'approver_id',
-        'file_surat' // <--- Tambahkan ini
-=======
-        'tanggal_pinjam',
-        'tanggal_kembali',
-        'status',
-        'approver_id'
->>>>>>> feature/feature_member
+        'file_surat', // <-- Pastikan ada koma di sini
     ];
 
+    // Relasi: Peminjaman milik satu User
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // GANTI DARI TASK KE ITEM
+    // Relasi: Peminjaman meminjam satu Item
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id');
