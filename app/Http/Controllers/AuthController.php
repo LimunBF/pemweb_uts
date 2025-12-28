@@ -17,21 +17,26 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        // 1. Validasi Input
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
+        // 2. Cek Kredensial
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // Redirect sesuai role
-            if (Auth::user()->role == 'mahasiswa') {
+            // Redirect berdasarkan role (mahasiswa/dosen ke dashboard student)
+            if (in_array(Auth::user()->role, ['mahasiswa', 'dosen'])) {
                 return redirect()->route('student.dashboard');
             }
+            
+            // Jika bukan keduanya (berarti Admin), ke dashboard admin
             return redirect()->route('dashboard_admin');
         }
 
+        // 3. Jika Gagal
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
@@ -59,7 +64,7 @@ class AuthController extends Controller
             'contact' => $request->contact,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'mahasiswa',
+            'role' => 'mahasiswa', // Default pendaftar mandiri adalah mahasiswa
         ]);
 
         return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
@@ -71,12 +76,6 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-<<<<<<< HEAD
-        
-        // Setelah logout, kembali ke halaman login
-        return redirect()->route('login');
-=======
         return redirect('/login');
->>>>>>> feature/register
     }
 }

@@ -28,20 +28,17 @@ class UserDashboardController extends Controller
     // 3. Halaman Pinjaman Saya
     public function myLoans()
     {
-<<<<<<< HEAD
         // Ambil data mentah
         $rawLoans = Peminjaman::with('item')
                     ->where('user_id', Auth::id())
                     ->orderBy('created_at', 'desc') 
                     ->get();
-=======
         // Mengambil data peminjaman milik user yang sedang login
         // Pastikan relasi 'item' ada di model Peminjaman
         $loans = Peminjaman::with('item')
             ->where('user_id', Auth::id())
             ->orderBy('tanggal_kembali', 'asc') // Logic pengurutan Anda (Deadline terdekat di atas)
             ->paginate(10); // GUNAKAN INI pengganti ->get()
->>>>>>> feature/feature_member
 
         $groupedLoans = $rawLoans->groupBy(function ($item) {
             return $item->kode_peminjaman ?? 'SINGLE_' . $item->id;
