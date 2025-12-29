@@ -3,19 +3,15 @@
 @section('content')
 <div class="container mx-auto">
     
-    {{-- Header & Tombol Tambah --}}
    <div class="bg-gradient-to-r from-pink-900 to-pink-600 rounded-2xl p-6 md:p-8 mb-6 text-white shadow-lg relative overflow-hidden">
-        {{-- Hiasan Background Abstrak --}}
         <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10"></div>
 
         <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            {{-- Bagian Kiri: Judul & Deskripsi --}}
             <div class="w-full md:flex-1 text-center md:text-left">
                 <h1 class="text-3xl md:text-4xl font-bold">Daftar Anggota Laboratorium</h1>
                 <p class="mt-1 text-pink-100 opacity-90">Kelola semua data mahasiswa dan dosen disini.</p>
             </div>
-            
-            {{-- Bagian Kanan: Tombol Tambah --}}
+        
             <div class="w-full md:w-auto flex justify-center md:justify-end">
                 <a href="{{ route('members.create') }}" 
                    class="inline-flex items-center bg-white text-pink-700 font-bold px-5 py-3 rounded-xl shadow-lg hover:bg-pink-50 transition ease-in-out duration-150">
@@ -26,8 +22,6 @@
         </div>
     </div>
 
-    {{-- Tombol Filter (Di Bawah Kotak Ungu, Di Atas Tabel) --}}
-    {{-- Style disesuaikan untuk background putih --}}
     <div class="flex flex-wrap items-center gap-2 mb-6 px-1">
         <button type="button" class="px-4 py-1.5 text-sm font-bold bg-pink-100 text-pink-700 border border-pink-200 rounded-full shadow-sm hover:bg-pink-200 transition">
             Semua
@@ -66,26 +60,20 @@
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    {{-- Menggunakan variabel $members --}}
                     @forelse($members as $index => $member)
                     <tr class="hover:bg-pink-50 transition duration-150 ease-in-out">
-                        {{-- Kolom No --}}
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $loop->iteration }}
                         </td>
                         
-                        {{-- Kolom Nama (DITAMBAHKAN AVATAR) --}}
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex items-center">
-                                {{-- 1. Bagian Gambar Avatar --}}
                                 <div class="flex-shrink-0 h-8 w-8">
-                                    {{-- Menggunakan urlencode($member->name) agar inisial sesuai nama --}}
                                     <img class="h-8 w-8 rounded-full bg-gray-200" 
                                          src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=random" 
                                          alt="{{ $member->name }}">
                                 </div>
-                                
-                                {{-- 2. Bagian Teks Nama --}}
+
                                 <div class="ml-4">
                                     <div class="text-sm font-medium text-gray-900">{{ $member->name }}</div>
                                     <div class="text-xs text-gray-400">Bergabung: {{ $member->created_at->format('d M Y') }}</div>
@@ -93,7 +81,6 @@
                             </div>
                         </td>
 
-                        {{-- Kolom NIM --}}
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
                             @if($member->identity_number)
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded bg-gray-100 text-gray-800 border border-gray-200">
@@ -104,22 +91,17 @@
                             @endif
                         </td>
 
-                        {{-- Kolom No HP --}}
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $member->contact ?? '-' }}
                         </td>
 
-                        {{-- Kolom Email --}}
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {{ $member->email }}
                         </td>
 
-                        {{-- Kolom Aksi --}}
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                            {{-- Tombol Edit (Link Dummy #) --}}
                             <a href="{{ route('members.edit', $member->id) }}" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1 rounded-md transition">Edit</a>
                             
-                            {{-- Form Hapus --}}
                             <form action="{{ route('members.destroy', $member->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus anggota ini? Data yang dihapus tidak bisa dikembalikan.');">
                                 @csrf
                                 @method('DELETE')
@@ -128,7 +110,7 @@
                         </td>
                     </tr>
                     @empty
-                    {{-- Tampilan Kosong --}}
+
                     <tr>
                         <td colspan="6" class="px-6 py-12 text-center text-gray-500">
                             <div class="flex flex-col items-center justify-center">
