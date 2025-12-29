@@ -4,20 +4,42 @@
 <div class="container mx-auto">
     
     {{-- Header & Tombol Tambah --}}
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <div>
-            <h2 class="text-3xl font-bold text-pink-800">Daftar Anggota</h2>
-            <p class="text-md italic text-pink-500 mt-1">Kelola semua data mahasiswa/anggota di sini.</p>
+   <div class="bg-gradient-to-r from-pink-900 to-pink-600 rounded-2xl p-6 md:p-8 mb-6 text-white shadow-lg relative overflow-hidden">
+        {{-- Hiasan Background Abstrak --}}
+        <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            {{-- Bagian Kiri: Judul & Deskripsi --}}
+            <div class="w-full md:flex-1 text-center md:text-left">
+                <h1 class="text-3xl md:text-4xl font-bold">Daftar Anggota Laboratorium</h1>
+                <p class="mt-1 text-pink-100 opacity-90">Kelola semua data mahasiswa dan dosen disini.</p>
+            </div>
+            
+            {{-- Bagian Kanan: Tombol Tambah --}}
+            <div class="w-full md:w-auto flex justify-center md:justify-end">
+                <a href="{{ route('members.create') }}" 
+                   class="inline-flex items-center bg-white text-pink-700 font-bold px-5 py-3 rounded-xl shadow-lg hover:bg-pink-50 transition ease-in-out duration-150">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Anggota Baru
+                </a>    
+            </div>
         </div>
-        
-        {{-- Link tombol bisa disesuaikan, misalnya ke route('members.create') jika sudah ada --}}
-        <a href="{{ route('members.create') }}" class="bg-lab-pink-btn hover:bg-pink-700 text-white font-medium py-2 px-4 rounded-lg shadow-md flex items-center transition ease-in-out duration-150">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-            Tambah Anggota Baru
-        </a>
     </div>
 
-    {{-- Notifikasi Sukses --}}
+    {{-- Tombol Filter (Di Bawah Kotak Ungu, Di Atas Tabel) --}}
+    {{-- Style disesuaikan untuk background putih --}}
+    <div class="flex flex-wrap items-center gap-2 mb-6 px-1">
+        <button type="button" class="px-4 py-1.5 text-sm font-bold bg-pink-100 text-pink-700 border border-pink-200 rounded-full shadow-sm hover:bg-pink-200 transition">
+            Semua
+        </button>
+        <button type="button" class="px-4 py-1.5 text-sm font-medium bg-white text-gray-600 border border-gray-300 rounded-full shadow-sm hover:bg-gray-50 transition">
+            Mahasiswa
+        </button>
+        <button type="button" class="px-4 py-1.5 text-sm font-medium bg-white text-gray-600 border border-gray-300 rounded-full shadow-sm hover:bg-gray-50 transition">
+            Dosen
+        </button>
+    </div>
+
     @if(session('success'))
     <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm" role="alert">
         <div class="flex items-center">
