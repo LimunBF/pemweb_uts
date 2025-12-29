@@ -3,14 +3,12 @@
 @section('content')
 <div class="max-w-7xl mx-auto">
     
-    {{-- LOGIC PHP: Cek Keterlambatan --}}
+    {{-- LOGIC PHP: Cek Keterlambatan Global --}}
     @php
-        // Cek apakah ada item yang statusnya 'terlambat'
-        // Menggunakan isset untuk mencegah error jika variabel belum ada
         $hasLateItems = isset($groupedLoans) && $groupedLoans->flatten()->contains('status', 'terlambat');
     @endphp
 
-    {{-- 1. WARNING ALERT --}}
+    {{-- 1. WARNING ALERT (GLOBAL) --}}
     @if($hasLateItems)
         <div class="mb-6 bg-red-600 rounded-xl shadow-lg shadow-red-200 p-5 flex flex-col md:flex-row items-center justify-between gap-4 text-white animate-pulse border border-red-700">
             <div class="flex items-center gap-4">
@@ -48,7 +46,7 @@
         </div>
     @endif
 
-    {{-- Cek apakah variabel groupedLoans ada dan tidak kosong --}}
+    {{-- LIST CARD --}}
     @if(isset($groupedLoans) && $groupedLoans->count() > 0)
         <div class="space-y-6">
             @foreach($groupedLoans as $kode => $items)
@@ -56,7 +54,7 @@
                     $firstItem = $items->first();
                     $status = $firstItem->status;
                     
-                    // Definisikan warna badge (Gunakan Array biasa agar aman di PHP lama)
+                    // Warna Badge
                     $badgeColors = [
                         'pending' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
                         'disetujui' => 'bg-green-100 text-green-800 border-green-200',
@@ -66,7 +64,7 @@
                     ];
                     $badgeColor = $badgeColors[$status] ?? 'bg-gray-100 text-gray-800';
 
-                    // Definisikan Label Status
+                    // Label Status
                     $statusLabels = [
                         'pending' => 'Menunggu Konfirmasi',
                         'disetujui' => 'Disetujui / Dipinjam',
@@ -75,20 +73,46 @@
                         'terlambat' => 'Terlambat',
                     ];
                     $statusLabel = $statusLabels[$status] ?? ucfirst($status);
+
+                    // --- LOGIKA HITUNG HARI & JAM TERLAMBAT ---
+                    $lateText = '';
+                    if ($status == 'terlambat') {
+                        $deadline = \Carbon\Carbon::parse($firstItem->tanggal_kembali);
+                        $now = \Carbon\Carbon::now();
+                        
+                        // Hitung selisih waktu
+                        $diff = $deadline->diff($now);
+                        
+                        $parts = [];
+                        if ($diff->d > 0) $parts[] = $diff->d . ' Hari';
+                        if ($diff->h > 0) $parts[] = $diff->h . ' Jam';
+                        
+                        // Gabung string (Misal: 2 Hari 5 Jam)
+                        $timeString = implode(' ', $parts);
+                        $lateText = 'Telat ' . ($timeString ?: 'Baru saja'); 
+                    }
                 @endphp
 
-                <div class="bg-white rounded-xl shadow-md border border-pink-100 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div class="bg-white rounded-xl shadow-md border {{ $status == 'terlambat' ? 'border-red-300' : 'border-pink-100' }} overflow-hidden hover:shadow-lg transition-shadow duration-300">
                     
                     {{-- Header Kartu --}}
                     <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center flex-wrap gap-3">
                                 <span class="text-xs font-mono font-bold text-gray-400 uppercase tracking-wider">
                                     #{{ $kode }}
                                 </span>
                                 <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $badgeColor }}">
                                     {{ $statusLabel }}
                                 </span>
+
+                                {{-- INFO KETERLAMBATAN DI HEADER (BADGE TAMBAHAN) --}}
+                                @if($status == 'terlambat')
+                                    <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-red-600 text-white border border-red-700 shadow-sm flex items-center gap-1">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        {{ $lateText }}
+                                    </span>
+                                @endif
                             </div>
                             <div class="text-xs text-gray-500 mt-1">
                                 Diajukan: {{ \Carbon\Carbon::parse($firstItem->created_at)->translatedFormat('d F Y, H:i') }}
@@ -96,7 +120,8 @@
                         </div>
 
                         {{-- Tombol Cetak Surat --}}
-                        @if(in_array($status, ['pending', 'disetujui']))
+                        @if(in_array($status, ['pending', 'disetujui', 'terlambat'])) 
+                        {{-- Tambahkan 'terlambat' agar surat tetap bisa dicetak/diunduh --}}
                             <a href="{{ route('student.loan.print', $firstItem->id) }}" target="_blank" 
                                class="flex items-center text-sm font-medium text-lab-pink-btn hover:text-pink-900 bg-pink-50 hover:bg-pink-100 px-3 py-2 rounded-lg transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,9 +137,16 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             
                             {{-- Informasi Tanggal --}}
-                            <div class="text-sm text-gray-600 border-l-4 border-lab-pink pl-4 h-fit">
+                            <div class="text-sm text-gray-600 border-l-4 {{ $status == 'terlambat' ? 'border-red-500' : 'border-lab-pink' }} pl-4 h-fit">
                                 <p class="mb-1"><span class="font-bold">Mulai Pinjam:</span> <br> {{ \Carbon\Carbon::parse($firstItem->tanggal_pinjam)->translatedFormat('d F Y') }}</p>
-                                <p class="mb-2"><span class="font-bold">Rencana Kembali:</span> <br> {{ \Carbon\Carbon::parse($firstItem->tanggal_kembali)->translatedFormat('d F Y') }}</p>
+                                
+                                {{-- Tanggal Kembali jadi MERAH jika telat --}}
+                                <p class="mb-2">
+                                    <span class="font-bold">Rencana Kembali:</span> <br> 
+                                    <span class="{{ $status == 'terlambat' ? 'text-red-600 font-bold bg-red-50 px-1 rounded' : '' }}">
+                                        {{ \Carbon\Carbon::parse($firstItem->tanggal_kembali)->translatedFormat('d F Y') }}
+                                    </span>
+                                </p>
                                 
                                 <div class="mt-3">
                                     <span class="text-xs font-bold text-gray-400 uppercase">Keperluan:</span>
@@ -124,20 +156,33 @@
 
                             {{-- Daftar Barang --}}
                             <div class="md:col-span-2">
-                                <h4 class="text-sm font-bold text-gray-700 mb-3 border-b pb-2">Daftar Barang</h4>
+                                <h4 class="text-sm font-bold text-gray-700 mb-3 border-b pb-2 flex justify-between items-center">
+                                    Daftar Barang
+                                    @if($status == 'terlambat')
+                                         <span class="text-[10px] text-red-500 font-bold uppercase animate-pulse">! Pengembalian Tertunda</span>
+                                    @endif
+                                </h4>
                                 <ul class="space-y-2">
                                     @foreach($items as $loan)
-                                        <li class="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg border border-gray-100">
-                                            <div class="flex items-center">
-                                                <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center text-lab-pink-btn font-bold border border-pink-100 mr-3 shadow-sm text-sm">
+                                        <li class="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 px-4 py-3 rounded-lg border {{ $status == 'terlambat' ? 'border-red-200 bg-red-50' : 'border-gray-100' }}">
+                                            <div class="flex items-center mb-2 sm:mb-0">
+                                                <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center font-bold border border-pink-100 mr-3 shadow-sm text-sm {{ $status == 'terlambat' ? 'text-red-600 border-red-200' : 'text-lab-pink-btn' }}">
                                                     {{ substr($loan->item->nama_alat, 0, 1) }}
                                                 </div>
                                                 <div>
                                                     <span class="text-sm font-bold text-gray-800 block">{{ $loan->item->nama_alat }}</span>
                                                     <span class="text-xs text-gray-400 block font-mono">{{ $loan->item->kode_alat }}</span>
+                                                    
+                                                    {{-- INFO TERLAMBAT DI SETIAP BARANG --}}
+                                                    @if($status == 'terlambat')
+                                                        <span class="text-[10px] font-bold text-red-600 flex items-center gap-1 mt-1">
+                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                            {{ $lateText }}
+                                                        </span>
+                                                    @endif
                                                 </div>
                                             </div>
-                                            <span class="text-sm font-bold text-gray-600 bg-white px-3 py-1 rounded border border-gray-200">
+                                            <span class="text-sm font-bold bg-white px-3 py-1 rounded border shadow-sm {{ $status == 'terlambat' ? 'text-red-600 border-red-200' : 'text-gray-600 border-gray-200' }}">
                                                 {{ $loan->amount }} Unit
                                             </span>
                                         </li>
@@ -158,7 +203,7 @@
         </div>
 
     @else
-        {{-- TAMPILAN KOSONG (JIKA BELUM ADA DATA) --}}
+        {{-- TAMPILAN KOSONG --}}
         <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
             <div class="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
