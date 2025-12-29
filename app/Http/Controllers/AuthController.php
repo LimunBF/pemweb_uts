@@ -48,53 +48,75 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function registerProses(Request $request)
+    public function register(Request $request)
     {
-        // 1. Validasi Dasar (Hanya Mahasiswa & Dosen)
         $request->validate([
-            'name'     => 'required',
+            'name'     => 'required|string|max:255|unique:users,name',
             'email'    => 'required|email|unique:users,email',
+            
+            // VALIDASI KONTAK (10-13 DIGIT)
+            'contact'  => [
+                'required',
+                'numeric',
+                'digits_between:10,13',
+                'regex:/^08[0-9]+$/', // <--- INI YANG MENJAMIN AWALAN 08
+                'unique:users,contact'
+            ],
+            
             'password' => 'required|min:6',
-            'role'     => 'required|in:mahasiswa,dosen', // Admin dihapus dari validasi ini
+            'role'     => 'required|in:mahasiswa,dosen',
+        ], [
+            // Pesan Error Spesifik untuk Alert Box Atas
+            'name.unique'             => 'Nama ini sudah terdaftar.',
+            'email.unique'            => 'Email Ini sudah digunakan.',
+            'contact.required'        => 'Nomor WhatsApp/HP wajib diisi.',
+            'contact.numeric'         => 'Nomor WhatsApp/HP harus berupa angka.',
+            'contact.digits_between'  => 'Nomor WhatsApp/HP tidak valid (Harus 10-13 digit).',
+            'contact.regex'           => 'Format nomor tidak valid. Harus diawali "08" (Contoh: 0812345...).',
+            'contact.unique'          => 'Nomor WhatsApp/HP ini sudah terdaftar.',
+            'password.min'            => 'Password minimal 6 karakter.',
         ]);
 
-        // 2. Tentukan Identity Number (NIM/NIP)
+        // Validasi NIM/NIP (Wajib 8 Karakter)
         $identityNumber = null;
         $role = $request->role;
 
         if ($role === 'mahasiswa') {
-            $request->validate(['identity_number_mhs' => 'required']);
+            $request->validate([
+                'identity_number_mhs' => 'required|string|size:8|unique:users,identity_number'
+            ], [
+                'identity_number_mhs.required' => 'NIM wajib diisi.',
+                'identity_number_mhs.size'     => 'Format NIM salah (Wajib 8 digit/karakter).',
+                'identity_number_mhs.unique'   => 'NIM ini sudah terdaftar sebelumnya.',
+            ]);
+            
             $identityNumber = $request->identity_number_mhs;
             
         } elseif ($role === 'dosen') {
-            $request->validate(['identity_number_dosen' => 'required']);
+            $request->validate([
+                'identity_number_dosen' => 'required|string|min:8|unique:users,identity_number'
+            ], [
+                'identity_number_dosen.required' => 'NIP wajib diisi.',
+                'identity_number_dosen.min'      => 'NIP terlalu pendek (Minimal 8 digit).',
+                'identity_number_dosen.unique'   => 'NIP ini sudah terdaftar.',
+            ]);
+            
             $identityNumber = $request->identity_number_dosen;
         }
 
-        // 3. Simpan User ke Database
-        $data = [
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => $role,
+        // Simpan User
+        $user = User::create([
+            'name'            => $request->name,
+            'email'           => $request->email,
+            'contact'         => $request->contact,
+            'password'        => Hash::make($request->password),
+            'role'            => $role,
             'identity_number' => $identityNumber,
-        ];
+        ]);
 
-        User::create($data);
-
-        // 4. Login Otomatis & Redirect
-        $loginData = [
-            'email' => $request->email,
-            'password' => $request->password
-        ];
-
-        if (Auth::attempt($loginData)) {
-            $request->session()->regenerate();
-            // Karena hanya Mhs & Dosen, redirect ke User Dashboard semua
-            return redirect()->route('user.dashboard');
-        }
-
-        return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
+        // Auto Login & Redirect
+        Auth::login($user);
+                return redirect()->route('student.dashboard')->with('success', 'Registrasi berhasil! Selamat datang.');
     }
 
     // --- LOGOUT ---

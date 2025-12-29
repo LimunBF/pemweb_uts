@@ -29,14 +29,13 @@
 
         /* --- ANIMASI KUCING --- */
         .cat-head { transition: transform 0.3s ease-out; }
-        
         .cat-paw {
             transition: transform 0.4s ease-out; 
             transform-box: fill-box;
             transform-origin: center bottom;
         }
         
-        /* POSISI AWAL TANGAN (Sembunyi Sempurna) */
+        /* POSISI AWAL TANGAN (Sembunyi) */
         #paw-left, #paw-right { transform: translateY(180px); }
 
         /* Transisi Saat Malu */
@@ -63,25 +62,26 @@
             opacity: 1;
             transform: translateY(0) scale(1);
         }
+        
+        /* Hilangkan spinner input number */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
     </style>
 </head>
 <body class="bg-white min-h-screen font-poppins flex">
 
     <div class="hidden lg:flex lg:w-1/2 bg-lab-pink relative flex-col justify-center items-center overflow-hidden">
-        
-        {{-- Background Decor --}}
         <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-white rounded-full mix-blend-overlay opacity-40 blur-3xl animate-pulse"></div>
         <div class="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply opacity-20 blur-3xl animate-pulse"></div>
 
-        {{-- Container Kucing --}}
         <div class="relative z-10 mb-10 transform scale-110"> 
-            
-            {{-- CHAT BUBBLE --}}
             <div id="bubble" class="chat-bubble absolute -top-16 -right-24 bg-white px-4 py-2 rounded-xl rounded-bl-none shadow-lg border border-lab-pink-btn z-30 w-48 select-none">
                 <p id="bubble-text" class="text-xs font-bold text-gray-700 leading-tight text-center">Halo! Daftar dulu yuk ✨</p>
             </div>
 
-            {{-- SVG KUCING --}}
             <div class="w-60 h-52 cursor-pointer relative overflow-hidden" id="cat-container" style="border-radius: 0 0 100px 100px;">
                 <svg viewBox="0 0 200 180" class="w-full h-full drop-shadow-xl">
                     <g class="cat-head">
@@ -90,7 +90,6 @@
                         <path d="M 170 60 L 190 10 L 130 40 Z" fill="#fff" stroke="#e5e7eb" stroke-width="2"/>
                         <path d="M 172 55 L 182 25 L 145 45 Z" fill="#FCE7F3"/>
                         <ellipse cx="100" cy="100" rx="85" ry="75" fill="#fff" stroke="#e5e7eb" stroke-width="2"/>
-                        
                         <path d="M 35 155 Q 100 190 165 155 L 165 180 Q 100 215 35 180 Z" fill="#DB2777"/>
                         
                         <g id="eyes">
@@ -113,7 +112,6 @@
                         <path d="M 94 115 Q 100 120 106 115" fill="none" stroke="#DB2777" stroke-width="2"/>
                         <path d="M 100 120 L 100 125 M 100 125 Q 90 135 80 130 M 100 125 Q 110 135 120 130" stroke="#374151" stroke-width="2" fill="none" stroke-linecap="round"/>
                     </g>
-                    
                     <g id="paws" transform="translate(0, 180)">
                         <g id="paw-left" class="cat-paw">
                             <path d="M 35 0 Q 25 -30 60 -60 Q 85 -30 75 0 Z" fill="#fff" stroke="#e5e7eb" stroke-width="2"/>
@@ -128,7 +126,6 @@
             </div>
         </div>
 
-        {{-- Teks Sambutan (Unselectable) --}}
         <div class="text-center z-10 px-10 select-none">
             <h2 class="text-3xl font-bold text-lab-text mb-2 drop-shadow-sm">Bergabunglah Bersama Kami!</h2>
             <p class="text-gray-600 font-medium">Daftarkan akunmu untuk mulai meminjam alat.</p>
@@ -138,39 +135,64 @@
     <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white overflow-y-auto">
         <div class="w-full max-w-md">
             
-            <div class="text-left mb-8">
+            <div class="text-left mb-6">
                 <h1 class="text-3xl font-extrabold text-lab-text">Buat Akun Baru</h1>
                 <p class="text-sm text-gray-400 font-medium uppercase tracking-wider mt-1">Sistem Inventaris Lab PTIK</p>
             </div>
 
+            {{-- ALERT BOX NOTIFIKASI ERROR --}}
             @if($errors->any())
                 <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm animate-pulse">
-                    <p class="text-sm font-bold text-red-600">Gagal Mendaftar:</p>
-                    <ul class="list-disc list-inside text-xs text-red-500 mt-1">
-                        @foreach($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            {{-- Icon Warning --}}
+                            <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm leading-5 font-bold text-red-700">
+                                Pendaftaran Gagal! Periksa kembali:
+                            </h3>
+                            <ul class="mt-2 text-xs list-disc list-inside text-red-600 space-y-1">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register') }}" class="space-y-5">
+            <form method="POST" action="{{ route('register') }}" class="space-y-4">
                 @csrf
 
                 {{-- Nama Lengkap --}}
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">NAMA LENGKAP</label>
-                    <input type="text" name="name" id="name" required
-                        class="block w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:ring-0 focus:border-lab-pink-btn outline-none transition font-semibold text-gray-700 placeholder-gray-300"
+                    <input type="text" name="name" id="name" value="{{ old('name') }}" required
+                        class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('name') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="John Doe">
                 </div>
 
                 {{-- Email --}}
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">EMAIL KAMPUS</label>
-                    <input type="email" name="email" id="email" required
-                        class="block w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:ring-0 focus:border-lab-pink-btn outline-none transition font-semibold text-gray-700 placeholder-gray-300"
+                    <input type="email" name="email" id="email" value="{{ old('email') }}" required
+                        class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('email') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="nim@student.uns.ac.id">
+                </div>
+
+                {{-- Contact / No HP --}}
+                <div class="group relative">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-gray-400 ml-1 tracking-wide">NO. WHATSAPP / HP</label>
+                        {{-- COUNTER DIGIT HP --}}
+                        <span id="contact-counter" class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">0/13</span>
+                    </div>
+                    <input type="number" name="contact" id="contact" value="{{ old('contact') }}" required
+                        class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('contact') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
+                        placeholder="08123456789">
                 </div>
 
                 {{-- Role Selection --}}
@@ -179,8 +201,8 @@
                     <div class="relative">
                         <select id="role" name="role" onchange="toggleInputs()"
                             class="block w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:ring-0 focus:border-lab-pink-btn outline-none transition font-semibold text-gray-700 cursor-pointer appearance-none">
-                            <option value="mahasiswa">Mahasiswa</option>
-                            <option value="dosen">Dosen</option>
+                            <option value="mahasiswa" {{ old('role') == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                            <option value="dosen" {{ old('role') == 'dosen' ? 'selected' : '' }}>Dosen</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -189,30 +211,33 @@
                 </div>
 
                 {{-- Input NIM (Mahasiswa) --}}
-                <div id="input-nim" class="group">
-                    <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">NIM</label>
-                    <input type="text" name="identity_number_mhs" id="identity_number_mhs"
-                        class="block w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:ring-0 focus:border-lab-pink-btn outline-none transition font-semibold text-gray-700 placeholder-gray-300"
+                <div id="input-nim" class="group {{ old('role') == 'dosen' ? 'hidden' : '' }}">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-gray-400 ml-1 tracking-wide">NIM</label>
+                        {{-- COUNTER DIGIT NIM --}}
+                        <span id="nim-counter" class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">0/8</span>
+                    </div>
+                    <input type="text" name="identity_number_mhs" id="identity_number_mhs" value="{{ old('identity_number_mhs') }}" maxlength="8"
+                        class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('identity_number_mhs') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="M05...">
                 </div>
 
-                {{-- Input NIP (Dosen - Hidden) --}}
-                <div id="input-nip" class="group hidden">
+                {{-- Input NIP (Dosen) --}}
+                <div id="input-nip" class="group {{ old('role') == 'dosen' ? '' : 'hidden' }}">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">NIP</label>
-                    <input type="text" name="identity_number_dosen" id="identity_number_dosen"
-                        class="block w-full px-4 py-3 bg-gray-50 border-2 border-gray-100 rounded-xl focus:ring-0 focus:border-lab-pink-btn outline-none transition font-semibold text-gray-700 placeholder-gray-300"
+                    <input type="text" name="identity_number_dosen" id="identity_number_dosen" value="{{ old('identity_number_dosen') }}"
+                        class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('identity_number_dosen') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="199...">
                 </div>
 
-                {{-- Password dengan Toggle Mata --}}
+                {{-- Password --}}
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">PASSWORD</label>
                     <div class="relative">
                         <input id="password" type="password" name="password" required
-                            class="block w-full px-4 py-3 pr-12 bg-gray-50 border-2 border-gray-100 rounded-xl focus:ring-0 focus:border-lab-pink-btn outline-none transition font-semibold text-gray-700 placeholder-gray-300"
+                            class="block w-full px-4 py-3 pr-12 bg-gray-50 border-2 {{ $errors->has('password') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                             placeholder="••••••••">
                         
-                        {{-- Tombol Mata (type="button" agar tidak submit) --}}
                         <button type="button" onclick="togglePassword()" onmousedown="event.preventDefault()"
                             class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-lab-pink-btn transition focus:outline-none">
                             <svg id="eye-open" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -234,7 +259,7 @@
             </form>
 
             {{-- Footer --}}
-            <div class="mt-8 text-center">
+            <div class="mt-8 text-center pb-4">
                 <p class="text-sm text-gray-500 font-medium">
                     Sudah punya akun? 
                     <a href="{{ route('login') }}" class="text-lab-pink-btn hover:text-pink-700 font-bold transition ml-1 hover:underline">
@@ -254,20 +279,63 @@
         
         const nameInput = document.getElementById('name');
         const emailInput = document.getElementById('email');
+        const contactInput = document.getElementById('contact'); 
         const roleInput = document.getElementById('role');
         const nimInput = document.getElementById('identity_number_mhs');
         const nipInput = document.getElementById('identity_number_dosen');
         const passwordInput = document.getElementById('password');
 
-        // 1. CHAT BUBBLE HELPER
+        // Counters
+        const contactCounter = document.getElementById('contact-counter');
+        const nimCounter = document.getElementById('nim-counter');
+
+        // --- 1. COUNTER LOGIC ---
+        // Dipisahkan jadi fungsi agar bisa dipanggil saat Load & saat Input
+        function updateContactUI() {
+            let val = contactInput.value;
+            // Batasi 13 digit visual
+            if (val.length > 13) {
+                contactInput.value = val.slice(0, 13);
+                val = contactInput.value;
+            }
+            contactCounter.innerText = `${val.length}/13`;
+            
+            // Validasi Warna
+            if (val.length >= 10 && val.length <= 13) {
+                contactCounter.classList.replace('text-gray-400', 'text-green-600');
+                contactCounter.classList.replace('bg-gray-100', 'bg-green-100');
+            } else {
+                contactCounter.classList.replace('text-green-600', 'text-gray-400');
+                contactCounter.classList.replace('bg-green-100', 'bg-gray-100');
+            }
+        }
+
+        function updateNimUI() {
+            let val = nimInput.value;
+            // Batasi 8 digit visual
+            if (val.length > 8) {
+                nimInput.value = val.slice(0, 8);
+                val = nimInput.value;
+            }
+            nimCounter.innerText = `${val.length}/8`;
+            
+            // Validasi Warna (Harus pas 8)
+            if (val.length === 8) {
+                nimCounter.classList.replace('text-gray-400', 'text-green-600');
+                nimCounter.classList.replace('bg-gray-100', 'bg-green-100');
+            } else {
+                nimCounter.classList.replace('text-green-600', 'text-gray-400');
+                nimCounter.classList.replace('bg-green-100', 'bg-gray-100');
+            }
+        }
+
+        // Attach Listener
+        contactInput.addEventListener('input', updateContactUI);
+        nimInput.addEventListener('input', updateNimUI);
+
+        // --- 2. CHAT BUBBLE HELPER ---
         let bubbleTimeout;
-        const messages = [
-            "Miaw! 😽", 
-            "Isi yang lengkap ya!", 
-            "Jangan lupa passwordnya!", 
-            "Semangat daftarnya! 🔥",
-            "Aku siap menjaga lab! 🛡️"
-        ];
+        const messages = ["Miaw! 😽", "Isi yang lengkap ya!", "Semangat daftarnya! 🔥", "Aku siap menjaga lab! 🛡️"];
 
         function say(text) {
             clearTimeout(bubbleTimeout);
@@ -276,7 +344,7 @@
             bubbleTimeout = setTimeout(() => bubble.classList.remove('visible'), 3000);
         }
 
-        // 2. INTERAKSI PER KOLOM (Event Listeners)
+        // --- 3. INTERAKSI PER KOLOM ---
         nameInput.addEventListener('focus', () => say("Siapa namamu? 🤔"));
         nameInput.addEventListener('input', () => {
             catContainer.classList.add('typing');
@@ -285,24 +353,21 @@
         });
 
         emailInput.addEventListener('focus', () => say("Email kampus ya! 📧"));
+        contactInput.addEventListener('focus', () => say("Nomor HP aktif ya! 📱"));
         roleInput.addEventListener('focus', () => say("Pilih peranmu! 🎭"));
         nimInput.addEventListener('focus', () => say("NIM kamu berapa? 🆔"));
         nipInput.addEventListener('focus', () => say("NIP Bapak/Ibu? 🆔"));
         
-        // Hover Tombol Daftar
         document.getElementById('btn-register').addEventListener('mouseenter', () => say("Gas Daftar! 🚀"));
 
-        // Klik Kucing
         catContainer.addEventListener('click', () => {
             const randomMsg = messages[Math.floor(Math.random() * messages.length)];
             say(randomMsg);
-            
-            // Efek Kaget
             catContainer.style.transform = "scale(1.15)";
             setTimeout(() => catContainer.style.transform = "scale(1.1)", 150);
         });
 
-        // 3. TOGGLE ROLE
+        // --- 4. TOGGLE ROLE ---
         function toggleInputs() {
             const role = roleInput.value;
             const inputNim = document.getElementById('input-nim');
@@ -320,7 +385,7 @@
             }
         }
 
-        // 4. MATA IKUT KURSOR
+        // --- 5. MATA IKUT KURSOR ---
         const eyeRadius = 8;
         document.addEventListener('mousemove', (e) => {
             if (catContainer.classList.contains('shy')) return;
@@ -336,10 +401,9 @@
             });
         });
 
-        // Efek Mengetik
         let typingTimer;
 
-        // 5. LOGIKA PASSWORD (SHY)
+        // --- 6. LOGIKA PASSWORD (SHY) ---
         passwordInput.addEventListener('focus', () => {
             catContainer.classList.add('shy');
             say("Ssstt.. Rahasia! 🙈");
@@ -350,7 +414,6 @@
             say("Oke, aman! 👍");
         });
 
-        // 6. TOGGLE PASSWORD (TETAP SHY)
         function togglePassword() {
             var eyeOpen = document.getElementById("eye-open");
             var eyeClosed = document.getElementById("eye-closed");
@@ -364,13 +427,17 @@
                 eyeOpen.classList.add("hidden");
                 eyeClosed.classList.remove("hidden");
             }
-
-            // PENTING: Paksa kucing tetap shy dan kembalikan fokus ke input
             passwordInput.focus();
             if (!catContainer.classList.contains('shy')) {
                 catContainer.classList.add('shy');
             }
         }
+
+        // --- 7. JALANKAN LOGIKA UI SAAT LOAD ---
+        // (Ini yang memperbaiki masalah counter reset setelah redirect error)
+        updateContactUI();
+        updateNimUI();
+        toggleInputs(); 
     </script>
 </body>
 </html>
