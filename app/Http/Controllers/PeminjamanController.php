@@ -5,81 +5,84 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Peminjaman;
 use App\Models\Item;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class PeminjamanController extends Controller
 {
-    // =========================================================================
-    // 1. FITUR ADMIN: LIST KONFIRMASI & RIWAYAT (DENGAN FILTER)
-    // =========================================================================
     public function index(Request $request)
     {
-        // A. Permintaan Baru (Status: Pending) -> Untuk Notifikasi Kotak Kuning
-        // Ini selalu ditampilkan di paling atas
-        $pendingLoans = Peminjaman::with(['user', 'item'])
+        // 1. DATA PENDING (DIKELOMPOKKAN)
+        // Ambil semua yang pending, lalu dikelompokkan berdasarkan 'kode_peminjaman'
+        $rawPending = Peminjaman::with(['user', 'item'])
                         ->where('status', 'pending')
                         ->orderBy('created_at', 'asc')
                         ->get();
 
-        // B. Riwayat Peminjaman (Data Utama Tabel Bawah)
-        // Kita gunakan nama variable '$peminjaman' agar pagination di view tidak error
-        $query = Peminjaman::with(['user', 'item'])
-                           ->where('status', '!=', 'pending'); // Jangan tampilkan yang pending (karena sudah ada di atas)
+        // Hasilnya: Daftar Grup (Bukan daftar item lagi)
+        $pendingLoans = $rawPending->groupBy('kode_peminjaman');
 
-        // --- LOGIKA FILTER (DARI KODE LAMA) ---
-        // Filter Status
+        // 2. DATA RIWAYAT (TETAP SATUAN)
+        // Agar admin bisa melihat detail per item yang sudah dipinjam/kembali
+        $query = Peminjaman::with(['user', 'item'])
+                           ->where('status', '!=', 'pending');
+
         if ($request->has('status') && $request->status != '') {
             $query->where('status', $request->status);
         }
 
-        // Filter Tanggal
         if ($request->start_date && $request->end_date) {
             $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
         }
 
-        // Ambil data dengan pagination
         $peminjaman = $query->latest()->paginate(10);
         
-        // Kembalikan ke view 'admin.pinjam'
         return view('admin.pinjam', compact('peminjaman', 'pendingLoans'));
     }
 
-    // =========================================================================
-    // 2. FITUR MAHASISWA: AJUKAN PINJAM
-    // =========================================================================
+    // --- FORM CREATE (TETAP SAMA) ---
+    public function create()
+    {
+        $users = User::whereIn('role', ['mahasiswa', 'dosen'])->orderBy('name')->get();
+        $items = Item::where('status_ketersediaan', 'Tersedia')->orderBy('nama_alat')->get();
+        return view('admin.create_peminjaman', compact('users', 'items'));
+    }
+
+    // --- PROSES SIMPAN (TETAP SAMA) ---
     public function store(Request $request)
     {
         $request->validate([
             'item_id' => 'required|exists:items,id',
             'amount' => 'required|integer|min:1', 
-            'tanggal_pinjam' => 'required|date|after_or_equal:today',
+            'tanggal_pinjam' => 'required|date',
             'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
+            'user_id' => 'nullable|exists:users,id', 
         ]);
 
-        // Cek Stok menggunakan Accessor 'stok_ready' di Model Item
+        $targetUserId = $request->user_id ?? Auth::id();
         $item = Item::findOrFail($request->item_id);
         if ($item->stok_ready < $request->amount) {
             return back()->withErrors(['item_id' => 'Stok barang tidak mencukupi.'])->withInput();
         }
 
-        // Simpan
         Peminjaman::create([
-            'user_id' => Auth::id(),
+            'user_id' => $targetUserId,
             'item_id' => $request->item_id,
             'amount' => $request->amount,
-            'kode_peminjaman' => 'LOAN-' . Auth::id() . '-' . time(),
+            'kode_peminjaman' => 'LOAN-' . $targetUserId . '-' . time(),
             'tanggal_pinjam' => $request->tanggal_pinjam,
             'tanggal_kembali' => $request->tanggal_kembali,
-            'status' => 'pending', // Masuk sebagai pending
-            'alasan' => $request->input('alasan', 'Keperluan Praktikum'),
+            'status' => 'pending', 
+            'alasan' => $request->input('alasan', 'Peminjaman Manual'),
         ]);
 
-        return redirect()->route('student.loans')->with('success', 'Pengajuan berhasil! Menunggu persetujuan Admin.');
+        if (Auth::user()->role == 'admin') {
+            return redirect()->route('peminjaman')->with('success', 'Peminjaman berhasil ditambahkan.');
+        }
+        return redirect()->route('student.loans')->with('success', 'Pengajuan berhasil!');
     }
 
-    // =========================================================================
-    // 3. FITUR ADMIN: UPDATE STATUS (TERIMA / TOLAK / KEMBALI)
-    // =========================================================================
+    // --- UPDATE STATUS (LOGIKA MASSAL) ---
     public function update(Request $request, $id)
     {
         $loan = Peminjaman::findOrFail($id);
@@ -88,18 +91,26 @@ class PeminjamanController extends Controller
             'status' => 'required|in:disetujui,ditolak,dikembalikan'
         ]);
 
-        $loan->update([
-            'status' => $request->status,
-            'approver_id' => Auth::id()
-        ]);
+        // LOGIKA KHUSUS: Jika menyetujui/menolak, lakukan untuk SEMUA barang dengan kode yang sama
+        if (in_array($request->status, ['disetujui', 'ditolak']) && $loan->kode_peminjaman) {
+            
+            Peminjaman::where('kode_peminjaman', $loan->kode_peminjaman)
+                      ->where('status', 'pending') // Hanya update yang statusnya masih pending
+                      ->update([
+                          'status' => $request->status,
+                          'approver_id' => Auth::id()
+                      ]);
 
-        // Pesan Feedback
-        $msg = match($request->status) {
-            'disetujui' => 'Peminjaman DISETUJUI.',
-            'ditolak' => 'Peminjaman DITOLAK.',
-            'dikembalikan' => 'Barang telah KEMBALI.',
-            default => 'Status diperbarui.'
-        };
+            $msg = 'Seluruh permintaan dalam kode ' . $loan->kode_peminjaman . ' berhasil diproses.';
+
+        } else {
+            // Update satuan (biasanya untuk pengembalian barang satu per satu)
+            $loan->update([
+                'status' => $request->status,
+                'approver_id' => Auth::id()
+            ]);
+            $msg = 'Status item diperbarui.';
+        }
 
         return back()->with('success', $msg);
     }
