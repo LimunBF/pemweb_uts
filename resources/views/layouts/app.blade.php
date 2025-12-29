@@ -28,7 +28,6 @@
         }
     </script>
     
-    {{-- Font Google Poppins --}}
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
     </style>
@@ -47,7 +46,6 @@
 
             <!-- Menu Navigasi -->
             <nav class="flex-1 mt-6 px-4 space-y-2">
-                {{-- MENU KHUSUS ADMIN --}}
                 @if (Auth::check() && Auth::user()->role == 'admin')
                     <a href="{{ route('dashboard_admin') }}" class="flex items-center px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('dashboard_admin') ? 'bg-lab-text text-white shadow-md' : 'text-gray-600 hover:bg-lab-pink hover:text-gray-900' }}">
                         <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
@@ -126,20 +124,16 @@
                 </form>
             </div>
         </aside>
+        <!-- END SIDEBAR -->
 
-        <!-- KONTEN UTAMA -->
         <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             
             <!-- HEADER ATAS -->
             <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 shadow-sm">
-                <!-- Tombol Menu Mobile -->
                 <button class="md:hidden text-gray-500">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
-
-                <!-- Spacer -->
                 <div class="flex-1"></div> 
-
                 <!-- Profil Admin -->
                 <div class="flex items-center space-x-4">
                     <div class="flex flex-col text-right">
@@ -153,22 +147,10 @@
                                  src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? 'G') }}&background=FFC0CB&color=590D22" 
                                  alt="Admin">
                         </button>
-                        <!-- Dropdown Logout -->
-                        <div class="absolute right-0 top-full pt-4 w-48 hidden group-hover:block z-50">
-                            <div class="bg-white rounded-md shadow-lg py-1 border border-gray-100">
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 cursor-pointer">
-                                        Logout
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </header>
 
-            <!-- MAIN CONTENT AREA -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-white p-8">
                 @yield('content')
             </main>
