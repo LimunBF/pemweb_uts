@@ -127,13 +127,21 @@ class UserDashboardController extends Controller
             $groupLoans = collect([$currentLoan]);
         }
 
-        // Load Template
         $templatePath = resource_path('templates/Surat Peminjaman Alat.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
         
-        // Isi Data
+        // --- LOGIKA BARU: MENENTUKAN LABEL NIM / NIP ---
+        $userRole = strtolower($currentLoan->user->role ?? 'mahasiswa');
+
+        if ($userRole === 'dosen') {
+            $label = 'NIP';
+        } else {
+            $label = 'NIM';
+        }
+
+        $templateProcessor->setValue('label_id', $label); // Mengganti ${label_id}
         $templateProcessor->setValue('name', $currentLoan->user->name);
-        $templateProcessor->setValue('id_number', $currentLoan->user->identity_number ?? '-');
+        $templateProcessor->setValue('id_number', $currentLoan->user->identity_number ?? '-'); // Mengganti ${id_number}
         $templateProcessor->setValue('phone_number', $currentLoan->user->contact ?? '-');
         $templateProcessor->setValue('reason', $currentLoan->alasan ?? '-'); 
 
@@ -142,7 +150,7 @@ class UserDashboardController extends Controller
         $templateProcessor->setValue('start_date', Carbon::parse($currentLoan->tanggal_pinjam)->format('d/m/Y'));
         $templateProcessor->setValue('end_date', Carbon::parse($currentLoan->tanggal_kembali)->format('d/m/Y'));
 
-        // Isi Tabel
+        //Isi Tabel Barang (Looping Slot 1-5)
         $maxSlots = 5; 
         foreach(range(1, $maxSlots) as $i) {
             if (isset($groupLoans[$i-1])) {
@@ -150,24 +158,31 @@ class UserDashboardController extends Controller
                 $templateProcessor->setValue("alat_$i", $loan->item->nama_alat);
                 $templateProcessor->setValue("qty_$i", $loan->amount . ' Unit'); 
             } else {
+                // Jika barang kurang dari 5, kosongkan sisanya
                 $templateProcessor->setValue("alat_$i", '');
                 $templateProcessor->setValue("qty_$i", '');
             }
         }
 
-        // Ambil NIM/NIP. Jika kosong, pakai 'USER-[ID_DATABASE]'
-        $nim = $currentLoan->user->identity_number ?? 'USER-' . $currentLoan->user->id;
-        $fileName = 'Surat_Peminjaman_' . $nim . '_' . $currentLoan->id . '.docx';
         
+        // Ambil ID Number untuk nama file. Jika kosong, pakai 'USER-[ID]'
+        $nimUntukFile = $currentLoan->user->identity_number ?? 'USER-' . $currentLoan->user->id;
+        
+        // Format Nama File: Surat_Peminjaman_[NIM/ID]_[ID_PINJAM].docx
+        $fileName = 'Surat_Peminjaman_' . $nimUntukFile . '_' . $currentLoan->id . '.docx';
+        
+        // Simpan di folder temp storage public
         $tempPath = storage_path('app/public/temp/' . $fileName);
         
+        // Buat folder temp jika belum ada
         if (!file_exists(dirname($tempPath))) {
             mkdir(dirname($tempPath), 0755, true);
         }
 
+        // Simpan hasil generate
         $templateProcessor->saveAs($tempPath);
 
-        // Download dengan nama yang sudah diset
+        // Force Download & Hapus file temp setelah dikirim
         return response()->download($tempPath, $fileName)->deleteFileAfterSend(true);
     }
 }
