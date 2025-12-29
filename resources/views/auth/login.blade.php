@@ -206,7 +206,7 @@
                         Daftar Anggota Baru
                     </a>
                 </p>
-                <a href="#" id="forgot-link" class="block text-[10px] text-gray-400 font-bold hover:text-lab-pink-btn transition">
+                <a href="https://wa.me/6285175405338?text=Halo+Admin+saya+lupa+password+akun+lab" target="_blank" ...>
                     Lupa Password? Hubungi Admin Lab
                 </a>
             </div>

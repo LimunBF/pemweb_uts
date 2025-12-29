@@ -118,23 +118,15 @@ class UserDashboardController extends Controller
     public function printSurat($id)
     {
         $currentLoan = Peminjaman::with(['item', 'user'])->findOrFail($id);
-
-        // --- [LOGIKA BARU] CEK APAKAH ADA FILE UPLOAD USER? ---
         if (!empty($currentLoan->file_surat)) {
             // Ambil path file dari storage
             $path = storage_path('app/public/' . $currentLoan->file_surat);
-
             // Cek apakah file fisiknya benar-benar ada di server
             if (file_exists($path)) {
                 // Langsung download file aslinya (PDF/Gambar/Docx)
                 return response()->download($path);
             } 
-            // Jika file tidak ditemukan (misal terhapus), kode akan lanjut ke bawah 
-            // untuk mencoba generate surat otomatis sebagai fallback.
         }
-
-
-        // --- [LOGIKA LAMA] GENERATE SURAT DARI TEMPLATE (JIKA TIDAK UPLOAD) ---
         
         // 1. Grouping Logic
         if (!empty($currentLoan->kode_peminjaman)) {
@@ -144,29 +136,23 @@ class UserDashboardController extends Controller
         } else {
             $groupLoans = collect([$currentLoan]);
         }
-
-        // 2. Load Template
         $templatePath = resource_path('templates/Surat Peminjaman Alat.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
-        
-        // 3. Tentukan Label NIM/NIP
+        // Tentukan Label NIM/NIP
         $userRole = strtolower($currentLoan->user->role ?? 'mahasiswa');
         $label = ($userRole === 'dosen') ? 'NIP' : 'NIM';
-
-        // 4. Isi Data Diri
+        // Isi Data Diri
         $templateProcessor->setValue('label_id', $label);
         $templateProcessor->setValue('name', $currentLoan->user->name);
         $templateProcessor->setValue('id_number', $currentLoan->user->identity_number ?? '-');
         $templateProcessor->setValue('phone_number', $currentLoan->user->contact ?? '-');
         $templateProcessor->setValue('reason', $currentLoan->alasan ?? '-'); 
-
-        // 5. Isi Tanggal
+        // Isi Tanggal
         Carbon::setLocale('id');
         $templateProcessor->setValue('tgl_surat', Carbon::now()->isoFormat('D MMMM Y')); 
         $templateProcessor->setValue('start_date', Carbon::parse($currentLoan->tanggal_pinjam)->format('d/m/Y'));
         $templateProcessor->setValue('end_date', Carbon::parse($currentLoan->tanggal_kembali)->format('d/m/Y'));
-
-        // 6. Isi Tabel Barang
+        // Isi Tabel Barang
         $maxSlots = 5; 
         foreach(range(1, $maxSlots) as $i) {
             if (isset($groupLoans[$i-1])) {
@@ -179,18 +165,14 @@ class UserDashboardController extends Controller
             }
         }
 
-        // 7. Simpan & Download
+        // Simpan & Download
         $nimUntukFile = $currentLoan->user->identity_number ?? 'USER-' . $currentLoan->user->id;
         $fileName = 'Surat_Peminjaman_' . $nimUntukFile . '_' . $currentLoan->id . '.docx';
-        
         $tempPath = storage_path('app/public/temp/' . $fileName);
-        
         if (!file_exists(dirname($tempPath))) {
             mkdir(dirname($tempPath), 0755, true);
         }
-
         $templateProcessor->saveAs($tempPath);
-
         return response()->download($tempPath, $fileName)->deleteFileAfterSend(true);
     }
 }

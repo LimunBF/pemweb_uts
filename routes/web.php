@@ -8,6 +8,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Models\User;
 
 /*
@@ -87,6 +88,9 @@ Route::middleware(['auth'])->group(function () {
         
         // Print Surat
         Route::get('/my-loans/{id}/print', [UserDashboardController::class, 'printSurat'])->name('loan.print');
+
+        // EDIT PROFIL ---
+        Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     });
 
 });
