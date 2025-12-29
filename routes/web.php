@@ -70,6 +70,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('members', MemberController::class);
 
     // --- PEMINJAMAN (ADMIN) ---
+    Route::get('/peminjaman/cetak', [App\Http\Controllers\PeminjamanController::class, 'cetak'])->name('peminjaman.cetak');
     Route::get('/peminjaman', [PeminjamanController::class, 'index'])->name('peminjaman');
     Route::get('/peminjaman/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
     Route::post('/peminjaman', [PeminjamanController::class, 'store'])->name('peminjaman.store');

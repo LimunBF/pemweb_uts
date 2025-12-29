@@ -19,25 +19,63 @@ class PeminjamanController extends Controller
                         ->orderBy('created_at', 'asc')
                         ->get();
 
-        // Hasilnya: Daftar Grup (Bukan daftar item lagi)
+        // Hasilnya: Daftar Grup
         $pendingLoans = $rawPending->groupBy('kode_peminjaman');
 
         // 2. DATA RIWAYAT (TETAP SATUAN)
-        // Agar admin bisa melihat detail per item yang sudah dipinjam/kembali
         $query = Peminjaman::with(['user', 'item'])
                            ->where('status', '!=', 'pending');
 
-        if ($request->has('status') && $request->status != '') {
+        // Filter Status
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        if ($request->start_date && $request->end_date) {
+        // Filter Role (Mahasiswa / Dosen)
+        if ($request->filled('role')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('role', $request->role);
+            });
+        }
+
+        // Filter Tanggal
+        if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
         }
 
-        $peminjaman = $query->latest()->paginate(10);
+        // Tampilan di Dashboard: Terbaru ke Terlama (Latest)
+        $peminjaman = $query->latest()->paginate(10)->withQueryString();
         
         return view('admin.pinjam', compact('peminjaman', 'pendingLoans'));
+    }
+
+    // --- CETAK LAPORAN ---
+    public function cetak(Request $request)
+    {
+        $query = Peminjaman::with(['user', 'item']);
+
+        // Filter Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter Role (Mahasiswa / Dosen)
+        if ($request->filled('role')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('role', $request->role);
+            });
+        }
+
+        // Filter Tanggal
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
+        }
+
+        // URUTAN KHUSUS CETAK: 
+        // Berdasarkan 'tanggal_pinjam' dari yang TERLAMA (ASC)
+        $peminjaman = $query->orderBy('tanggal_pinjam', 'asc')->get();
+
+        return view('admin.peminjaman_cetak', compact('peminjaman'));
     }
 
     // --- FORM CREATE (TETAP SAMA) ---
@@ -91,11 +129,10 @@ class PeminjamanController extends Controller
             'status' => 'required|in:disetujui,ditolak,dikembalikan'
         ]);
 
-        // LOGIKA KHUSUS: Jika menyetujui/menolak, lakukan untuk SEMUA barang dengan kode yang sama
         if (in_array($request->status, ['disetujui', 'ditolak']) && $loan->kode_peminjaman) {
             
             Peminjaman::where('kode_peminjaman', $loan->kode_peminjaman)
-                      ->where('status', 'pending') // Hanya update yang statusnya masih pending
+                      ->where('status', 'pending') 
                       ->update([
                           'status' => $request->status,
                           'approver_id' => Auth::id()
@@ -104,7 +141,6 @@ class PeminjamanController extends Controller
             $msg = 'Seluruh permintaan dalam kode ' . $loan->kode_peminjaman . ' berhasil diproses.';
 
         } else {
-            // Update satuan (biasanya untuk pengembalian barang satu per satu)
             $loan->update([
                 'status' => $request->status,
                 'approver_id' => Auth::id()

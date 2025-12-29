@@ -2,24 +2,7 @@
 
 @section('content')
 
-    {{-- Script Config Tailwind (Inline) --}}
-    <script>
-        if (typeof tailwind !== 'undefined') {
-            tailwind.config = {
-                theme: {
-                    extend: {
-                        colors: {
-                            'lab-pink-btn': '#db2777', // Pink-600
-                            'lab-text': '#1f2937',     // Gray-800
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <div class="container mx-auto px-4 py-8 max-w-7xl">
-
+    <div class="container mx-auto"></div>
         {{-- FLASH MESSAGE --}}
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm flex justify-between items-center" role="alert">
@@ -42,34 +25,28 @@
             </div>
         @endif
 
-        {{-- HEADER (Tombol Tambah Peminjam Diaktifkan) --}}
-        <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg relative overflow-hidden">
-            <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10 pointer-events-none"></div>
+        {{-- HEADER --}}
 
-            <div class="flex flex-col md:flex-row justify-between items-center relative z-10 gap-4">
-                <div>
-                    <h2 class="text-3xl md:text-4xl font-bold">Data Peminjaman</h2>
-                    <p class="mt-2 text-pink-100 opacity-90">
-                        Kelola permohonan masuk dan pantau status inventaris.
-                    </p>
-                </div>
-                
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('peminjaman.create') }}" class="inline-flex items-center px-5 py-2.5 bg-white text-lab-pink-btn border border-transparent rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-pink-50 transition shadow-lg transform hover:-translate-y-0.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Tambah Peminjam
-                    </a>
-                </div>
+        <div class="bg-gradient-to-r from-pink-900 to-pink-600 rounded-2xl p-6 md:p-8 mb-6 text-white shadow-lg relative overflow-hidden">
+        <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="w-full md:flex-1 text-center md:text-left">
+                <h1 class="text-3xl md:text-4xl font-bold">Data Peminjam</h1>
+                <p class="mt-1 text-pink-100 opacity-90">Kelola permohonan masuk dan pantau status inventaris.</p>
+            </div>
+        
+            <div class="w-full md:w-auto flex justify-center md:justify-end">
+                <a href="#" 
+                   class="inline-flex items-center bg-white text-pink-700 font-bold px-5 py-3 rounded-xl shadow-lg hover:bg-pink-50 transition ease-in-out duration-150">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Peminjam
+                </a>    
             </div>
         </div>
+    </div>
 
-        {{-- ========================================================= --}}
-        {{-- BAGIAN 1: PERMINTAAN MASUK (GROUPED BY KODE) --}}
-        {{-- ========================================================= --}}
-        {{-- Ini bagian yang diubah agar menampilkan 1 Peminjam = 1 Baris (Banyak Barang) --}}
-        
+        {{-- BAGIAN 1: PERMINTAAN MASUK (PENDING) --}}
         @if(isset($pendingLoans) && $pendingLoans->count() > 0)
             <div class="mb-10 animate-fade-in-down">
                 <div class="flex items-center gap-3 mb-4">
@@ -93,58 +70,43 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            {{-- LOOPING GROUP (KODE SURAT) --}}
                             @foreach($pendingLoans as $kode => $items)
-                                @php
-                                    $firstItem = $items->first(); // Ambil data umum dari item pertama
-                                @endphp
+                                @php $firstItem = $items->first(); @endphp
                                 <tr class="hover:bg-yellow-50/50 transition">
-                                    {{-- Kolom Peminjam --}}
                                     <td class="px-6 py-4 align-top">
                                         <div class="font-bold text-gray-800">{{ $firstItem->user->name ?? 'User dihapus' }}</div>
                                         <div class="text-xs text-gray-500 mb-1">{{ $firstItem->user->identity_number ?? '-' }}</div>
                                         <span class="text-[10px] bg-gray-100 px-2 py-0.5 rounded font-mono">{{ $kode }}</span>
                                     </td>
-                                    
-                                    {{-- Kolom Daftar Barang (List) --}}
                                     <td class="px-6 py-4 align-top">
                                         <div class="text-xs text-gray-500 italic mb-2">"{{ $firstItem->alasan }}"</div>
                                         <ul class="list-disc list-inside space-y-1">
                                             @foreach($items as $loan)
                                                 <li class="text-sm font-medium text-gray-700">
                                                     {{ $loan->item->nama_alat }} 
-                                                    <span class="text-xs text-gray-500 font-bold bg-white border px-1 rounded ml-1">x{{ $loan->amount }}</span>
+                                                    <span class="text-xs text-gray-500 font-bold bg-white border px-1 rounded ml-1">x{{ $loan->amount ?? 1 }}</span>
                                                 </li>
                                             @endforeach
                                         </ul>
                                     </td>
-
-                                    {{-- Kolom Durasi --}}
                                     <td class="px-6 py-4 text-center align-top text-sm text-gray-600">
                                         {{ \Carbon\Carbon::parse($firstItem->tanggal_pinjam)->format('d M') }} 
                                         <span class="text-gray-400 mx-1">-</span>
                                         {{ \Carbon\Carbon::parse($firstItem->tanggal_kembali)->format('d M') }}
                                     </td>
-                                    
-                                    {{-- Kolom Aksi --}}
                                     <td class="px-6 py-4 text-center align-top">
                                         <div class="flex justify-center gap-3">
-                                            {{-- TERIMA SEMUA --}}
-                                            <form action="{{ route('peminjaman.update', $firstItem->id) }}" method="POST" onsubmit="return confirm('Setujui SEMUA barang dalam permintaan ini?');">
+                                            <form action="{{ route('peminjaman.update', $firstItem->id) }}" method="POST" onsubmit="return confirm('Setujui permintaan ini?');">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="disetujui">
                                                 <button type="submit" class="flex items-center gap-1 bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                                    Terima Semua
+                                                    Setujui
                                                 </button>
                                             </form>
-                                            
-                                            {{-- TOLAK SEMUA --}}
                                             <form action="{{ route('peminjaman.update', $firstItem->id) }}" method="POST" onsubmit="return confirm('Tolak permintaan ini?')">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="ditolak">
                                                 <button type="submit" class="flex items-center gap-1 bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                     Tolak
                                                 </button>
                                             </form>
@@ -158,38 +120,63 @@
             </div>
         @endif
 
-        {{-- BAGIAN 2: DAFTAR RIWAYAT (TETAP SAMA SEPERTI SKRIP LAMA) --}}
+        {{-- BAGIAN 2: DAFTAR RIWAYAT & FILTER --}}
         
-        {{-- FILTER --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
             <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                Filter Data Peminjaman
+                Filter & Cetak Data
             </h3>
             
             <form action="{{ route('peminjaman') }}" method="GET">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    
+                    {{-- 1. Filter Kategori User (BARU) --}}
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">Kategori User</label>
+                        <select name="role" class="w-full text-sm border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn">
+                            <option value="">Semua User</option>
+                            <option value="mahasiswa" {{ request('role') == 'mahasiswa' ? 'selected' : '' }}>Mahasiswa</option>
+                            <option value="dosen" {{ request('role') == 'dosen' ? 'selected' : '' }}>Dosen</option>
+                        </select>
+                    </div>
+
+                    {{-- 2. Filter Tanggal Mulai --}}
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Dari Tanggal</label>
                         <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full text-sm border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn">
                     </div>
+
+                    {{-- 3. Filter Tanggal Akhir --}}
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Sampai Tanggal</label>
                         <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full text-sm border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn">
                     </div>
+
+                    {{-- 4. Filter Status --}}
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
                         <select name="status" class="w-full text-sm border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn">
-                            <option value="">-- Semua Status --</option>
-                            <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui (Sedang Dipinjam)</option>
+                            <option value="">Semua Status</option>
+                            <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
                             <option value="dikembalikan" {{ request('status') == 'dikembalikan' ? 'selected' : '' }}>Dikembalikan</option>
                             <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                         </select>
                     </div>
+                    
+                    {{-- TOMBOL FILTER & CETAK --}}
                     <div class="flex items-end gap-2">
-                        <button type="submit" class="w-full p-2.5 bg-lab-pink-btn text-white rounded-lg hover:bg-pink-700 transition shadow-sm font-bold text-sm">
-                            Terapkan Filter
+                        <button type="submit" class="flex-1 p-2.5 bg-lab-pink-btn text-white rounded-lg hover:bg-pink-700 transition shadow-sm font-bold text-sm">
+                            Filter
                         </button>
+                        
+                        {{-- Tombol Cetak membawa semua parameter filter yang aktif --}}
+                        <a href="{{ route('peminjaman.cetak', request()->all()) }}" target="_blank" class="flex-1 p-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition shadow-sm font-bold text-sm text-center flex items-center justify-center gap-2" title="Cetak Laporan PDF">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                            Cetak
+                        </a>
                     </div>
                 </div>
             </form>
@@ -263,4 +250,5 @@
         </div>
 
     </div>
+</div
 @endsection
