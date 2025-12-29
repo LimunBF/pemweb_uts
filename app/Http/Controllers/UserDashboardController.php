@@ -128,7 +128,7 @@ class UserDashboardController extends Controller
         }
 
         // Load Template
-        $templatePath = storage_path('app/templates/Surat Peminjaman Alat.docx');
+        $templatePath = resource_path('templates/Surat Peminjaman Alat.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
         
         // Isi Data
