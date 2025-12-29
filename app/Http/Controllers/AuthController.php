@@ -48,24 +48,51 @@ class AuthController extends Controller
         return view('auth.register');
     }
 
-    public function register(Request $request)
+    public function registerProses(Request $request)
     {
+        // 1. Validasi Dasar (Hanya Mahasiswa & Dosen)
         $request->validate([
-            'name' => 'required|string|max:255',
-            'identity_number' => 'required|unique:users,identity_number',
-            'contact' => 'required|string',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'role'     => 'required|in:mahasiswa,dosen', // Admin dihapus dari validasi ini
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'identity_number' => $request->identity_number,
-            'contact' => $request->contact,
-            'email' => $request->email,
+        // 2. Tentukan Identity Number (NIM/NIP)
+        $identityNumber = null;
+        $role = $request->role;
+
+        if ($role === 'mahasiswa') {
+            $request->validate(['identity_number_mhs' => 'required']);
+            $identityNumber = $request->identity_number_mhs;
+            
+        } elseif ($role === 'dosen') {
+            $request->validate(['identity_number_dosen' => 'required']);
+            $identityNumber = $request->identity_number_dosen;
+        }
+
+        // 3. Simpan User ke Database
+        $data = [
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'mahasiswa', // Default pendaftar mandiri adalah mahasiswa
-        ]);
+            'role'     => $role,
+            'identity_number' => $identityNumber,
+        ];
+
+        User::create($data);
+
+        // 4. Login Otomatis & Redirect
+        $loginData = [
+            'email' => $request->email,
+            'password' => $request->password
+        ];
+
+        if (Auth::attempt($loginData)) {
+            $request->session()->regenerate();
+            // Karena hanya Mhs & Dosen, redirect ke User Dashboard semua
+            return redirect()->route('user.dashboard');
+        }
 
         return redirect()->route('login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
