@@ -114,11 +114,29 @@ class UserDashboardController extends Controller
         return redirect()->route('student.loans')->with('success', 'Pengajuan berhasil dikirim!');
     }
 
-    // 6. CETAK SURAT 
+    // CETAK SURAT 
     public function printSurat($id)
     {
         $currentLoan = Peminjaman::with(['item', 'user'])->findOrFail($id);
 
+        // --- [LOGIKA BARU] CEK APAKAH ADA FILE UPLOAD USER? ---
+        if (!empty($currentLoan->file_surat)) {
+            // Ambil path file dari storage
+            $path = storage_path('app/public/' . $currentLoan->file_surat);
+
+            // Cek apakah file fisiknya benar-benar ada di server
+            if (file_exists($path)) {
+                // Langsung download file aslinya (PDF/Gambar/Docx)
+                return response()->download($path);
+            } 
+            // Jika file tidak ditemukan (misal terhapus), kode akan lanjut ke bawah 
+            // untuk mencoba generate surat otomatis sebagai fallback.
+        }
+
+
+        // --- [LOGIKA LAMA] GENERATE SURAT DARI TEMPLATE (JIKA TIDAK UPLOAD) ---
+        
+        // 1. Grouping Logic
         if (!empty($currentLoan->kode_peminjaman)) {
             $groupLoans = Peminjaman::with('item')
                             ->where('kode_peminjaman', $currentLoan->kode_peminjaman)
@@ -127,30 +145,28 @@ class UserDashboardController extends Controller
             $groupLoans = collect([$currentLoan]);
         }
 
+        // 2. Load Template
         $templatePath = resource_path('templates/Surat Peminjaman Alat.docx');
         $templateProcessor = new TemplateProcessor($templatePath);
         
-        // --- LOGIKA BARU: MENENTUKAN LABEL NIM / NIP ---
+        // 3. Tentukan Label NIM/NIP
         $userRole = strtolower($currentLoan->user->role ?? 'mahasiswa');
+        $label = ($userRole === 'dosen') ? 'NIP' : 'NIM';
 
-        if ($userRole === 'dosen') {
-            $label = 'NIP';
-        } else {
-            $label = 'NIM';
-        }
-
-        $templateProcessor->setValue('label_id', $label); // Mengganti ${label_id}
+        // 4. Isi Data Diri
+        $templateProcessor->setValue('label_id', $label);
         $templateProcessor->setValue('name', $currentLoan->user->name);
-        $templateProcessor->setValue('id_number', $currentLoan->user->identity_number ?? '-'); // Mengganti ${id_number}
+        $templateProcessor->setValue('id_number', $currentLoan->user->identity_number ?? '-');
         $templateProcessor->setValue('phone_number', $currentLoan->user->contact ?? '-');
         $templateProcessor->setValue('reason', $currentLoan->alasan ?? '-'); 
 
+        // 5. Isi Tanggal
         Carbon::setLocale('id');
         $templateProcessor->setValue('tgl_surat', Carbon::now()->isoFormat('D MMMM Y')); 
         $templateProcessor->setValue('start_date', Carbon::parse($currentLoan->tanggal_pinjam)->format('d/m/Y'));
         $templateProcessor->setValue('end_date', Carbon::parse($currentLoan->tanggal_kembali)->format('d/m/Y'));
 
-        //Isi Tabel Barang (Looping Slot 1-5)
+        // 6. Isi Tabel Barang
         $maxSlots = 5; 
         foreach(range(1, $maxSlots) as $i) {
             if (isset($groupLoans[$i-1])) {
@@ -158,31 +174,23 @@ class UserDashboardController extends Controller
                 $templateProcessor->setValue("alat_$i", $loan->item->nama_alat);
                 $templateProcessor->setValue("qty_$i", $loan->amount . ' Unit'); 
             } else {
-                // Jika barang kurang dari 5, kosongkan sisanya
                 $templateProcessor->setValue("alat_$i", '');
                 $templateProcessor->setValue("qty_$i", '');
             }
         }
 
-        
-        // Ambil ID Number untuk nama file. Jika kosong, pakai 'USER-[ID]'
+        // 7. Simpan & Download
         $nimUntukFile = $currentLoan->user->identity_number ?? 'USER-' . $currentLoan->user->id;
-        
-        // Format Nama File: Surat_Peminjaman_[NIM/ID]_[ID_PINJAM].docx
         $fileName = 'Surat_Peminjaman_' . $nimUntukFile . '_' . $currentLoan->id . '.docx';
         
-        // Simpan di folder temp storage public
         $tempPath = storage_path('app/public/temp/' . $fileName);
         
-        // Buat folder temp jika belum ada
         if (!file_exists(dirname($tempPath))) {
             mkdir(dirname($tempPath), 0755, true);
         }
 
-        // Simpan hasil generate
         $templateProcessor->saveAs($tempPath);
 
-        // Force Download & Hapus file temp setelah dikirim
         return response()->download($tempPath, $fileName)->deleteFileAfterSend(true);
     }
 }
