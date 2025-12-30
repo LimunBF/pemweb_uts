@@ -10,10 +10,32 @@ use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
-    // 1. TAMPILKAN DATA
-    public function index()
+    // 1. TAMPILKAN DATA (DENGAN FILTER & SEARCH)
+    public function index(Request $request)
     {
-        $members = User::where('role', 'mahasiswa')->latest()->get();
+        // Mulai Query
+        $query = User::query();
+
+        // A. Logika Filter Role (Mahasiswa/Dosen)
+        if ($request->has('role') && in_array($request->role, ['mahasiswa', 'dosen'])) {
+            $query->where('role', $request->role);
+        }
+
+        // B. Logika Search (Pencarian) - BAGIAN INI YANG PENTING
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%")
+                  ->orWhere('identity_number', 'LIKE', "%{$search}%") // NIM atau NIP
+                  ->orWhere('contact', 'LIKE', "%{$search}%");       // No HP
+            });
+        }
+
+        // Ambil data (urutkan terbaru)
+        $members = $query->latest()->get();
+
+        // Kembalikan ke View
         return view('members.index', compact('members'));
     }
 
@@ -26,23 +48,22 @@ class MemberController extends Controller
     // 3. SIMPAN DATA BARU
     public function store(Request $request)
     {
-        // Validasi
         $request->validate([
             'name'            => 'required|string|max:255',
             'email'           => 'required|string|email|max:255|unique:users',
-            'identity_number' => 'required|string|max:20|unique:users', // NIM
+            'identity_number' => 'required|string|max:20|unique:users',
             'contact'         => 'nullable|string|max:15',
             'password'        => 'required|string|min:6',
+            'role'            => 'required|in:mahasiswa,dosen',
         ]);
 
-        // Simpan ke Database
         User::create([
             'name'            => $request->name,
             'email'           => $request->email,
             'identity_number' => $request->identity_number,
             'contact'         => $request->contact,
-            'password'        => Hash::make($request->password), // Enkripsi password
-            'role'            => 'mahasiswa', // Otomatis set sebagai mahasiswa
+            'password'        => Hash::make($request->password),
+            'role'            => $request->role,
         ]);
 
         return redirect()->route('members.index')->with('success', 'Anggota berhasil ditambahkan!');
@@ -60,7 +81,6 @@ class MemberController extends Controller
     {
         $member = User::findOrFail($id);
 
-        // 1. Validasi Ketat (Sama seperti ProfileController)
         $request->validate([
             'name'            => 'required|string|max:255',
             'email'           => 'required|email|unique:users,email,' . $member->id,
@@ -69,37 +89,28 @@ class MemberController extends Controller
                 'nullable', 'numeric', 'digits_between:10,13', 'regex:/^08[0-9]+$/', 
                 'unique:users,contact,' . $member->id
             ],
-            // Password opsional, tapi jika diisi WAJIB konfirmasi
             'password'        => 'nullable|min:6|confirmed',
-        ], [
-            'identity_number.size'   => 'NIM/NIP harus 8 digit.',
-            'contact.regex'          => 'Format HP harus diawali 08.',
-            'password.confirmed'     => 'Konfirmasi password baru tidak cocok.',
         ]);
 
-        // 2. Siapkan Data Update
         $data = [
             'name'            => $request->name,
             'email'           => $request->email,
             'identity_number' => $request->identity_number,
             'contact'         => $request->contact,
-            'role'            => $request->role, // Admin berhak ganti role
+            'role'            => $request->role,
         ];
 
         $passwordChanged = false;
         $plainPassword = null;
 
-        // 3. Cek Password Baru
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
             $plainPassword = $request->password;
             $passwordChanged = true;
         }
 
-        // 4. Update Database
         $member->update($data);
 
-        // 5. Kirim Email Notifikasi (Jika Password Berubah)
         if ($passwordChanged) {
             try {
                 Mail::send('emails.password_changed', [
@@ -110,7 +121,6 @@ class MemberController extends Controller
                             ->subject('Reset Password Oleh Admin - Lab PTIK');
                 });
             } catch (\Exception $e) {
-                // Log error tapi jangan gagalkan proses update
                 Log::error("Gagal kirim email ke {$member->email}: " . $e->getMessage());
                 return redirect()->route('members.index')
                     ->with('success', "Data {$member->name} diperbarui (Email notifikasi gagal terkirim).");
