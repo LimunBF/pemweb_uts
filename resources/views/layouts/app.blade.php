@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Inventaris Lab PTIK</title>
     
+    {{-- TAMBAHKAN INI --}}
+    <link rel="icon" href="{{ asset('templates/logo.png') }}" type="image/png">
+    
     {{-- Tailwind CSS CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -40,9 +43,10 @@
         <!-- SIDEBAR -->
         <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
             <!-- Header Sidebar -->
-            <div class="h-16 flex items-center justify-center border-b border-gray-200">
-                <h1 class="text-xl font-bold text-lab-text">Laboratorium PTIK</h1>
-            </div>
+        <div class="h-16 flex items-center justify-center border-b border-gray-200 gap-2">
+            <img src="{{ asset('templates/logo.png') }}" alt="Logo" class="h-8 w-8">
+            <h1 class="text-xl font-bold text-lab-text">Laboratorium PTIK</h1>
+        </div>
 
             <!-- Menu Navigasi -->
             <nav class="flex-1 mt-6 px-4 space-y-2">

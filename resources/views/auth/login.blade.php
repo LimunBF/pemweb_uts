@@ -6,7 +6,7 @@
     <title>Login - Sistem Inventaris Lab PTIK</title>
     
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ asset('templates/logo.png') }}" type="image/png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
