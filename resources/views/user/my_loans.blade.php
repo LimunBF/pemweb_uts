@@ -29,9 +29,10 @@
             <h2 class="text-3xl font-bold text-lab-text">Pinjaman Saya</h2>
             <p class="text-gray-500 text-sm mt-1">Riwayat dan status pengajuan alat laboratorium.</p>
         </div>
-        
-        <a href="{{ route('student.loan.form') }}" class="bg-lab-pink-btn hover:bg-pink-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition transform hover:-translate-y-1 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+        <a href="{{ route('student.loan.form') }}" class="group bg-lab-pink-btn hover:bg-pink-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition transform hover:-translate-y-1 flex items-center">
+            {{-- Tambahkan class animasi di sini: group-hover:rotate-180 --}}
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 transition-transform duration-500 ease-in-out group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>
             Ajukan Baru
@@ -244,28 +245,59 @@
 
     @else
         {{-- TAMPILAN KOSONG (JIKA FILTER TIDAK DITEMUKAN) --}}
-        <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 animate-fade-in-up">
-            <div class="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-            </div>
-            <h3 class="mt-2 text-lg font-medium text-gray-900">
-                {{ request()->hasAny(['status', 'start_date', 'end_date']) ? 'Data tidak ditemukan' : 'Belum ada riwayat' }}
-            </h3>
-            <p class="mt-1 text-sm text-gray-500">
-                {{ request()->hasAny(['status', 'start_date', 'end_date']) ? 'Coba ubah status atau tanggal pencarian Anda.' : 'Anda belum pernah mengajukan peminjaman alat.' }}
-            </p>
-            <div class="mt-6">
-                @if(request()->hasAny(['status', 'start_date', 'end_date']))
-                    <a href="{{ route('student.loans') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                        Reset Filter
-                    </a>
-                @else
-                    <a href="{{ route('student.loan.form') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lab-pink-btn hover:bg-pink-700">
-                        Buat Pengajuan Baru
-                    </a>
-                @endif
+        <div class="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100 animate-fade-in-up overflow-hidden relative">
+            
+            {{-- Dekorasi Background Blob --}}
+            <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-pink-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+
+            <div class="relative z-10 flex flex-col items-center">
+                {{-- ILUSTRASI SVG: Empty Box / Relax --}}
+                <div class="w-56 h-56 mb-2">
+                    <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                        {{-- Lantai --}}
+                        <ellipse cx="200" cy="260" rx="120" ry="10" fill="#F3F4F6"/>
+                        
+                        {{-- Kotak Kardus --}}
+                        <path d="M130 180 L200 210 L270 180 L200 150 L130 180 Z" fill="#E5E7EB"/>
+                        <path d="M130 180 V250 L200 280 V210 L130 180 Z" fill="#D1D5DB"/>
+                        <path d="M270 180 V250 L200 280 V210 L270 180 Z" fill="#9CA3AF"/>
+                        
+                        {{-- Tutup Kotak Terbuka --}}
+                        <path d="M130 180 L80 140 L150 110 L200 150 L130 180 Z" fill="#D1D5DB" stroke="white" stroke-width="2"/>
+                        <path d="M270 180 L320 140 L250 110 L200 150 L270 180 Z" fill="#D1D5DB" stroke="white" stroke-width="2"/>
+
+                        {{-- Elemen Mengambang (Kertas/Debu) --}}
+                        <circle cx="150" cy="100" r="3" fill="#DB2777" class="animate-bounce" style="animation-duration: 2s"/>
+                        <circle cx="250" cy="80" r="5" fill="#FF91A4" class="animate-bounce" style="animation-duration: 3s"/>
+                        <rect x="180" y="60" width="40" height="50" rx="4" fill="white" stroke="#DB2777" stroke-width="2" transform="rotate(15)" class="animate-pulse"/>
+                        <path d="M190 75 H210" stroke="#DB2777" stroke-width="2"/>
+                        <path d="M190 85 H210" stroke="#DB2777" stroke-width="2"/>
+                    </svg>
+                </div>
+
+                <h3 class="text-2xl font-bold text-gray-800">
+                    {{ request()->hasAny(['status', 'start_date', 'end_date']) ? 'Tidak Ada Data Ditemukan' : 'Belum Ada Pinjaman' }}
+                </h3>
+                
+                <p class="mt-2 text-gray-500 max-w-md mx-auto leading-relaxed">
+                    {{ request()->hasAny(['status', 'start_date', 'end_date']) 
+                        ? 'Filter yang Anda terapkan tidak cocok dengan data manapun. Coba reset filter untuk melihat semua data.' 
+                        : 'Saat ini Anda tidak memiliki barang yang sedang dipinjam atau riwayat peminjaman sebelumnya.' }}
+                </p>
+
+                <div class="mt-8">
+                    @if(request()->hasAny(['status', 'start_date', 'end_date']))
+                        <a href="{{ route('student.loans') }}" class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition transform hover:-translate-y-1">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Reset Filter
+                        </a>
+                    @else
+                        <a href="{{ route('student.loan.form') }}" class="inline-flex items-center px-8 py-3 border border-transparent shadow-lg text-sm font-bold rounded-xl text-white bg-lab-pink-btn hover:bg-pink-700 transition transform hover:-translate-y-1 hover:shadow-pink-200">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Buat Pengajuan Baru
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
     @endif

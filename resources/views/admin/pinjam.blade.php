@@ -1,23 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- Config Tailwind (Fallback) --}}
-<script>
-    if (typeof tailwind !== 'undefined') {
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'lab-pink-btn': '#db2777',
-                        'lab-text': '#1f2937',
-                    }
-                }
-            }
-        }
-    }
-</script>
 
-<div class="container mx-auto px-4 py-8 max-w-7xl">
+{{-- HAPUS SCRIPT TAILWIND DISINI AGAR TIDAK BENTROK DENGAN LAYOUT UTAMA --}}
+
+<div class="container mx-auto"> 
+    {{-- Container disamakan dengan Dashboard (tanpa max-w-7xl yang membatasi lebar) --}}
     
     {{-- Notifikasi --}}
     @if(session('success'))
@@ -41,26 +29,34 @@
         </div>
     @endif
 
-    {{-- HEADER PINK --}}
-    <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg relative overflow-hidden">
-        <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10 pointer-events-none"></div>
-        <div class="flex flex-col md:flex-row justify-between items-center relative z-10 gap-4">
-            <div>
-                <h2 class="text-3xl md:text-4xl font-bold">Manajemen Peminjaman</h2>
-                <p class="mt-2 text-pink-100 opacity-90">
-                    Kelola persetujuan dan pantau status barang lab.
-                </p>
-            </div>
-            
-            <div class="flex items-center gap-3">
-                <a href="{{ route('peminjaman.create') }}" class="inline-flex items-center px-5 py-2.5 bg-white text-lab-pink-btn border border-transparent rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-pink-50 transition shadow-lg transform hover:-translate-y-0.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Input Peminjaman Baru
-                </a>
-            </div>
+    {{-- HEADER PINK (Desain disamakan dengan Dashboard) --}}
+    <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg relative overflow-hidden flex items-center justify-between">
+        <div class="relative z-10">
+            <h2 class="text-3xl md:text-4xl font-bold">Manajemen Peminjaman</h2>
+            <p class="mt-2 text-pink-100 opacity-90">
+                Kelola persetujuan dan pantau status barang lab.
+            </p>
         </div>
+        
+        {{-- Hiasan Background --}}
+        <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10 pointer-events-none"></div>
+
+        {{-- Tombol Input (Tetap ada, tapi z-index tinggi agar bisa diklik) --}}
+        <div class="relative z-20 hidden md:block">
+            <a href="{{ route('peminjaman.create') }}" class="inline-flex items-center px-5 py-3 bg-white text-lab-pink-btn border border-transparent rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-pink-50 transition shadow-lg transform hover:-translate-y-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Input Baru
+            </a>
+        </div>
+    </div>
+
+    {{-- Tombol Input Mobile Only --}}
+    <div class="md:hidden mb-6">
+        <a href="{{ route('peminjaman.create') }}" class="block w-full text-center px-5 py-3 bg-lab-pink-btn text-white rounded-xl font-bold text-sm shadow-lg">
+            + Input Peminjaman Baru
+        </a>
     </div>
 
     {{-- SECTION 1: PERMINTAAN MASUK (PENDING) --}}
@@ -72,7 +68,7 @@
                 </div>
                 <h3 class="text-xl font-bold text-gray-800">
                     Permintaan Masuk 
-                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2 shadow-sm">{{ $pendingLoans->count() }}</span>
+                    <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-2 shadow-sm align-middle">{{ $pendingLoans->count() }}</span>
                 </h3>
             </div>
 
@@ -95,7 +91,7 @@
                         <div class="p-5">
                             {{-- Info User --}}
                             <div class="flex items-center mb-4">
-                                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 text-white flex items-center justify-center font-bold mr-3">
+                                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 text-white flex items-center justify-center font-bold mr-3 text-sm">
                                     {{ substr($first->user->name, 0, 1) }}
                                 </div>
                                 <div>
@@ -144,32 +140,45 @@
 
                         {{-- Footer Action --}}
                         <div class="px-5 py-4 bg-gray-50 border-t border-gray-100 flex gap-2">
+                            {{-- Form Tolak --}}
                             <form action="{{ route('peminjaman.update', $first->id) }}" method="POST" class="flex-1">
                                 @csrf @method('PATCH')
                                 <input type="hidden" name="status" value="ditolak">
-                                <button type="submit" class="w-full py-2 rounded-lg border border-red-200 text-red-600 text-sm font-bold hover:bg-red-50 transition" onclick="return confirm('Tolak permintaan ini?')">Tolak</button>
+                                {{-- Ubah type="submit" jadi type="button" & tambah onclick --}}
+                                <button type="button" 
+                                        onclick="confirmSubmit(this, 'Tolak Permintaan?', 'Apakah Anda yakin ingin menolak peminjaman ini?', 'Ya, Tolak', '#EF4444')" 
+                                        class="w-full py-2 rounded-lg border border-red-200 text-red-600 text-sm font-bold hover:bg-red-50 transition">
+                                    Tolak
+                                </button>
                             </form>
+
+                            {{-- Form Setujui --}}
                             <form action="{{ route('peminjaman.update', $first->id) }}" method="POST" class="flex-1">
                                 @csrf @method('PATCH')
                                 <input type="hidden" name="status" value="disetujui">
-                                <button type="submit" class="w-full py-2 rounded-lg bg-green-500 text-white text-sm font-bold shadow hover:bg-green-600 transition" onclick="return confirm('Setujui permintaan ini?')">Setujui</button>
+                                {{-- Ubah type="submit" jadi type="button" & tambah onclick --}}
+                                <button type="button" 
+                                        onclick="confirmSubmit(this, 'Setujui Permintaan?', 'Barang akan status dipinjam.', 'Ya, Setujui', '#10B981')" 
+                                        class="w-full py-2 rounded-lg bg-green-500 text-white text-sm font-bold shadow hover:bg-green-600 transition">
+                                    Setujui
+                                </button>
                             </form>
                         </div>
                     </div>
                 @endforeach
             </div>
         @else
-            <div class="bg-white rounded-xl p-8 text-center border border-gray-200 shadow-sm">
+            <div class="bg-white rounded-xl p-8 text-center border border-gray-200 shadow-sm mb-8">
                 <div class="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
                     <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <p class="text-gray-500 text-sm font-medium">Tidak ada permintaan baru.</p>
+                <p class="text-gray-500 text-sm font-medium">Tidak ada permintaan baru saat ini.</p>
             </div>
         @endif
-    </div>
+    
 
     {{-- SECTION 2: FILTER & DATA (REALTIME) --}}
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 relative">
+    <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 relative">
         
         {{-- Loading Overlay --}}
         <div id="filter-loading" class="hidden absolute inset-0 bg-white/70 backdrop-blur-sm z-20 rounded-xl flex items-center justify-center">
@@ -183,13 +192,13 @@
             {{-- Input Hidden untuk menyimpan status tombol Quick Date --}}
             <input type="hidden" name="period" id="periodInput" value="{{ request('period', 'all') }}">
 
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                <h3 class="text-sm font-bold text-gray-700 flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                    Filter Data Peminjaman
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <h3 class="text-lg font-bold text-gray-800 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-lab-pink-btn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    Riwayat & Filter
                 </h3>
 
-                {{-- QUICK DATE FILTERS (Dengan Active State) --}}
+                {{-- QUICK DATE FILTERS --}}
                 <div class="flex gap-2 overflow-x-auto pb-1 md:pb-0">
                     <button type="button" onclick="setQuickDate('all')" 
                         class="px-4 py-1.5 text-xs font-bold rounded-full border transition duration-200 
@@ -240,12 +249,8 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Status</label>
                     <select name="status" id="statusFilter" class="w-full text-sm border-gray-200 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn cursor-pointer hover:bg-gray-50 transition" onchange="submitFilter()">
-                        {{-- Opsi Default (Value Kosong) sekarang jadi SEMUA --}}
                         <option value="" {{ request('status') == '' ? 'selected' : '' }}>📂 Semua Riwayat</option>
-                        
                         <option disabled>──────────</option>
-                        
-                        {{-- Opsi Spesifik --}}
                         <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>🟢 Sedang Dipinjam</option>
                         <option value="terlambat" {{ request('status') == 'terlambat' ? 'selected' : '' }}>⚠️ Terlambat</option>
                         <option value="dikembalikan" {{ request('status') == 'dikembalikan' ? 'selected' : '' }}>🔵 Dikembalikan</option>
@@ -253,7 +258,7 @@
                     </select>
                 </div>
                 
-                {{-- Tombol Cetak (Membawa semua parameter filter saat ini) --}}
+                {{-- Tombol Cetak --}}
                 <div class="flex items-end">
                     <a href="{{ route('peminjaman.cetak', request()->all()) }}" target="_blank" class="w-full p-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition text-sm font-bold text-center flex justify-center items-center gap-2 shadow-md">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
@@ -272,11 +277,9 @@
                 </div>
             @endif
         </form>
-    </div>
 
-    {{-- TABEL RIWAYAT --}}
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div class="overflow-x-auto">
+        {{-- TABEL RIWAYAT --}}
+        <div class="mt-6 overflow-x-auto rounded-xl border border-gray-200">
             <table class="w-full text-left border-collapse">
                 <thead class="bg-gray-50 border-b border-gray-200">
                     <tr class="text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -287,7 +290,7 @@
                         <th class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 text-sm">
+                <tbody class="divide-y divide-gray-100 text-sm bg-white">
                     @forelse($peminjaman as $kode => $items)
                         @php 
                             $first = $items->first(); 
@@ -334,7 +337,11 @@
                                     <form action="{{ route('peminjaman.update', $first->id) }}" method="POST">
                                         @csrf @method('PATCH')
                                         <input type="hidden" name="status" value="dikembalikan">
-                                        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-1 mx-auto" onclick="return confirm('Konfirmasi barang sudah kembali?')">
+                                        
+                                        {{-- Tombol Selesai --}}
+                                        <button type="button" 
+                                                onclick="confirmSubmit(this, 'Konfirmasi Pengembalian?', 'Pastikan semua barang telah dicek kondisinya.', 'Ya, Barang Kembali', '#1F2937')"
+                                                class="bg-gray-800 hover:bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-1 mx-auto">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                             Selesai
                                         </button>
@@ -358,7 +365,7 @@
             </table>
         </div>
         
-        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
+        <div class="mt-4">
             {{ $peminjaman->links() }}
         </div>
     </div>
@@ -378,7 +385,7 @@
             form.submit();
         }
 
-        // FITUR BARU: Quick Date Setter + Set Active State via Hidden Input
+        // FITUR BARU: Quick Date Setter
         window.setQuickDate = function(type) {
             const today = new Date();
             const formatDate = (date) => {
@@ -411,15 +418,15 @@
             startDate.value = startStr;
             endDate.value = (type === 'all') ? '' : endStr;
             
-            // Set Input Hidden agar controller tahu tombol mana yg aktif (untuk styling setelah reload)
+            // Set Input Hidden
             periodInput.value = type;
 
             submitFilter();
         }
 
-        // Logic Auto Submit Tanggal Manual (Akan mereset period jika user ubah manual)
+        // Logic Auto Submit
         startDate.addEventListener('change', function() {
-            periodInput.value = 'custom'; // Tandai sebagai manual
+            periodInput.value = 'custom';
             endDate.min = this.value;
             if (this.value && endDate.value) submitFilter();
         });

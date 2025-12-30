@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar - Sistem Inventaris Lab PTIK</title>
 
-    <link rel="icon" href="{{ asset('templates/logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('templates/logo_ptik.png') }}" type="image/png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -75,12 +75,17 @@
 </head>
 <body class="bg-white min-h-screen font-poppins flex">
 
+    {{-- BAGIAN KIRI: KUCING & DEKORASI --}}
     <div class="hidden lg:flex lg:w-1/2 bg-lab-pink relative flex-col justify-center items-center overflow-hidden">
         <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-white rounded-full mix-blend-overlay opacity-40 blur-3xl animate-pulse"></div>
         <div class="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply opacity-20 blur-3xl animate-pulse"></div>
 
-        <div class="relative z-10 mb-10 transform scale-110"> 
-            <div id="bubble" class="chat-bubble absolute -top-16 -right-24 bg-white px-4 py-2 rounded-xl rounded-bl-none shadow-lg border border-lab-pink-btn z-30 w-48 select-none">
+        <div class="relative z-10 mb-6 transform scale-110 flex flex-col items-center"> 
+            
+            {{-- LOGO PTIK KIRI (Agar Resmi & Konsisten dengan Login) --}}
+            <img src="{{ asset('templates/logo_ptik.png') }}" alt="Logo PTIK" class="w-24 h-auto mb-8 drop-shadow-xl hover:scale-110 transition-transform duration-300">
+
+            <div id="bubble" class="chat-bubble absolute top-20 -right-24 bg-white px-4 py-2 rounded-xl rounded-bl-none shadow-lg border border-lab-pink-btn z-30 w-48 select-none">
                 <p id="bubble-text" class="text-xs font-bold text-gray-700 leading-tight text-center">Halo! Daftar dulu yuk ✨</p>
             </div>
 
@@ -129,15 +134,21 @@
         </div>
 
         <div class="text-center z-10 px-10 select-none">
-            <h2 class="text-3xl font-bold text-lab-text mb-2 drop-shadow-sm">Bergabunglah Bersama Kami!</h2>
+            <h2 class="text-3xl font-bold text-lab-text mt-2 mb-2 drop-shadow-sm">Bergabunglah Bersama Kami!</h2>
             <p class="text-gray-600 font-medium">Daftarkan akunmu untuk mulai meminjam alat.</p>
         </div>
     </div>
 
+    {{-- BAGIAN KANAN: FORM REGISTER --}}
     <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white overflow-y-auto">
         <div class="w-full max-w-md">
             
             <div class="text-left mb-6">
+                {{-- LOGO PTIK KANAN (Hanya muncul di Mobile/Responsif Kecil, di Desktop pakai Kiri) --}}
+                <div class="lg:hidden mb-4 flex justify-center">
+                    <img src="{{ asset('templates/logo_ptik.png') }}" alt="Logo PTIK" class="h-16 w-auto drop-shadow-md">
+                </div>
+
                 <h1 class="text-3xl font-extrabold text-lab-text">Buat Akun Baru</h1>
                 <p class="text-sm text-gray-400 font-medium uppercase tracking-wider mt-1">Sistem Inventaris Lab PTIK</p>
             </div>
@@ -292,17 +303,14 @@
         const nimCounter = document.getElementById('nim-counter');
 
         // --- 1. COUNTER LOGIC ---
-        // Dipisahkan jadi fungsi agar bisa dipanggil saat Load & saat Input
         function updateContactUI() {
             let val = contactInput.value;
-            // Batasi 13 digit visual
             if (val.length > 13) {
                 contactInput.value = val.slice(0, 13);
                 val = contactInput.value;
             }
             contactCounter.innerText = `${val.length}/13`;
             
-            // Validasi Warna
             if (val.length >= 10 && val.length <= 13) {
                 contactCounter.classList.replace('text-gray-400', 'text-green-600');
                 contactCounter.classList.replace('bg-gray-100', 'bg-green-100');
@@ -314,14 +322,12 @@
 
         function updateNimUI() {
             let val = nimInput.value;
-            // Batasi 8 digit visual
             if (val.length > 8) {
                 nimInput.value = val.slice(0, 8);
                 val = nimInput.value;
             }
             nimCounter.innerText = `${val.length}/8`;
             
-            // Validasi Warna (Harus pas 8)
             if (val.length === 8) {
                 nimCounter.classList.replace('text-gray-400', 'text-green-600');
                 nimCounter.classList.replace('bg-gray-100', 'bg-green-100');
@@ -331,7 +337,6 @@
             }
         }
 
-        // Attach Listener
         contactInput.addEventListener('input', updateContactUI);
         nimInput.addEventListener('input', updateNimUI);
 
@@ -436,7 +441,6 @@
         }
 
         // --- 7. JALANKAN LOGIKA UI SAAT LOAD ---
-        // (Ini yang memperbaiki masalah counter reset setelah redirect error)
         updateContactUI();
         updateNimUI();
         toggleInputs(); 

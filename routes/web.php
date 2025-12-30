@@ -18,22 +18,24 @@ use App\Models\User;
 */
 
 // ====================================================
-// 1. JALUR PUBLIK (Login, Register, Logout, Root)
+// 1. JALUR PUBLIK (Landing, Login, Register, Logout)
 // ====================================================
 
-// Halaman Utama Pintar (Cek Login & Role)
+// --- [REVISI] HALAMAN UTAMA (ROOT) ---
 Route::get('/', function () {
+    // 1. Cek apakah user SUDAH login?
     if (Auth::check()) {
-        // PERBAIKAN DI SINI:
-        // Cek apakah role user ada di dalam daftar ['mahasiswa', 'dosen']
+        // Jika Mahasiswa/Dosen -> Redirect ke Dashboard Student
         if (in_array(Auth::user()->role, ['mahasiswa', 'dosen'])) {
             return redirect()->route('student.dashboard');
         }
-        // Jika Admin -> Dashboard Admin
+        // Jika Admin -> Redirect ke Dashboard Admin
         return redirect()->route('dashboard_admin');
     }
-    // Jika belum login -> Halaman Login
-    return redirect()->route('login');
+
+    // 2. Jika BELUM login -> Tampilkan Landing Page (Welcome)
+    // return redirect()->route('login'); // DULU: <-- Kode Lama (Dikomentari)
+    return view('welcome'); // <-- Kode Baru (Tampilkan Landing Page)
 });
 
 // Autentikasi
