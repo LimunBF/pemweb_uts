@@ -96,9 +96,13 @@
         {{-- KOP SURAT --}}
         <div class="border-b-2 border-lab-pink pb-3 mb-5 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center text-2xl border border-gray-200 text-gray-400">
-                    🏛️
+                
+                <div class="w-16 h-16 flex items-center justify-center">
+                    <img src="{{ asset('templates/logo.png') }}" 
+                         alt="Logo UNS" 
+                         class="w-full h-full object-contain">
                 </div>
+
                 <div>
                     <h1 class="text-xl font-extrabold text-lab-dark uppercase tracking-tight leading-none">Lab. PTIK</h1>
                     <p class="text-sm font-semibold text-gray-600">Pendidikan Teknik Informatika dan Komputer</p>
@@ -200,8 +204,8 @@
                 <p class="text-xs text-gray-600 mb-1">Surakarta, {{ date('d F Y') }}</p>
                 <p class="text-xs font-bold text-gray-800 mb-12">Kepala Laboratorium</p>
                 
-                <p class="text-sm font-bold text-gray-900 border-b border-gray-800 inline-block pb-0.5 px-2">    (nama)      </p>
-                <p class="text-[10px] text-gray-500 mt-1">NIP.</p>
+                <p class="text-xs font-bold text-gray-900 border-b border-gray-800 inline-block pb-0.5 px-2">    Yusfia Hafid Aristyagama S.T., M.T.      </p>
+                <p class="text-xs text-gray-500 mt-1">NIP.199105242019031016</p>
             </div>
         </div>
 
