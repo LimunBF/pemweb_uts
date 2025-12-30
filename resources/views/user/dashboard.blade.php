@@ -185,9 +185,9 @@
                         </div>
                         
                         {{-- Notifikasi Kecil --}}
-                        <div class="mt-2 flex items-start text-xs text-yellow-700 bg-yellow-50 p-2 rounded-lg border border-yellow-200">
-                            <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <p>Jika password diganti, notifikasi berisi password baru akan dikirim ke WhatsApp Anda.</p>
+                        <div class="mt-2 flex items-start text-xs text-blue-700 bg-blue-50 p-2 rounded-lg border border-blue-200">
+                            <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <p>Jika password diganti, password baru akan dikirimkan ke <strong>Email Kampus</strong> Anda sebagai cadangan.</p>
                         </div>
                     </div>
 
