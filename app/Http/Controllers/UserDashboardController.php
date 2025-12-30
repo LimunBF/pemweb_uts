@@ -26,24 +26,32 @@ class UserDashboardController extends Controller
     }
 
     // 3. Halaman Pinjaman Saya
-    public function myLoans()
+    public function myLoans(Request $request)
     {
-        // Ambil data mentah
-        $rawLoans = Peminjaman::with('item')
-                    ->where('user_id', Auth::id())
-                    ->orderBy('created_at', 'desc') 
-                    ->get();
-        // Mengambil data peminjaman milik user yang sedang login
-        // Pastikan relasi 'item' ada di model Peminjaman
-        $loans = Peminjaman::with('item')
-            ->where('user_id', Auth::id())
-            ->orderBy('tanggal_kembali', 'asc') // Logic pengurutan Anda (Deadline terdekat di atas)
-            ->paginate(10); // GUNAKAN INI pengganti ->get()
+        // 1. Query Dasar: Ambil peminjaman milik user yang login
+        $query = Peminjaman::with('item')
+                    ->where('user_id', Auth::id());
 
+        // 2. Filter Status (Jika ada input status)
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // 3. Filter Tanggal (Jika kedua tanggal diisi)
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            // Filter berdasarkan range tanggal pinjam
+            $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
+        }
+
+        // 4. Eksekusi Query (Urutkan dari yang terbaru)
+        $rawLoans = $query->orderBy('created_at', 'desc')->get();
+
+        // 5. Grouping Data (Agar tampil per "Surat/Kode")
         $groupedLoans = $rawLoans->groupBy(function ($item) {
             return $item->kode_peminjaman ?? 'SINGLE_' . $item->id;
         });
 
+        // 6. Kirim ke View
         return view('user.my_loans', compact('groupedLoans'));
     }
 

@@ -38,6 +38,64 @@
         </a>
     </div>
 
+    {{-- ========================================== --}}
+    {{-- FILTER SECTION (REALTIME & OTOMATIS) --}}
+    {{-- ========================================== --}}
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-8 relative">
+        
+        {{-- Loading Overlay (Muncul saat filter berubah) --}}
+        <div id="filter-loading" class="hidden absolute inset-0 bg-white/70 backdrop-blur-sm z-10 rounded-xl flex items-center justify-center">
+            <div class="flex items-center gap-2 text-lab-pink-btn font-bold animate-pulse">
+                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                Memuat Data...
+            </div>
+        </div>
+
+        <form action="{{ route('student.loans') }}" method="GET" id="filterForm">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                {{-- Filter Status (Langsung Submit) --}}
+                <div class="relative">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Status Peminjaman</label>
+                    <select name="status" id="statusFilter" class="w-full text-sm border-gray-200 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn bg-gray-50 transition cursor-pointer hover:bg-white" onchange="submitFilter()">
+                        <option value="">Semua Status</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Menunggu Konfirmasi</option>
+                        <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui / Dipinjam</option>
+                        <option value="dikembalikan" {{ request('status') == 'dikembalikan' ? 'selected' : '' }}>Selesai (Dikembalikan)</option>
+                        <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                        <option value="terlambat" {{ request('status') == 'terlambat' ? 'selected' : '' }}>Terlambat</option>
+                    </select>
+                </div>
+
+                {{-- Filter Tanggal Mulai --}}
+                <div class="relative">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Dari Tanggal</label>
+                    <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}" class="w-full text-sm border-gray-200 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn bg-gray-50 cursor-pointer">
+                </div>
+
+                {{-- Filter Tanggal Akhir --}}
+                <div class="relative">
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Sampai Tanggal</label>
+                    <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}" class="w-full text-sm border-gray-200 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn bg-gray-50 cursor-pointer">
+                </div>
+
+            </div>
+
+            {{-- Chip Filter Aktif & Tombol Reset (Muncul otomatis jika ada filter) --}}
+            @if(request()->hasAny(['status', 'start_date', 'end_date']))
+                <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-3">
+                    <div class="text-xs text-gray-500 italic">
+                        Menampilkan hasil filter...
+                    </div>
+                    <a href="{{ route('student.loans') }}" class="text-xs font-bold text-red-500 hover:text-red-700 flex items-center gap-1 transition">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Hapus Filter
+                    </a>
+                </div>
+            @endif
+        </form>
+    </div>
+
     {{-- Pesan Sukses/Error --}}
     @if(session('success'))
         <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm">
@@ -48,7 +106,7 @@
 
     {{-- LIST CARD --}}
     @if(isset($groupedLoans) && $groupedLoans->count() > 0)
-        <div class="space-y-6">
+        <div class="space-y-6 animate-fade-in-up">
             @foreach($groupedLoans as $kode => $items)
                 @php
                     $firstItem = $items->first();
@@ -64,7 +122,6 @@
                     ];
                     $badgeColor = $badgeColors[$status] ?? 'bg-gray-100 text-gray-800';
 
-                    // Label Status
                     $statusLabels = [
                         'pending' => 'Menunggu Konfirmasi',
                         'disetujui' => 'Disetujui / Dipinjam',
@@ -74,22 +131,16 @@
                     ];
                     $statusLabel = $statusLabels[$status] ?? ucfirst($status);
 
-                    // --- LOGIKA HITUNG HARI & JAM TERLAMBAT ---
+                    // Logic Hitung Hari
                     $lateText = '';
                     if ($status == 'terlambat') {
                         $deadline = \Carbon\Carbon::parse($firstItem->tanggal_kembali);
                         $now = \Carbon\Carbon::now();
-                        
-                        // Hitung selisih waktu
                         $diff = $deadline->diff($now);
-                        
                         $parts = [];
                         if ($diff->d > 0) $parts[] = $diff->d . ' Hari';
                         if ($diff->h > 0) $parts[] = $diff->h . ' Jam';
-                        
-                        // Gabung string (Misal: 2 Hari 5 Jam)
-                        $timeString = implode(' ', $parts);
-                        $lateText = 'Telat ' . ($timeString ?: 'Baru saja'); 
+                        $lateText = 'Telat ' . (implode(' ', $parts) ?: 'Baru saja'); 
                     }
                 @endphp
 
@@ -106,7 +157,6 @@
                                     {{ $statusLabel }}
                                 </span>
 
-                                {{-- INFO KETERLAMBATAN DI HEADER (BADGE TAMBAHAN) --}}
                                 @if($status == 'terlambat')
                                     <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-red-600 text-white border border-red-700 shadow-sm flex items-center gap-1">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -121,7 +171,6 @@
 
                         {{-- Tombol Cetak Surat --}}
                         @if(in_array($status, ['pending', 'disetujui', 'terlambat'])) 
-                        {{-- Tambahkan 'terlambat' agar surat tetap bisa dicetak/diunduh --}}
                             <a href="{{ route('student.loan.print', $firstItem->id) }}" target="_blank" 
                                class="flex items-center text-sm font-medium text-lab-pink-btn hover:text-pink-900 bg-pink-50 hover:bg-pink-100 px-3 py-2 rounded-lg transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,7 +189,6 @@
                             <div class="text-sm text-gray-600 border-l-4 {{ $status == 'terlambat' ? 'border-red-500' : 'border-lab-pink' }} pl-4 h-fit">
                                 <p class="mb-1"><span class="font-bold">Mulai Pinjam:</span> <br> {{ \Carbon\Carbon::parse($firstItem->tanggal_pinjam)->translatedFormat('d F Y') }}</p>
                                 
-                                {{-- Tanggal Kembali jadi MERAH jika telat --}}
                                 <p class="mb-2">
                                     <span class="font-bold">Rencana Kembali:</span> <br> 
                                     <span class="{{ $status == 'terlambat' ? 'text-red-600 font-bold bg-red-50 px-1 rounded' : '' }}">
@@ -172,14 +220,6 @@
                                                 <div>
                                                     <span class="text-sm font-bold text-gray-800 block">{{ $loan->item->nama_alat }}</span>
                                                     <span class="text-xs text-gray-400 block font-mono">{{ $loan->item->kode_alat }}</span>
-                                                    
-                                                    {{-- INFO TERLAMBAT DI SETIAP BARANG --}}
-                                                    @if($status == 'terlambat')
-                                                        <span class="text-[10px] font-bold text-red-600 flex items-center gap-1 mt-1">
-                                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                            {{ $lateText }}
-                                                        </span>
-                                                    @endif
                                                 </div>
                                             </div>
                                             <span class="text-sm font-bold bg-white px-3 py-1 rounded border shadow-sm {{ $status == 'terlambat' ? 'text-red-600 border-red-200' : 'text-gray-600 border-gray-200' }}">
@@ -203,21 +243,77 @@
         </div>
 
     @else
-        {{-- TAMPILAN KOSONG --}}
-        <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100">
+        {{-- TAMPILAN KOSONG (JIKA FILTER TIDAK DITEMUKAN) --}}
+        <div class="text-center py-16 bg-white rounded-xl shadow-sm border border-gray-100 animate-fade-in-up">
             <div class="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="h-10 w-10 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
             </div>
-            <h3 class="mt-2 text-lg font-medium text-gray-900">Belum ada riwayat</h3>
-            <p class="mt-1 text-sm text-gray-500">Anda belum pernah mengajukan peminjaman alat.</p>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">
+                {{ request()->hasAny(['status', 'start_date', 'end_date']) ? 'Data tidak ditemukan' : 'Belum ada riwayat' }}
+            </h3>
+            <p class="mt-1 text-sm text-gray-500">
+                {{ request()->hasAny(['status', 'start_date', 'end_date']) ? 'Coba ubah status atau tanggal pencarian Anda.' : 'Anda belum pernah mengajukan peminjaman alat.' }}
+            </p>
             <div class="mt-6">
-                <a href="{{ route('student.loan.form') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lab-pink-btn hover:bg-pink-700">
-                    Buat Pengajuan Baru
-                </a>
+                @if(request()->hasAny(['status', 'start_date', 'end_date']))
+                    <a href="{{ route('student.loans') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Reset Filter
+                    </a>
+                @else
+                    <a href="{{ route('student.loan.form') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-lab-pink-btn hover:bg-pink-700">
+                        Buat Pengajuan Baru
+                    </a>
+                @endif
             </div>
         </div>
     @endif
 </div>
+
+{{-- SCRIPT: LOGIKA REALTIME & TANGGAL --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('filterForm');
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+        const loading = document.getElementById('filter-loading');
+
+        // Fungsi Submit
+        window.submitFilter = function() {
+            loading.classList.remove('hidden'); // Tampilkan loading
+            form.submit();
+        }
+
+        // 1. Logic Status (Langsung submit saat ganti)
+        document.getElementById('statusFilter').addEventListener('change', submitFilter);
+
+        // 2. Logic Tanggal
+        startDate.addEventListener('change', function() {
+            endDate.min = this.value; // Tanggal akhir min = tanggal mulai
+            
+            // Jika tanggal akhir invalid, reset
+            if (endDate.value && endDate.value < this.value) {
+                endDate.value = '';
+            }
+
+            // AUTO SUBMIT: Hanya jika KEDUA tanggal terisi
+            if (this.value && endDate.value) {
+                submitFilter();
+            }
+        });
+
+        endDate.addEventListener('change', function() {
+            // AUTO SUBMIT: Hanya jika KEDUA tanggal terisi
+            if (startDate.value && this.value) {
+                submitFilter();
+            }
+        });
+    });
+</script>
+
+<style>
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in-up { animation: fadeInUp 0.4s ease-out forwards; }
+</style>
 @endsection
