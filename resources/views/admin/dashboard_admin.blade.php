@@ -88,8 +88,8 @@
             {{-- 3. Menu Cepat (Quick Actions) --}}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                {{-- Kelola Barang --}}
-                <a href="#" class="group bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex items-center hover:shadow-xl hover:border-lab-pink-btn transition-all duration-300">
+                {{-- Kelola Barang: Diarahkan ke route 'items.index' --}}
+                <a href="{{ route('items.index') }}" class="group bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex items-center hover:shadow-xl hover:border-lab-pink-btn transition-all duration-300">
                     <div class="p-4 bg-lab-pink rounded-xl text-lab-pink-btn mr-5 group-hover:bg-lab-pink-btn group-hover:text-white transition-colors">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     </div>
@@ -99,8 +99,8 @@
                     </div>
                 </a>
 
-                {{-- Konfirmasi Peminjaman --}}
-                <a href="#" class="group bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex items-center hover:shadow-xl hover:border-blue-500 transition-all duration-300">
+                {{-- Konfirmasi Peminjaman: Diarahkan ke route 'peminjaman' --}}
+                <a href="{{ route('peminjaman') }}" class="group bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex items-center hover:shadow-xl hover:border-blue-500 transition-all duration-300">
                     <div class="p-4 bg-blue-50 rounded-xl text-blue-600 mr-5 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                     </div>

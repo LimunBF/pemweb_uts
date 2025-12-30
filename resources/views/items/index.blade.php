@@ -132,7 +132,7 @@
                 <tbody class="bg-white divide-y divide-gray-100">
                     @forelse($items as $index => $item)
                     {{-- Animasi Staggered Row --}}
-                    <tr class="group hover:bg-pink-50 transition-all duration-300 transform hover:scale-[1.002] animate-row" style="animation-delay: {{ 0.1 + ($index * 0.05) }}s;">
+                    <tr class="group hover:bg-pink-50 transition-all duration-300 transform hover:scale-[1.002] animate-row">
                         
                         {{-- Nama & Deskripsi --}}
                         <td class="px-8 py-5 whitespace-nowrap">
