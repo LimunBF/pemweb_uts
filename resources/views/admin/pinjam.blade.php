@@ -1,8 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
+    {{-- Script Config Tailwind (Inline) --}}
+    <script>
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'lab-pink-btn': '#db2777', // Pink-600
+                            'lab-text': '#1f2937',     // Gray-800
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
-    <div class="container mx-auto"></div>
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
         {{-- FLASH MESSAGE --}}
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm flex justify-between items-center" role="alert">
@@ -25,23 +40,26 @@
             </div>
         @endif
 
-        {{-- HEADER --}}
-
-        <div class="bg-gradient-to-r from-pink-900 to-pink-600 rounded-2xl p-6 md:p-8 mb-6 text-white shadow-lg relative overflow-hidden">
-        <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10"></div>
-
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="w-full md:flex-1 text-center md:text-left">
-                <h1 class="text-3xl md:text-4xl font-bold">Data Peminjam</h1>
-                <p class="mt-1 text-pink-100 opacity-90">Kelola permohonan masuk dan pantau status inventaris.</p>
-            </div>
-        
-            <div class="w-full md:w-auto flex justify-center md:justify-end">
-                <a href="#" 
-                   class="inline-flex items-center bg-white text-pink-700 font-bold px-5 py-3 rounded-xl shadow-lg hover:bg-pink-50 transition ease-in-out duration-150">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    Tambah Peminjam
-                </a>    
+        {{-- HEADER (Tombol Tambah Peminjam Diaktifkan) --}}
+        <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg relative overflow-hidden">
+            <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10 pointer-events-none"></div>
+                <div class="flex flex-col md:flex-row justify-between items-center relative z-10 gap-4">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold">Data Peminjaman</h2>
+                        <p class="mt-2 text-pink-100 opacity-90">
+                            Kelola permohonan masuk dan pantau status inventaris.
+                        </p>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('peminjaman.create') }}" class="inline-flex items-center px-5 py-2.5 bg-white text-lab-pink-btn border border-transparent rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-pink-50 transition shadow-lg transform hover:-translate-y-0.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Tambah Peminjam
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -71,7 +89,9 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @foreach($pendingLoans as $kode => $items)
-                                @php $firstItem = $items->first(); @endphp
+                                @php
+                                    $firstItem = $items->first(); // Ambil data umum dari item pertama
+                                @endphp
                                 <tr class="hover:bg-yellow-50/50 transition">
                                     <td class="px-6 py-4 align-top">
                                         <div class="font-bold text-gray-800">{{ $firstItem->user->name ?? 'User dihapus' }}</div>
@@ -100,13 +120,16 @@
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="disetujui">
                                                 <button type="submit" class="flex items-center gap-1 bg-green-100 hover:bg-green-200 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                                     Setujui
                                                 </button>
+                                                
                                             </form>
                                             <form action="{{ route('peminjaman.update', $firstItem->id) }}" method="POST" onsubmit="return confirm('Tolak permintaan ini?')">
                                                 @csrf @method('PATCH')
                                                 <input type="hidden" name="status" value="ditolak">
                                                 <button type="submit" class="flex items-center gap-1 bg-red-100 hover:bg-red-200 text-red-700 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                     Tolak
                                                 </button>
                                             </form>
@@ -158,7 +181,7 @@
                         <label class="block text-xs font-medium text-gray-500 mb-1">Status</label>
                         <select name="status" class="w-full text-sm border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn">
                             <option value="">Semua Status</option>
-                            <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui</option>
+                            <option value="disetujui" {{ request('status') == 'disetujui' ? 'selected' : '' }}>Disetujui (Sedang Dipinjam)</option>
                             <option value="dikembalikan" {{ request('status') == 'dikembalikan' ? 'selected' : '' }}>Dikembalikan</option>
                             <option value="ditolak" {{ request('status') == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                         </select>
