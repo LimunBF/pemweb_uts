@@ -12,18 +12,14 @@ class PeminjamanController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. DATA PENDING (DIKELOMPOKKAN)
-        // Ambil semua yang pending, lalu dikelompokkan berdasarkan 'kode_peminjaman'
+
         $rawPending = Peminjaman::with(['user', 'item'])
                         ->where('status', 'pending')
                         ->orderBy('created_at', 'asc')
                         ->get();
 
-        // Hasilnya: Daftar Grup (Bukan daftar item lagi)
-        $pendingLoans = $rawPending->groupBy('kode_peminjaman');
 
-        // 2. DATA RIWAYAT (TETAP SATUAN)
-        // Agar admin bisa melihat detail per item yang sudah dipinjam/kembali
+        $pendingLoans = $rawPending->groupBy('kode_peminjaman');
         $query = Peminjaman::with(['user', 'item'])
                            ->where('status', '!=', 'pending');
 
@@ -39,16 +35,14 @@ class PeminjamanController extends Controller
         
         return view('admin.pinjam', compact('peminjaman', 'pendingLoans'));
     }
-
-    // --- FORM CREATE (TETAP SAMA) ---
+    // --- FORM PEMINJAMAN ---
     public function create()
     {
         $users = User::whereIn('role', ['mahasiswa', 'dosen'])->orderBy('name')->get();
         $items = Item::where('status_ketersediaan', 'Tersedia')->orderBy('nama_alat')->get();
-        return view('admin.create_peminjaman', compact('users', 'items'));
+        return view('admin.create_peminjam', compact('users', 'items'));
     }
 
-    // --- PROSES SIMPAN (TETAP SAMA) ---
     public function store(Request $request)
     {
         $request->validate([
@@ -82,7 +76,6 @@ class PeminjamanController extends Controller
         return redirect()->route('student.loans')->with('success', 'Pengajuan berhasil!');
     }
 
-    // --- UPDATE STATUS (LOGIKA MASSAL) ---
     public function update(Request $request, $id)
     {
         $loan = Peminjaman::findOrFail($id);
@@ -91,11 +84,10 @@ class PeminjamanController extends Controller
             'status' => 'required|in:disetujui,ditolak,dikembalikan'
         ]);
 
-        // LOGIKA KHUSUS: Jika menyetujui/menolak, lakukan untuk SEMUA barang dengan kode yang sama
         if (in_array($request->status, ['disetujui', 'ditolak']) && $loan->kode_peminjaman) {
             
             Peminjaman::where('kode_peminjaman', $loan->kode_peminjaman)
-                      ->where('status', 'pending') // Hanya update yang statusnya masih pending
+                      ->where('status', 'pending') 
                       ->update([
                           'status' => $request->status,
                           'approver_id' => Auth::id()
@@ -104,7 +96,7 @@ class PeminjamanController extends Controller
             $msg = 'Seluruh permintaan dalam kode ' . $loan->kode_peminjaman . ' berhasil diproses.';
 
         } else {
-            // Update satuan (biasanya untuk pengembalian barang satu per satu)
+
             $loan->update([
                 'status' => $request->status,
                 'approver_id' => Auth::id()
