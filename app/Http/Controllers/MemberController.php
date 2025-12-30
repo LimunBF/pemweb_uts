@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
@@ -58,31 +60,64 @@ class MemberController extends Controller
     {
         $member = User::findOrFail($id);
 
+        // 1. Validasi Ketat (Sama seperti ProfileController)
         $request->validate([
             'name'            => 'required|string|max:255',
-            // Validasi unique kecuali untuk user ini sendiri
             'email'           => 'required|email|unique:users,email,' . $member->id,
-            'identity_number' => 'required|string|unique:users,identity_number,' . $member->id,
-            'contact'         => 'nullable|string|max:15',
-            'password'        => 'nullable|string|min:6', // Password boleh kosong jika tidak ingin diganti
+            'identity_number' => 'required|string|size:8|unique:users,identity_number,' . $member->id,
+            'contact'         => [
+                'nullable', 'numeric', 'digits_between:10,13', 'regex:/^08[0-9]+$/', 
+                'unique:users,contact,' . $member->id
+            ],
+            // Password opsional, tapi jika diisi WAJIB konfirmasi
+            'password'        => 'nullable|min:6|confirmed',
+        ], [
+            'identity_number.size'   => 'NIM/NIP harus 8 digit.',
+            'contact.regex'          => 'Format HP harus diawali 08.',
+            'password.confirmed'     => 'Konfirmasi password baru tidak cocok.',
         ]);
 
-        // Data yang akan diupdate
+        // 2. Siapkan Data Update
         $data = [
             'name'            => $request->name,
             'email'           => $request->email,
             'identity_number' => $request->identity_number,
             'contact'         => $request->contact,
+            'role'            => $request->role, // Admin berhak ganti role
         ];
 
-        // Cek jika password diisi, maka update password baru
+        $passwordChanged = false;
+        $plainPassword = null;
+
+        // 3. Cek Password Baru
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
+            $plainPassword = $request->password;
+            $passwordChanged = true;
         }
 
+        // 4. Update Database
         $member->update($data);
 
-        return redirect()->route('members.index')->with('success', 'Data anggota berhasil diperbarui!');
+        // 5. Kirim Email Notifikasi (Jika Password Berubah)
+        if ($passwordChanged) {
+            try {
+                Mail::send('emails.password_changed', [
+                    'user' => $member,
+                    'plainPassword' => $plainPassword
+                ], function ($message) use ($member) {
+                    $message->to($member->email)
+                            ->subject('Reset Password Oleh Admin - Lab PTIK');
+                });
+            } catch (\Exception $e) {
+                // Log error tapi jangan gagalkan proses update
+                Log::error("Gagal kirim email ke {$member->email}: " . $e->getMessage());
+                return redirect()->route('members.index')
+                    ->with('success', "Data {$member->name} diperbarui (Email notifikasi gagal terkirim).");
+            }
+        }
+
+        return redirect()->route('members.index')->with('success', "Data {$member->name} berhasil diperbarui!");
     }
 
     // 6. HAPUS DATA
