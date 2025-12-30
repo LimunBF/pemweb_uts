@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Log;
 
 class MemberController extends Controller
 {
-    // 1. TAMPILKAN DATA (DENGAN FILTER & SEARCH)
     public function index(Request $request)
     {
         // Mulai Query
@@ -39,13 +38,11 @@ class MemberController extends Controller
         return view('members.index', compact('members'));
     }
 
-    // 2. FORM TAMBAH
     public function create()
     {
         return view('members.create');
     }
 
-    // 3. SIMPAN DATA BARU
     public function store(Request $request)
     {
         $request->validate([
@@ -69,14 +66,12 @@ class MemberController extends Controller
         return redirect()->route('members.index')->with('success', 'Anggota berhasil ditambahkan!');
     }
 
-    // 4. FORM EDIT
     public function edit($id)
     {
         $member = User::findOrFail($id);
         return view('members.edit', compact('member'));
     }
 
-    // 5. UPDATE DATA
     public function update(Request $request, $id)
     {
         $member = User::findOrFail($id);
@@ -130,7 +125,6 @@ class MemberController extends Controller
         return redirect()->route('members.index')->with('success', "Data {$member->name} berhasil diperbarui!");
     }
 
-    // 6. HAPUS DATA
     public function destroy($id)
     {
         $member = User::findOrFail($id);
