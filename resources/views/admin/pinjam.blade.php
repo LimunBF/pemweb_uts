@@ -43,26 +43,25 @@
         {{-- HEADER (Tombol Tambah Peminjam Diaktifkan) --}}
         <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg relative overflow-hidden">
             <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10 pointer-events-none"></div>
-                <div class="flex flex-col md:flex-row justify-between items-center relative z-10 gap-4">
-                    <div>
-                        <h2 class="text-3xl md:text-4xl font-bold">Data Peminjaman</h2>
-                        <p class="mt-2 text-pink-100 opacity-90">
-                            Kelola permohonan masuk dan pantau status inventaris.
-                        </p>
-                    </div>
-                    
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('peminjaman.create') }}" class="inline-flex items-center px-5 py-2.5 bg-white text-lab-pink-btn border border-transparent rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-pink-50 transition shadow-lg transform hover:-translate-y-0.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            Tambah Peminjam
-                        </a>
-                    </div>
+            <div class="flex flex-col md:flex-row justify-between items-center relative z-10 gap-4">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-bold">Data Peminjaman</h2>
+                    <p class="mt-2 text-pink-100 opacity-90">
+                        Kelola permohonan masuk dan pantau status inventaris.
+                    </p>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    {{-- Pastikan nama route ini sesuai dengan routes/web.php (misal: admin.peminjaman.create) --}}
+                    <a href="{{ route('peminjaman.create') }}" class="inline-flex items-center px-5 py-2.5 bg-white text-lab-pink-btn border border-transparent rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-pink-50 transition shadow-lg transform hover:-translate-y-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Tambah Peminjam
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
 
         {{-- BAGIAN 1: PERMINTAAN MASUK (PENDING) --}}
         @if(isset($pendingLoans) && $pendingLoans->count() > 0)
@@ -90,7 +89,7 @@
                         <tbody class="divide-y divide-gray-100">
                             @foreach($pendingLoans as $kode => $items)
                                 @php
-                                    $firstItem = $items->first(); // Ambil data umum dari item pertama
+                                    $firstItem = $items->first();
                                 @endphp
                                 <tr class="hover:bg-yellow-50/50 transition">
                                     <td class="px-6 py-4 align-top">
@@ -154,7 +153,7 @@
             <form action="{{ route('peminjaman') }}" method="GET">
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                     
-                    {{-- 1. Filter Kategori User (BARU) --}}
+                    {{-- 1. Filter Kategori User --}}
                     <div>
                         <label class="block text-xs font-medium text-gray-500 mb-1">Kategori User</label>
                         <select name="role" class="w-full text-sm border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn">
@@ -193,7 +192,6 @@
                             Filter
                         </button>
                         
-                        {{-- Tombol Cetak membawa semua parameter filter yang aktif --}}
                         <a href="{{ route('peminjaman.cetak', request()->all()) }}" target="_blank" class="flex-1 p-2.5 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition shadow-sm font-bold text-sm text-center flex items-center justify-center gap-2" title="Cetak Laporan PDF">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -273,5 +271,4 @@
         </div>
 
     </div>
-</div
 @endsection
