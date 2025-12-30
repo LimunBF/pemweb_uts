@@ -17,9 +17,6 @@ class PeminjamanController extends Controller
                         ->orderBy('created_at', 'asc')
                         ->get();
 
-        // 1. DATA PENDING (DIKELOMPOKKAN BERDASARKAN KODE PEMINJAMAN)
-        $pendingLoans = $rawPending->groupBy('kode_peminjaman');
-        
         // Hasilnya: Daftar Grup
         $pendingLoans = $rawPending->groupBy('kode_peminjaman');
 
@@ -50,7 +47,36 @@ class PeminjamanController extends Controller
         return view('admin.pinjam', compact('peminjaman', 'pendingLoans')); 
     }
 
-    // --- FORM PEMINJAMAN ---
+    // --- CETAK LAPORAN ---
+    public function cetak(Request $request)
+    {
+        $query = Peminjaman::with(['user', 'item']);
+
+        // Filter Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter Role (Mahasiswa / Dosen)
+        if ($request->filled('role')) {
+            $query->whereHas('user', function($q) use ($request) {
+                $q->where('role', $request->role);
+            });
+        }
+
+        // Filter Tanggal
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
+        }
+
+        // URUTAN KHUSUS CETAK: 
+        // Berdasarkan 'tanggal_pinjam' dari yang TERLAMA (ASC)
+        $peminjaman = $query->orderBy('tanggal_pinjam', 'asc')->get();
+
+        return view('admin.peminjaman_cetak', compact('peminjaman'));
+    }
+
+
     public function create()
     {
         $users = User::whereIn('role', ['mahasiswa', 'dosen'])->orderBy('name')->get();
