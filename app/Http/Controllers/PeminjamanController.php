@@ -12,14 +12,13 @@ class PeminjamanController extends Controller
 {
     public function index(Request $request)
     {
-
         $rawPending = Peminjaman::with(['user', 'item'])
                         ->where('status', 'pending')
                         ->orderBy('created_at', 'asc')
                         ->get();
 
-
         $pendingLoans = $rawPending->groupBy('kode_peminjaman');
+        
         $query = Peminjaman::with(['user', 'item'])
                            ->where('status', '!=', 'pending');
 
@@ -33,47 +32,66 @@ class PeminjamanController extends Controller
 
         $peminjaman = $query->latest()->paginate(10);
         
-        return view('admin.pinjam', compact('peminjaman', 'pendingLoans'));
+        return view('admin.pinjam', compact('peminjaman', 'pendingLoans')); 
     }
+
     // --- FORM PEMINJAMAN ---
     public function create()
     {
         $users = User::whereIn('role', ['mahasiswa', 'dosen'])->orderBy('name')->get();
         $items = Item::where('status_ketersediaan', 'Tersedia')->orderBy('nama_alat')->get();
+        
         return view('admin.create_peminjam', compact('users', 'items'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'item_id' => 'required|exists:items,id',
-            'amount' => 'required|integer|min:1', 
-            'tanggal_pinjam' => 'required|date',
+            'items'           => 'required|array|min:1', // Wajib ada minimal 1 barang
+            'items.*.item_id' => 'required|exists:items,id', // Tiap item harus valid
+            'items.*.amount'  => 'required|integer|min:1',   // Tiap jumlah harus valid
+            'tanggal_pinjam'  => 'required|date',
             'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
-            'user_id' => 'nullable|exists:users,id', 
+            'user_id'         => 'nullable|exists:users,id', // Untuk Admin
+            'alasan'          => 'nullable|string'
         ]);
 
         $targetUserId = $request->user_id ?? Auth::id();
-        $item = Item::findOrFail($request->item_id);
-        if ($item->stok_ready < $request->amount) {
-            return back()->withErrors(['item_id' => 'Stok barang tidak mencukupi.'])->withInput();
+        
+        $kodePeminjaman = 'LOAN-' . $targetUserId . '-' . time();
+        $alasan = $request->input('alasan', 'Peminjaman Manual');
+
+        // 2. CEK STOK TERSEDIA (Looping Pertama)
+        foreach ($request->items as $itemData) {
+            $itemDB = Item::find($itemData['item_id']);
+            
+            if (!$itemDB || $itemDB->stok_ready < $itemData['amount']) {
+                $namaBarang = $itemDB ? $itemDB->nama_alat : 'Barang tidak dikenal';
+                return back()
+                    ->withErrors(['items' => "Stok barang '{$namaBarang}' tidak mencukupi."])
+                    ->withInput();
+            }
         }
 
-        Peminjaman::create([
-            'user_id' => $targetUserId,
-            'item_id' => $request->item_id,
-            'amount' => $request->amount,
-            'kode_peminjaman' => 'LOAN-' . $targetUserId . '-' . time(),
-            'tanggal_pinjam' => $request->tanggal_pinjam,
-            'tanggal_kembali' => $request->tanggal_kembali,
-            'status' => 'pending', 
-            'alasan' => $request->input('alasan', 'Peminjaman Manual'),
-        ]);
+        // 3. SIMPAN DATA 
+        foreach ($request->items as $itemData) {
+            Peminjaman::create([
+                'user_id'         => $targetUserId,
+                'item_id'         => $itemData['item_id'],
+                'amount'          => $itemData['amount'],
+                'kode_peminjaman' => $kodePeminjaman,
+                'tanggal_pinjam'  => $request->tanggal_pinjam,
+                'tanggal_kembali' => $request->tanggal_kembali,
+                'status'          => 'pending', 
+                'alasan'          => $alasan,
+            ]);
+        }
 
+        // 4. REDIRECT SESUAI ROLE
         if (Auth::user()->role == 'admin') {
-            return redirect()->route('peminjaman')->with('success', 'Peminjaman berhasil ditambahkan.');
+            return redirect()->route('peminjaman')->with('success', 'Peminjaman berhasil dicatat.');
         }
-        return redirect()->route('student.loans')->with('success', 'Pengajuan berhasil!');
+        return redirect()->route('student.loans')->with('success', 'Pengajuan peminjaman berhasil dikirim!');
     }
 
     public function update(Request $request, $id)
@@ -92,11 +110,10 @@ class PeminjamanController extends Controller
                           'status' => $request->status,
                           'approver_id' => Auth::id()
                       ]);
-
+            
             $msg = 'Seluruh permintaan dalam kode ' . $loan->kode_peminjaman . ' berhasil diproses.';
 
         } else {
-
             $loan->update([
                 'status' => $request->status,
                 'approver_id' => Auth::id()
