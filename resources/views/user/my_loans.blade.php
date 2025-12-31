@@ -169,16 +169,31 @@
                                 Diajukan: {{ \Carbon\Carbon::parse($firstItem->created_at)->translatedFormat('d F Y, H:i') }}
                             </div>
                         </div>
+                        
+                        {{-- OPSI CETAK / PREVIEW SURAT --}}
+                        @if(in_array($status, ['pending', 'disetujui', 'terlambat']))
+                            <div class="flex gap-2 mt-2 sm:mt-0">
+                                
+                                <a href="{{ route('student.loan.preview', $firstItem->id) }}" target="_blank" 
+                                   class="flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition border border-blue-200"
+                                   title="Lihat Preview Surat">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    Preview
+                                </a>
 
-                        {{-- Tombol Cetak Surat --}}
-                        @if(in_array($status, ['pending', 'disetujui', 'terlambat'])) 
-                            <a href="{{ route('student.loan.print', $firstItem->id) }}" target="_blank" 
-                               class="flex items-center text-sm font-medium text-lab-pink-btn hover:text-pink-900 bg-pink-50 hover:bg-pink-100 px-3 py-2 rounded-lg transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                                </svg>
-                                Cetak Surat
-                            </a>
+                                <a href="{{ route('student.loan.print', $firstItem->id) }}" 
+                                   class="flex items-center text-sm font-medium text-lab-pink-btn hover:text-pink-900 bg-pink-50 hover:bg-pink-100 px-3 py-2 rounded-lg transition border border-pink-200"
+                                   title="Unduh File Word (.docx)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Unduh Docx
+                                </a>
+
+                            </div>
                         @endif
                     </div>
 
@@ -244,29 +259,22 @@
         </div>
 
     @else
-        {{-- TAMPILAN KOSONG (JIKA FILTER TIDAK DITEMUKAN) --}}
         <div class="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100 animate-fade-in-up overflow-hidden relative">
             
             {{-- Dekorasi Background Blob --}}
             <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-pink-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
 
             <div class="relative z-10 flex flex-col items-center">
-                {{-- ILUSTRASI SVG: Empty Box / Relax --}}
                 <div class="w-56 h-56 mb-2">
                     <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-                        {{-- Lantai --}}
                         <ellipse cx="200" cy="260" rx="120" ry="10" fill="#F3F4F6"/>
                         
-                        {{-- Kotak Kardus --}}
                         <path d="M130 180 L200 210 L270 180 L200 150 L130 180 Z" fill="#E5E7EB"/>
                         <path d="M130 180 V250 L200 280 V210 L130 180 Z" fill="#D1D5DB"/>
                         <path d="M270 180 V250 L200 280 V210 L270 180 Z" fill="#9CA3AF"/>
-                        
-                        {{-- Tutup Kotak Terbuka --}}
                         <path d="M130 180 L80 140 L150 110 L200 150 L130 180 Z" fill="#D1D5DB" stroke="white" stroke-width="2"/>
                         <path d="M270 180 L320 140 L250 110 L200 150 L270 180 Z" fill="#D1D5DB" stroke="white" stroke-width="2"/>
 
-                        {{-- Elemen Mengambang (Kertas/Debu) --}}
                         <circle cx="150" cy="100" r="3" fill="#DB2777" class="animate-bounce" style="animation-duration: 2s"/>
                         <circle cx="250" cy="80" r="5" fill="#FF91A4" class="animate-bounce" style="animation-duration: 3s"/>
                         <rect x="180" y="60" width="40" height="50" rx="4" fill="white" stroke="#DB2777" stroke-width="2" transform="rotate(15)" class="animate-pulse"/>

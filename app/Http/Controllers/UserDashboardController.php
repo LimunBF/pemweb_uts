@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Item;
 use App\Models\Peminjaman;
 use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpWord\TemplateProcessor; 
+use PhpOffice\PhpWord\TemplateProcessor;    
 use Carbon\Carbon;
 
 class UserDashboardController extends Controller
@@ -67,6 +67,17 @@ class UserDashboardController extends Controller
             'alasan' => 'nullable|string|max:255',
             'file_surat' => 'nullable|file|mimes:pdf,doc,docx|max:2048', 
         ]);
+
+        foreach ($request->items as $itemData) {
+            $itemDB = Item::find($itemData['item_id']);
+            if (!$itemDB || $itemDB->stok_ready < $itemData['amount']) {
+                $namaBarang = $itemDB ? $itemDB->nama_alat : 'Barang tidak ditemukan';
+                $sisaStok = $itemDB ? $itemDB->stok_ready : 0;
+                return back()
+                    ->withErrors(['items' => "Stok '{$namaBarang}' tidak mencukupi! (Tersedia: {$sisaStok}, Diminta: {$itemData['amount']})"])
+                    ->withInput(); 
+            }
+        }
 
         $user = Auth::user();
         $userIdNumber = $user->identity_number ?? $user->id; 
@@ -149,5 +160,57 @@ class UserDashboardController extends Controller
         }
         $templateProcessor->saveAs($tempPath);
         return response()->download($tempPath, $fileName)->deleteFileAfterSend(true);
+    }
+
+    public function previewSurat($id)
+    {
+        $currentLoan = Peminjaman::with(['item', 'user'])->findOrFail($id);
+        
+        if (!empty($currentLoan->kode_peminjaman)) {
+            $groupLoans = Peminjaman::with('item')
+                            ->where('kode_peminjaman', $currentLoan->kode_peminjaman)
+                            ->get();
+        } else {
+            $groupLoans = collect([$currentLoan]);
+        }
+
+        $userRole = strtolower($currentLoan->user->role ?? 'mahasiswa');
+        $label = ($userRole === 'dosen') ? 'NIP' : 'NIM';
+        
+        Carbon::setLocale('id'); 
+
+        $data = [
+            'user'       => $currentLoan->user,
+            'label_id'   => $label,
+            'peminjaman' => $groupLoans, 
+            'items'      => $groupLoans, 
+            'today'      => Carbon::now()->translatedFormat('d F Y'),
+        ];
+
+        $currentLoan = Peminjaman::with(['item', 'user'])->findOrFail($id);
+        
+        if (!empty($currentLoan->kode_peminjaman)) {
+            $groupLoans = Peminjaman::with('item')
+                            ->where('kode_peminjaman', $currentLoan->kode_peminjaman)
+                            ->get();
+        } else {
+            $groupLoans = collect([$currentLoan]);
+        }
+
+        $userRole = strtolower($currentLoan->user->role ?? 'mahasiswa');
+        $label = ($userRole === 'dosen') ? 'NIP' : 'NIM';
+        
+        // PENTING: Gunakan Carbon untuk format tanggal Indonesia
+        \Carbon\Carbon::setLocale('id');
+
+        $data = [
+            'user'       => $currentLoan->user,
+            'label_id'   => $label,
+            'peminjaman' => $groupLoans, 
+            'items'      => $groupLoans, 
+            'today'      => \Carbon\Carbon::now()->translatedFormat('d F Y'),
+        ];
+
+        return view('user.surat_preview', $data);
     }
 }
