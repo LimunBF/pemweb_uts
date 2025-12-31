@@ -39,9 +39,7 @@
             @method('PUT')
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                
-                {{-- KOLOM KIRI: Identitas & Akun (Email Pindah Sini) --}}
-                <div class="space-y-5">
+                    <div class="space-y-5">
                     <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider border-b pb-2">Identitas & Akun</h3>
 
                     {{-- Nama --}}
@@ -80,11 +78,8 @@
                     </div>
                 </div>
 
-                {{-- KOLOM KANAN: Kontak & Reset Password (Naik ke Atas) --}}
                 <div class="space-y-5">
                     <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider border-b pb-2">Kontak & Keamanan</h3>
-
-                    {{-- Kontak HP (Posisi Paling Atas di Kanan) --}}
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-sm font-bold text-gray-700">No. WhatsApp / HP</label>
@@ -96,7 +91,6 @@
                             placeholder="08xxxxxxxxxx">
                     </div>
 
-                    {{-- SECTION GANTI PASSWORD (ANIMATED - Langsung di bawah HP) --}}
                     <div class="bg-pink-50 p-5 rounded-xl border border-pink-100 transition-all duration-300">
                         <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center">
                             <svg class="w-4 h-4 mr-1 text-lab-pink-btn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -117,7 +111,6 @@
                             </button>
                         </div>
 
-                        {{-- Notifikasi Email --}}
                         <div id="emailNotice" class="hidden flex items-start text-xs text-blue-700 bg-blue-100 p-2 rounded-lg border border-blue-200">
                             <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                             <p>Password baru akan dikirim otomatis ke email anggota.</p>
@@ -150,7 +143,6 @@
                 <a href="{{ route('members.index') }}" class="px-6 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition font-bold">
                     Batal
                 </a>
-                {{-- Tombol ini tidak pakai 'w-full', jadi ukurannya tidak akan melebar --}}
                 <button type="submit" id="saveBtn" class="px-6 py-3 bg-lab-pink-btn text-white rounded-xl hover:bg-pink-700 transition font-bold shadow-lg transform active:scale-95 flex items-center">
                     <span>Simpan Perubahan</span>
                 </button>
@@ -160,7 +152,6 @@
 </div>
 
 <script>
-    // --- 1. TOGGLE PASSWORD VISIBILITY ---
     function togglePasswordVisibility(inputId, iconId) {
         const input = document.getElementById(inputId);
         const icon = document.getElementById(iconId);
@@ -177,7 +168,6 @@
         }
     }
 
-    // --- 2. LOGIC 2-STEP PASSWORD ---
     const passInput = document.getElementById('passwordInput');
     const confirmSection = document.getElementById('confirmSection');
     const confirmInput = document.getElementById('passwordConfirmInput');
@@ -206,14 +196,12 @@
         }
     });
 
-    // --- 3. COUNTER UI (UPDATE + COLOR CHANGE) ---
     const contactInput = document.getElementById('contact');
     const contactCounter = document.getElementById('contact-counter');
     const nimInput = document.getElementById('identity_number');
     const nimCounter = document.getElementById('nim-counter');
 
     function updateUI() {
-        // --- LOGIC HP ---
         let hpVal = contactInput.value;
         if(hpVal.length > 13) contactInput.value = hpVal.slice(0, 13);
         contactCounter.innerText = `${contactInput.value.length}/13`;
@@ -226,7 +214,6 @@
             contactCounter.classList.replace('bg-green-100', 'bg-gray-100');
         }
         
-        // --- LOGIC NIM ---
         let nimVal = nimInput.value;
         if(nimVal.length > 8) nimInput.value = nimVal.slice(0, 8);
         nimCounter.innerText = `${nimInput.value.length}/8`;

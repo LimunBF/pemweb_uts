@@ -12,18 +12,10 @@ class DashboardController extends Controller
     public function index()
     {      
         $total_barang = Item::sum('jumlah_total');
-
-        // Menghitung barang yang sedang dipinjam (Aktif)
         $barang_dipinjam = Peminjaman::whereIn('status', ['dipinjam', 'terlambat', 'disetujui'])->count();
-
-        // Menghitung barang tersedia
         $barang_tersedia = $total_barang - $barang_dipinjam;
         if ($barang_tersedia < 0) $barang_tersedia = 0;
 
-
-        // --- 2. DATA UNTUK CHART (BARU) ---
-
-        // A. Data Tren Peminjaman per Bulan (Tahun Ini)
         $monthly_data = Peminjaman::select(
             DB::raw('MONTH(created_at) as month'),
             DB::raw('COUNT(*) as total')
@@ -34,14 +26,11 @@ class DashboardController extends Controller
         ->pluck('total', 'month')
         ->toArray();
 
-        // Normalisasi Data (Pastikan bulan 1-12 ada nilainya, meski 0)
         $chart_peminjaman = [];
         for ($i = 1; $i <= 12; $i++) {
             $chart_peminjaman[] = $monthly_data[$i] ?? 0;
         }
 
-        // B. Data Kategori/Status Barang (Untuk Pie Chart)
-        // Kita pakai data yang sudah dihitung di atas agar konsisten dengan kartu
         $chart_status = [
             'tersedia' => $barang_tersedia,
             'dipinjam' => $barang_dipinjam
@@ -51,8 +40,8 @@ class DashboardController extends Controller
             'total_barang'     => $total_barang,
             'barang_dipinjam'  => $barang_dipinjam,
             'barang_tersedia'  => $barang_tersedia,
-            'chart_peminjaman' => $chart_peminjaman, // Data Array [0, 5, 2, ...]
-            'chart_status'     => $chart_status,       // Data Array Asosiatif
+            'chart_peminjaman' => $chart_peminjaman, 
+            'chart_status'     => $chart_status,   
             'user_name'        => 'Admin' 
         ];
 

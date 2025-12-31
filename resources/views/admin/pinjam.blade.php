@@ -2,12 +2,7 @@
 
 @section('content')
 
-{{-- HAPUS SCRIPT TAILWIND DISINI AGAR TIDAK BENTROK DENGAN LAYOUT UTAMA --}}
-
 <div class="container mx-auto"> 
-    {{-- Container disamakan dengan Dashboard (tanpa max-w-7xl yang membatasi lebar) --}}
-    
-    {{-- Notifikasi --}}
     @if(session('success'))
         <div class="mb-6 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-sm flex justify-between items-center animate-fade-in-up" role="alert">
             <div>
@@ -29,7 +24,6 @@
         </div>
     @endif
 
-    {{-- HEADER PINK (Desain disamakan dengan Dashboard) --}}
     <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg relative overflow-hidden flex items-center justify-between">
         <div class="relative z-10">
             <h2 class="text-3xl md:text-4xl font-bold">Manajemen Peminjaman</h2>
@@ -38,10 +32,7 @@
             </p>
         </div>
         
-        {{-- Hiasan Background --}}
         <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10 pointer-events-none"></div>
-
-        {{-- Tombol Input (Tetap ada, tapi z-index tinggi agar bisa diklik) --}}
         <div class="relative z-20 hidden md:block">
             <a href="{{ route('peminjaman.create') }}" class="inline-flex items-center px-5 py-3 bg-white text-lab-pink-btn border border-transparent rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-pink-50 transition shadow-lg transform hover:-translate-y-0.5">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,14 +43,11 @@
         </div>
     </div>
 
-    {{-- Tombol Input Mobile Only --}}
     <div class="md:hidden mb-6">
         <a href="{{ route('peminjaman.create') }}" class="block w-full text-center px-5 py-3 bg-lab-pink-btn text-white rounded-xl font-bold text-sm shadow-lg">
             + Input Peminjaman Baru
         </a>
     </div>
-
-    {{-- SECTION 1: PERMINTAAN MASUK (PENDING) --}}
     @if(isset($pendingLoans) && $pendingLoans->count() > 0)
         <div class="mb-10 animate-fade-in-up">
             <div class="flex items-center gap-3 mb-4">
@@ -76,9 +64,7 @@
                 @foreach($pendingLoans as $kode => $items)
                     @php $first = $items->first(); @endphp
                     
-                    {{-- CARD PENDING --}}
                     <div class="bg-white rounded-2xl shadow-md border border-yellow-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                        {{-- Header Card --}}
                         <div class="bg-yellow-50 px-5 py-3 border-b border-yellow-100 flex justify-between items-center">
                             <span class="text-xs font-mono font-bold text-yellow-700 bg-white px-2 py-1 rounded border border-yellow-200">
                                 #{{ \Illuminate\Support\Str::limit($kode, 10) }}
@@ -89,7 +75,6 @@
                         </div>
                         
                         <div class="p-5">
-                            {{-- Info User --}}
                             <div class="flex items-center mb-4">
                                 <div class="h-10 w-10 rounded-full bg-gradient-to-br from-gray-700 to-gray-900 text-white flex items-center justify-center font-bold mr-3 text-sm">
                                     {{ substr($first->user->name, 0, 1) }}
@@ -99,8 +84,6 @@
                                     <p class="text-xs text-gray-500 font-mono">{{ $first->user->identity_number }}</p>
                                 </div>
                             </div>
-
-                            {{-- Tanggal --}}
                             <div class="text-xs text-gray-600 bg-gray-50 p-3 rounded-lg mb-4 border border-gray-100 grid grid-cols-2 gap-2">
                                 <div>
                                     <span class="block text-gray-400 uppercase text-[10px] font-bold">Mulai</span>
@@ -112,7 +95,6 @@
                                 </div>
                             </div>
 
-                            {{-- List Barang --}}
                             <div class="mb-4">
                                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Item diminta:</p>
                                 <ul class="space-y-1">
@@ -124,13 +106,9 @@
                                     @endforeach
                                 </ul>
                             </div>
-
-                            {{-- Alasan --}}
                             @if($first->alasan)
                                 <div class="text-xs italic text-gray-500 mb-3 bg-yellow-50/50 p-2 rounded">"{{ $first->alasan }}"</div>
                             @endif
-
-                            {{-- Link Surat --}}
                             @if($first->file_surat)
                                 <a href="{{ asset('storage/'.$first->file_surat) }}" target="_blank" class="block w-full text-center text-xs font-bold text-blue-600 hover:text-blue-800 bg-blue-50 py-2 rounded-lg border border-blue-100 transition hover:shadow-sm">
                                     📄 Lihat Surat
@@ -138,13 +116,10 @@
                             @endif
                         </div>
 
-                        {{-- Footer Action --}}
                         <div class="px-5 py-4 bg-gray-50 border-t border-gray-100 flex gap-2">
-                            {{-- Form Tolak --}}
                             <form action="{{ route('peminjaman.update', $first->id) }}" method="POST" class="flex-1">
                                 @csrf @method('PATCH')
                                 <input type="hidden" name="status" value="ditolak">
-                                {{-- Ubah type="submit" jadi type="button" & tambah onclick --}}
                                 <button type="button" 
                                         onclick="confirmSubmit(this, 'Tolak Permintaan?', 'Apakah Anda yakin ingin menolak peminjaman ini?', 'Ya, Tolak', '#EF4444')" 
                                         class="w-full py-2 rounded-lg border border-red-200 text-red-600 text-sm font-bold hover:bg-red-50 transition">
@@ -152,11 +127,9 @@
                                 </button>
                             </form>
 
-                            {{-- Form Setujui --}}
                             <form action="{{ route('peminjaman.update', $first->id) }}" method="POST" class="flex-1">
                                 @csrf @method('PATCH')
                                 <input type="hidden" name="status" value="disetujui">
-                                {{-- Ubah type="submit" jadi type="button" & tambah onclick --}}
                                 <button type="button" 
                                         onclick="confirmSubmit(this, 'Setujui Permintaan?', 'Barang akan status dipinjam.', 'Ya, Setujui', '#10B981')" 
                                         class="w-full py-2 rounded-lg bg-green-500 text-white text-sm font-bold shadow hover:bg-green-600 transition">
@@ -176,11 +149,7 @@
             </div>
         @endif
     
-
-    {{-- SECTION 2: FILTER & DATA (REALTIME) --}}
     <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 relative">
-        
-        {{-- Loading Overlay --}}
         <div id="filter-loading" class="hidden absolute inset-0 bg-white/70 backdrop-blur-sm z-20 rounded-xl flex items-center justify-center">
             <div class="flex items-center gap-2 text-lab-pink-btn font-bold animate-pulse">
                 <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -189,7 +158,6 @@
         </div>
 
         <form action="{{ route('peminjaman') }}" method="GET" id="filterForm">
-            {{-- Input Hidden untuk menyimpan status tombol Quick Date --}}
             <input type="hidden" name="period" id="periodInput" value="{{ request('period', 'all') }}">
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -234,8 +202,6 @@
                         <option value="dosen" {{ request('role') == 'dosen' ? 'selected' : '' }}>Dosen</option>
                     </select>
                 </div>
-
-                {{-- Filter Tanggal (Input akan diisi JS) --}}
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Dari</label>
                     <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}" class="w-full text-sm border-gray-200 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn cursor-pointer hover:bg-gray-50">
@@ -337,8 +303,6 @@
                                     <form action="{{ route('peminjaman.update', $first->id) }}" method="POST">
                                         @csrf @method('PATCH')
                                         <input type="hidden" name="status" value="dikembalikan">
-                                        
-                                        {{-- Tombol Selesai --}}
                                         <button type="button" 
                                                 onclick="confirmSubmit(this, 'Konfirmasi Pengembalian?', 'Pastikan semua barang telah dicek kondisinya.', 'Ya, Barang Kembali', '#1F2937')"
                                                 class="bg-gray-800 hover:bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow transition flex items-center justify-center gap-1 mx-auto">
@@ -413,18 +377,12 @@
             } else if (type === 'all') {
                 startStr = ''; 
             }
-
-            // Set Tanggal
             startDate.value = startStr;
             endDate.value = (type === 'all') ? '' : endStr;
-            
-            // Set Input Hidden
             periodInput.value = type;
 
             submitFilter();
         }
-
-        // Logic Auto Submit
         startDate.addEventListener('change', function() {
             periodInput.value = 'custom';
             endDate.min = this.value;

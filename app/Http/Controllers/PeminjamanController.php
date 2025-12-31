@@ -13,25 +13,18 @@ class PeminjamanController extends Controller
 {
     public function index(Request $request)
     {
-        // 1. DATA PENDING
         $rawPending = Peminjaman::with(['user', 'item'])
                         ->where('status', 'pending')
                         ->orderBy('created_at', 'asc')
                         ->get();
 
         $pendingLoans = $rawPending->groupBy('kode_peminjaman');
-
-        // 2. DATA RIWAYAT
         $query = Peminjaman::with(['user', 'item'])
                     ->where('status', '!=', 'pending');
-
-        // --- FILTER STATUS ---
-        // Jika filter kosong, default hanya tampilkan yang AKTIF
         if ($request->filled('status') && $request->status != 'semua') {
             $query->where('status', $request->status);
         }
 
-        // --- FILTER LAINNYA ---
         if ($request->filled('role')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('role', $request->role);
@@ -42,15 +35,10 @@ class PeminjamanController extends Controller
             $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
         }
 
-        // Ambil Data & Grouping
         $allHistory = $query->orderBy('created_at', 'desc')->get();
-        
-        // Grouping unik berdasarkan Kode + Tanggal + User
         $groupedHistory = $allHistory->groupBy(function ($item) {
             return $item->kode_peminjaman . '|' . $item->tanggal_pinjam . '|' . $item->user_id;
         });
-
-        // Pagination Manual
         $perPage = 10;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
         $currentItems = $groupedHistory->slice(($currentPage - 1) * $perPage, $perPage)->all();
@@ -62,27 +50,21 @@ class PeminjamanController extends Controller
         return view('admin.pinjam', compact('peminjaman', 'pendingLoans')); 
     }
 
-    // --- CETAK LAPORAN (LOGIKA FILTER DISAMAKAN) ---
     public function cetak(Request $request)
     {
         $query = Peminjaman::with(['user', 'item'])
-                    ->where('status', '!=', 'pending'); // Hanya cetak riwayat (bukan pending)
+                    ->where('status', '!=', 'pending');
 
-        // 1. Filter Status (Copy dari Index)
         if (!$request->filled('status')) {
             $query->whereIn('status', ['disetujui', 'terlambat']);
         } elseif ($request->status != 'semua') {
             $query->where('status', $request->status);
         }
-
-        // 2. Filter Role
         if ($request->filled('role')) {
             $query->whereHas('user', function($q) use ($request) {
                 $q->where('role', $request->role);
             });
         }
-
-        // 3. Filter Tanggal
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $query->whereBetween('tanggal_pinjam', [$request->start_date, $request->end_date]);
         }
@@ -92,7 +74,6 @@ class PeminjamanController extends Controller
         return view('admin.peminjaman_cetak', compact('peminjaman'));
     }
 
-    // ... (Method create, store, update biarkan tetap sama seperti sebelumnya) ...
     public function create()
     {
         $users = User::whereIn('role', ['mahasiswa', 'dosen'])->orderBy('name')->get();

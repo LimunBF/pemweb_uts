@@ -62,11 +62,7 @@
                 @csrf
 
                 <div class="flex flex-col lg:flex-row gap-8">
-                    
-                    {{-- KOLOM KIRI --}}
                     <div class="w-full lg:w-1/3 space-y-6">
-                        
-                        {{-- 1. PENCARIAN USER --}}
                         <div class="bg-blue-50 rounded-2xl p-5 border border-blue-100 shadow-sm relative group focus-within:ring-2 focus-within:ring-blue-200 transition-all">
                             <h3 class="text-sm font-bold text-blue-800 mb-4 flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -96,8 +92,6 @@
                                 </p> 
                             @enderror
                         </div>
-
-                        {{-- 2. DETAIL WAKTU & ALASAN --}}
                         <div class="bg-gray-50 rounded-2xl p-5 border border-gray-200">
                             <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -107,12 +101,10 @@
                             <div class="grid grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-500 mb-1.5">Mulai Pinjam</label>
-                                    {{-- Validasi: min hari ini --}}
                                     <input type="date" name="tanggal_pinjam" id="start_date" class="block w-full text-sm px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent outline-none transition" required value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-500 mb-1.5">Rencana Kembali</label>
-                                    {{-- Validasi: min hari ini --}}
                                     <input type="date" name="tanggal_kembali" id="end_date" class="block w-full text-sm px-3 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent outline-none transition" required min="{{ date('Y-m-d') }}">
                                 </div>
                             </div>
@@ -122,8 +114,6 @@
                                 <textarea name="alasan" rows="3" class="block w-full text-sm px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent resize-none bg-white transition" placeholder="Contoh: Praktikum Jaringan, Penelitian Skripsi..." required></textarea>
                             </div>
                         </div>
-
-                        {{-- 3. OPSI SURAT --}}
                         <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
                             <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
@@ -145,8 +135,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- KOLOM KANAN: Daftar Barang --}}
                     <div class="w-full lg:w-2/3">
                         <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 h-full flex flex-col">
                             <div class="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
@@ -156,10 +144,7 @@
                                 </h3>
                                 <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded-full font-bold">Stok Realtime</span>
                             </div>
-                            
-                            {{-- Container Item Dinamis --}}
                             <div id="items-container" class="space-y-4 flex-grow">
-                                {{-- Item Pertama --}}
                                 <div class="item-row bg-gray-50 border border-gray-200 rounded-xl p-4 transition-all duration-300 relative group hover:shadow-md hover:bg-white hover:border-pink-200">
                                     <div class="flex gap-4 items-start">
                                         <div class="flex-shrink-0 w-8 h-8 bg-white border border-gray-200 text-gray-500 font-bold rounded-lg flex items-center justify-center index-badge group-hover:bg-lab-pink-btn group-hover:text-white group-hover:border-lab-pink-btn transition shadow-sm">1</div>
@@ -170,7 +155,6 @@
                                                 <select name="items[0][item_id]" class="item-select block w-full text-sm border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn py-2.5 bg-white cursor-pointer" required>
                                                     <option value="" disabled selected data-stock="0">-- Pilih Alat --</option>
                                                     @foreach($items as $item)
-                                                        {{-- Kirim data stok lewat attribute agar bisa dibaca JS --}}
                                                         <option value="{{ $item->id }}" data-stock="{{ $item->jumlah_total ?? 0 }}">
                                                             {{ $item->nama_alat }} (Total: {{ $item->jumlah_total ?? 'N/A' }})
                                                         </option>
@@ -181,7 +165,6 @@
                                             <div class="relative group/tooltip">
                                                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Jumlah</label>
                                                 <div class="relative">
-                                                    {{-- Default max dinamis akan diatur JS --}}
                                                     <input type="number" name="items[0][amount]" value="1" min="1" class="block w-full text-center text-sm font-bold text-gray-700 border-gray-300 rounded-lg focus:ring-lab-pink-btn focus:border-lab-pink-btn py-2.5 transition" required>
                                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-xs text-gray-400 font-medium">Unit</div>
                                                 </div>
@@ -234,24 +217,15 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        
-        // ==========================================
-        // 1. VALIDASI TANGGAL (MIN TODAY)
-        // ==========================================
         const startDate = document.getElementById('start_date');
         const endDate = document.getElementById('end_date');
 
         startDate.addEventListener('change', function() {
-            // Tanggal kembali tidak boleh sebelum tanggal pinjam
             endDate.min = this.value;
             if (endDate.value < this.value) {
                 endDate.value = this.value;
             }
         });
-
-        // ==========================================
-        // 2. LOGIKA SWITCH SURAT
-        // ==========================================
         const btnAuto = document.getElementById('btn-auto');
         const btnUpload = document.getElementById('btn-upload');
         const uploadArea = document.getElementById('upload-area');
@@ -281,10 +255,6 @@
             uploadArea.classList.add('animate-enter');
             fileInput.disabled = false;
         });
-
-        // ==========================================
-        // 3. LOGIKA PENCARIAN USER
-        // ==========================================
         const users = @json($users); 
         const searchInput = document.getElementById('user_search');
         const hiddenInput = document.getElementById('user_id_input');
@@ -343,17 +313,12 @@
                 suggestionsBox.classList.add('hidden');
             }
         });
-
-        // ==========================================
-        // 4. LOGIKA BARANG (STOK & MAX 5)
-        // ==========================================
         const container = document.getElementById('items-container');
         const addBtn = document.getElementById('add-item-btn');
         const warningText = document.getElementById('max-items-warning'); 
         const maxItems = 5; 
         let itemCount = 1; 
 
-        // Fungsi Update Validasi Stok
         function updateStockConstraints(row) {
             const select = row.querySelector('select');
             const input = row.querySelector('input[type="number"]');
@@ -361,19 +326,14 @@
             
             const selectedOption = select.options[select.selectedIndex];
             const stock = parseInt(selectedOption.getAttribute('data-stock')) || 0;
-
-            // 1. Set Max Attribute pada Input
             input.max = stock;
             
-            // 2. Jika nilai sekarang melebihi stok, turunkan otomatis
             if (parseInt(input.value) > stock) {
                 input.value = stock;
-                // Efek visual 'shake' atau border merah sebentar bisa ditambahkan
                 input.classList.add('border-red-500', 'text-red-600');
                 setTimeout(() => input.classList.remove('border-red-500', 'text-red-600'), 500);
             }
             
-            // 3. Update Tooltip Info
             if (stock > 0) {
                 tooltip.innerText = `Sisa Stok: ${stock} Unit`;
             } else {
@@ -382,7 +342,6 @@
             }
         }
 
-        // Listener Global untuk Input Number (Validasi saat mengetik)
         container.addEventListener('input', function(e) {
              if (e.target.type === 'number') {
                 const max = parseInt(e.target.max);
@@ -390,7 +349,6 @@
                 
                 if (val > max) {
                     e.target.value = max; // Paksa turun ke max
-                    // Tampilkan tooltip peringatan
                     const tooltip = e.target.closest('.group\\/tooltip').querySelector('.stock-tooltip');
                     tooltip.innerText = `Maksimal hanya ${max}!`;
                     tooltip.classList.remove('hidden');
@@ -398,16 +356,12 @@
                 }
              }
         });
-
-        // Listener Global untuk Change Dropdown
         container.addEventListener('change', function(e) {
             if (e.target.classList.contains('item-select')) {
                 const row = e.target.closest('.item-row');
                 updateStockConstraints(row);
             }
         });
-
-        // Tambah Item Baru
         addBtn.addEventListener('click', function() {
             if (itemCount >= maxItems) {
                 addBtn.classList.add('opacity-50', 'cursor-not-allowed');

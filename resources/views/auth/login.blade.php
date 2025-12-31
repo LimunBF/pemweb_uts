@@ -28,29 +28,24 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; }
 
-        /* --- ANIMASI KUCING --- */
         .cat-head { transition: transform 0.3s ease-out; }
         
-        /* TANGAN KUCING */
         .cat-paw {
-            transition: transform 0.4s ease-out, opacity 0.3s ease; /* Tambah transisi opacity */
+            transition: transform 0.4s ease-out, opacity 0.3s ease; 
             transform-box: fill-box;
             transform-origin: center bottom;
-            opacity: 0; /* Default: Sembunyi total (Invisible) */
+            opacity: 0; 
         }
         
-        /* Posisi Awal (Bisa tetap di bawah, tapi sudah invisible) */
         #paw-left, #paw-right { 
             transform: translateY(180px); 
         }
 
-        /* SAAT MALU (Tangan Naik & Muncul) */
         .shy .cat-paw {
-            opacity: 1; /* Munculkan saat malu */
+            opacity: 1; 
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.1s ease;
         }
         
-        /* Posisi Tangan Menutup Mata */
         .shy #paw-left {
             transform: translateY(-70px) translateX(10px) rotate(-10deg);
         }
@@ -58,11 +53,9 @@
             transform: translateY(-70px) translateX(-10px) rotate(10deg);
         }
 
-        /* PUPIL MATA */
         .pupil { transition: transform 0.1s ease-out; }
         .typing .pupil { transition: transform 0.05s linear; }
 
-        /* CHAT BUBBLE */
         .chat-bubble {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
@@ -74,30 +67,21 @@
             transform: translateY(0) scale(1);
         }
         
-        /* ANIMASI MASUK HALAMAN */
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
     </style>
 </head>
 <body class="font-poppins h-screen flex overflow-hidden bg-white">
 
-    {{-- BAGIAN KIRI: DEKORASI & KUCING --}}
     <div class="hidden lg:flex w-5/12 bg-lab-pink relative flex-col items-center justify-center overflow-hidden">
-        
-        {{-- Background Blobs --}}
         <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-white rounded-full mix-blend-overlay opacity-50 blur-3xl animate-pulse"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply opacity-20 blur-3xl animate-pulse"></div>
 
         <div class="relative z-10 flex flex-col items-center">
-            {{-- LOGO RESMI DI KIRI (Agar kesan resmi dapet) --}}
             <img src="{{ asset('templates/logo_ptik.png') }}" alt="Logo PTIK" class="w-20 h-auto mb-6 drop-shadow-xl hover:scale-110 transition-transform duration-300">
-
-            {{-- CHAT BUBBLE --}}
             <div id="bubble" class="chat-bubble absolute top-16 -right-24 bg-white px-4 py-2 rounded-xl rounded-bl-none shadow-lg border-2 border-lab-pink-btn z-30 w-48 text-center">
                 <p id="bubble-text" class="text-xs font-bold text-gray-700 leading-tight">Halo! Masuk dulu yuk ✨</p>
             </div>
-
-            {{-- SVG KUCING --}}
             <div class="w-64 h-64 cursor-pointer drop-shadow-2xl" id="cat-container">
                 <svg viewBox="0 0 200 180" class="w-full h-full overflow-visible">
                     <g class="cat-head">
@@ -142,15 +126,9 @@
         </div>
     </div>
 
-    {{-- BAGIAN KANAN: FORM LOGIN --}}
     <div class="w-full lg:w-7/12 flex items-center justify-center p-8 bg-white relative overflow-y-auto">
-        
-        {{-- Dekorasi Mobile --}}
         <div class="lg:hidden absolute top-0 left-0 w-full bg-lab-pink h-32 rounded-b-[3rem] -z-10"></div>
-
         <div class="w-full max-w-md space-y-8 animate-fade-in-up bg-white p-8 rounded-3xl shadow-xl lg:shadow-none border lg:border-none border-gray-100">
-            
-            {{-- LOGO RESMI (Juga di kanan untuk Mobile/Responsive) --}}
             <div class="flex flex-col items-center lg:items-start mb-8">
                 <div class="lg:hidden mb-4">
                     <img src="{{ asset('templates/logo_ptik.png') }}" alt="Logo PTIK" class="h-16 w-auto drop-shadow-md">
@@ -161,7 +139,6 @@
                 </div>
             </div>
 
-            {{-- Alert Messages --}}
             @if($errors->any())
                 <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg text-sm flex items-center shadow-sm">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -178,8 +155,6 @@
             <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
                 @csrf
                 <div class="space-y-5">
-                    
-                    {{-- Input Email --}}
                     <div class="group">
                         <label for="email" class="block text-xs font-bold text-gray-400 mb-1 tracking-wide group-focus-within:text-lab-pink-btn transition-colors">EMAIL KAMPUS</label>
                         <div class="relative">
@@ -191,8 +166,6 @@
                                 placeholder="nama@student.uns.ac.id">
                         </div>
                     </div>
-
-                    {{-- Input Password --}}
                     <div class="group">
                         <label for="password" class="block text-xs font-bold text-gray-400 mb-1 tracking-wide group-focus-within:text-lab-pink-btn transition-colors">PASSWORD</label>
                         <div class="relative">
@@ -202,9 +175,6 @@
                             <input id="password" name="password" type="password" required 
                                 class="appearance-none block w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent transition sm:text-sm bg-gray-50 focus:bg-white font-medium text-gray-700" 
                                 placeholder="••••••••">
-                            
-                            {{-- Tombol Mata --}}
-                            {{-- PENTING: onmousedown="event.preventDefault()" untuk mencegah input kehilangan fokus --}}
                             <button type="button" onclick="togglePassword()" onmousedown="event.preventDefault()"
                                 class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-lab-pink-btn transition focus:outline-none cursor-pointer">
                                 <svg id="eye-open" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -254,7 +224,6 @@
         </div>
     </div>
 
-    {{-- SCRIPT INTERAKSI KUCING --}}
     <script>
         const catContainer = document.getElementById('cat-container');
         const pupils = document.querySelectorAll('.pupil');
@@ -268,7 +237,6 @@
         let isTyping = false;
         let typingTimer;
 
-        // Fungsi Chat Bubble
         function say(text) {
             clearTimeout(bubbleTimeout);
             bubbleText.innerText = text;
@@ -277,8 +245,6 @@
                 bubble.classList.remove('visible');
             }, 3000); 
         }
-
-        // Fungsi Gerak Mata
         function moveEyes(xOffset, yOffset) {
             pupils.forEach(pupil => {
                 const limitX = Math.max(-eyeRadius, Math.min(xOffset, eyeRadius));
@@ -286,8 +252,6 @@
                 pupil.style.transform = `translate(${limitX}px, ${limitY}px)`;
             });
         }
-
-        // Mata Mengikuti Kursor
         document.addEventListener('mousemove', (e) => {
             if (catContainer.classList.contains('shy') || isTyping) return;
 
@@ -305,8 +269,6 @@
                 pupil.style.transform = `translate(${moveX}px, ${moveY}px)`;
             });
         });
-
-        // Interaksi Input Email
         emailInput.addEventListener('input', (e) => {
             isTyping = true;
             const valLength = e.target.value.length;
@@ -319,24 +281,17 @@
         });
 
         emailInput.addEventListener('focus', () => say("Cek ejaannya ya! 🧐"));
-
-        // Interaksi Password (Kucing Tutup Mata)
-        // Saat fokus: Tambahkan class 'shy' (tangan naik)
         passwordInput.addEventListener('focus', () => {
             catContainer.classList.add('shy'); 
             say("Jangan kasih tau siapa-siapa! 🙈");
         });
         
-        // Saat blur: Hapus class 'shy' (tangan turun)
         passwordInput.addEventListener('blur', () => {
             catContainer.classList.remove('shy'); 
             say("Udah aman? Sip! 👍");
         });
 
-        // Interaksi Tombol
         document.getElementById('btn-login').addEventListener('mouseenter', () => say("Gass Masuk! 🚀"));
-
-        // Interaksi Klik Kucing
         catContainer.addEventListener('click', () => {
             say("Meow! 😺");
             catContainer.style.transform = "scale(1.05)";
@@ -347,25 +302,16 @@
         function togglePassword() {
             var eyeOpen = document.getElementById("eye-open");
             var eyeClosed = document.getElementById("eye-closed");
-
-            // Karena kita pakai onmousedown=preventDefault(), fokus tidak hilang dari input.
-            // Jadi, kita hanya perlu mengubah tipe input.
-            
             if (passwordInput.type === "password") {
                 passwordInput.type = "text";
                 eyeOpen.classList.remove("hidden");
                 eyeClosed.classList.add("hidden");
-                
-                // CATATAN: Kucing TETAP dalam mode 'shy' (tangan menutup mata)
-                // karena input masih memiliki fokus.
                 say("Hayo ngintip! 👀"); 
             } else {
                 passwordInput.type = "password";
                 eyeOpen.classList.add("hidden");
                 eyeClosed.classList.remove("hidden");
             }
-            
-            // Paksa fokus kembali (backup)
             passwordInput.focus();
         }
     </script>

@@ -348,7 +348,6 @@
         say(msgs[Math.floor(Math.random() * msgs.length)]);
     });
 
-    // --- 4. TOGGLE ROLE & INPUTS ---
     function toggleInputs() {
         const role = roleInput.value;
         const divNim = document.getElementById('input-nim');
@@ -372,7 +371,6 @@
         }
     }
 
-    // --- 5. MATA IKUT KURSOR ---
     const eyeRadius = 8;
     document.addEventListener('mousemove', (e) => {
         if (catContainer.classList.contains('shy')) return;
@@ -388,7 +386,6 @@
         });
     });
 
-    // --- 6. SHY MODE (PASSWORD) ---
     function setShy(isShy) {
         if (isShy) {
             catContainer.classList.add('shy');
@@ -420,7 +417,6 @@
         passInput.focus();
     }
 
-    // --- 7. LOGIKA SUBMIT AJAX (ADMIN MODE) ---
     document.getElementById('createMemberForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
@@ -444,10 +440,6 @@
 
         try {
             const formData = new FormData(this);
-            
-            // MAP LOGIC: Tentukan 'identity_number' mana yang dikirim ke backend
-            // Backend biasanya mengharapkan 'identity_number', bukan '_mhs' atau '_dosen'
-            // Kita inject manual ke formData
             const role = roleInput.value;
             let finalId = '';
             

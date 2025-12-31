@@ -97,9 +97,7 @@
         {{-- KOP SURAT --}}
         <div class="border-b-2 border-lab-pink pb-3 mb-5 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                {{-- LOGO (Gunakan asset jika ada) --}}
                 <div class="w-16 h-16 flex items-center justify-center">
-                    {{-- Pastikan path logo sesuai dengan project Anda --}}
                     <img src="{{ asset('templates/logo.png') }}" 
                          alt="Logo" 
                          onerror="this.style.display='none'"

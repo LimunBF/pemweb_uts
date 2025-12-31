@@ -19,16 +19,13 @@
 
         {{-- Body Form --}}
         <div class="p-8">
-            {{-- Perubahan 1: Rute ke update dan menyertakan ID barang --}}
             <form action="{{ route('barang.update', $barang->id) }}" method="POST">
                 @csrf
-                {{-- Perubahan 2: Method PUT wajib untuk update data di Laravel --}}
                 @method('PUT')
 
                 {{-- Nama Alat --}}
                 <div class="mb-6">
                     <label for="nama_alat" class="block text-sm font-semibold text-gray-700 mb-2">Nama Alat</label>
-                    {{-- Perubahan 3: Menambahkan value old() dengan parameter kedua $barang->nama_alat agar data lama muncul --}}
                     <input type="text" name="nama_alat" id="nama_alat" 
                            class="mt-1 focus:ring-lab-pink-btn focus:border-lab-pink-btn block w-full shadow-sm sm:text-sm border-gray-300 rounded-lg py-3 px-4 border" 
                            placeholder="Contoh: Mikroskop Digital"
@@ -64,7 +61,6 @@
                 {{-- Deskripsi --}}
                 <div class="mb-6">
                     <label for="deskripsi" class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Alat</label>
-                    {{-- Perubahan 4: Isi textarea diletakkan di antara tag pembuka dan penutup --}}
                     <textarea name="deskripsi" id="deskripsi" rows="3" 
                               class="shadow-sm focus:ring-lab-pink-btn focus:border-lab-pink-btn mt-1 block w-full sm:text-sm border border-gray-300 rounded-lg p-3" 
                               placeholder="Spesifikasi alat, kondisi fisik, dll...">{{ old('deskripsi', $barang->deskripsi) }}</textarea>
@@ -76,7 +72,6 @@
                     <label for="status_ketersediaan" class="block text-sm font-semibold text-gray-700 mb-2">Status Ketersediaan</label>
                     <div class="relative">
                         <select name="status_ketersediaan" id="status_ketersediaan" class="block w-full pl-3 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-lab-pink-btn focus:border-lab-pink-btn sm:text-sm rounded-lg border shadow-sm">
-                            {{-- Perubahan 5: Logika untuk memilih opsi yang sesuai dengan data database --}}
                             <option value="Tersedia" {{ old('status_ketersediaan', $barang->status_ketersediaan) == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
                             <option value="Dipinjam" {{ old('status_ketersediaan', $barang->status_ketersediaan) == 'Dipinjam' ? 'selected' : '' }}>Dipinjam</option>
                             <option value="Perbaikan" {{ old('status_ketersediaan', $barang->status_ketersediaan) == 'Perbaikan' ? 'selected' : '' }}>Perbaikan</option>

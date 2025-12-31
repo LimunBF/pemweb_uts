@@ -97,13 +97,9 @@
             </div>
         </div>
 
-        {{-- Ilustrasi Kanan (Menggunakan Maskot Kucing Lagi agar Konsisten) --}}
         <div class="w-full lg:w-1/2 flex justify-center relative z-10">
-            {{-- Lingkaran Belakang --}}
-            <div class="absolute w-[400px] h-[400px] bg-gradient-to-tr from-pink-100 to-purple-100 rounded-full -z-10 blur-xl opacity-70"></div>
-            
+            <div class="absolute w-[400px] h-[400px] bg-gradient-to-tr from-pink-100 to-purple-100 rounded-full -z-10 blur-xl opacity-70"></div>    
             <div class="relative animate-float cursor-pointer group">
-                {{-- Chat Bubble Kucing --}}
                 <div class="absolute -top-12 -left-12 bg-white p-4 rounded-2xl rounded-br-none shadow-lg border-2 border-lab-pink-btn transform -rotate-6 z-20 group-hover:scale-110 transition-transform">
                     <p class="text-sm font-bold text-lab-text">👋 Hai! Mau pinjam apa?</p>
                 </div>
@@ -153,7 +149,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {{-- Fitur 1 --}}
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition duration-300">
                     <div class="w-14 h-14 bg-pink-100 rounded-2xl flex items-center justify-center text-lab-pink-btn mb-6">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
@@ -164,7 +159,6 @@
                     </p>
                 </div>
 
-                {{-- Fitur 2 --}}
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition duration-300">
                     <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 mb-6">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -175,7 +169,6 @@
                     </p>
                 </div>
 
-                {{-- Fitur 3 --}}
                 <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:-translate-y-2 transition duration-300">
                     <div class="w-14 h-14 bg-yellow-100 rounded-2xl flex items-center justify-center text-yellow-600 mb-6">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>

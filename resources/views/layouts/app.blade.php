@@ -9,7 +9,6 @@
     <link rel="icon" href="{{ asset('templates/logo_ptik.png') }}" type="image/png">
 
     <script>
-        // 1. Konfirmasi Hapus (Untuk form dengan ID spesifik)
         function confirmDelete(id) {
             Swal.fire({
                 title: 'Apakah Anda yakin?',
@@ -27,8 +26,6 @@
             })
         }
 
-        // 2. Konfirmasi Umum (Untuk Approve/Reject/Kembali)
-        // Fungsi ini akan mencari form terdekat dari tombol yang diklik
         function confirmSubmit(element, title, text, confirmBtnText = 'Ya', confirmColor = '#DB2777') {
             Swal.fire({
                 title: title,
@@ -46,7 +43,6 @@
             })
         }
 
-        // 3. Notifikasi Sukses (Opsional: Menggantikan Alert Sukses Biasa)
         @if(session('success'))
             Swal.fire({
                 icon: 'success',
@@ -56,8 +52,7 @@
                 timer: 3000
             });
         @endif
-        
-        // 4. Notifikasi Error
+
         @if($errors->any())
             Swal.fire({
                 icon: 'error',
@@ -72,7 +67,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    {{-- Konfigurasi Tema Warna --}}
     <script>
         tailwind.config = {
             theme: {
@@ -108,7 +102,6 @@
             }
         }
 
-        /* Class ini akan kita pasang di <main> */
         .page-animate {
             animation: pageFadeInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
@@ -119,7 +112,7 @@
             background-size: 200% 100%;
             animation: skeleton-loading 1.5s infinite ease-in-out;
             border-radius: 6px;
-            color: transparent !important; /* Sembunyikan teks asli jika ada */
+            color: transparent !important;
         }
 
         @keyframes skeleton-loading {
@@ -275,12 +268,6 @@
                     </div>
                 </div>
             </header>
-
-            {{-- 
-                PENTING:
-                Tambahkan class 'page-animate' di sini.
-                Ini akan membuat semua konten yang di-yield muncul dengan animasi slide up + fade in.
-            --}}
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-white p-8 page-animate">
                 @yield('content')
             </main>

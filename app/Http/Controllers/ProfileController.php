@@ -15,8 +15,6 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-
-        // 1. Validasi (Sama seperti sebelumnya)
         $request->validate([
             'email' => 'required|email|unique:users,email,' . $user->id,
             'contact' => [
@@ -25,13 +23,11 @@ class ProfileController extends Controller
             ],
             'password' => 'nullable|min:6|confirmed', 
         ], [
-            // ... (pesan error sama seperti sebelumnya) ...
             'email.unique' => 'Email ini sudah digunakan.',
             'contact.regex' => 'Format nomor HP harus diawali "08".',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        // 2. Siapkan Data
         $data = [
             'email'   => $request->email,
             'contact' => $request->contact,
@@ -39,24 +35,16 @@ class ProfileController extends Controller
 
         $passwordChanged = false;
         $plainPassword = null;
-
-        // 3. Cek Password
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
             $passwordChanged = true;
             $plainPassword = $request->password;
         }
 
-        // 4. Update Database
         /** @var \App\Models\User $user */
         $user->update($data);
 
-        // 5. LOGIKA BARU: Kirim Email (Bukan WA lagi)
         if ($passwordChanged) {
-            // Kirim ke email user ($user->email)
-            // Menggunakan view 'emails.password_changed' yang baru kita buat
-            // Mengirim data $user dan $plainPassword ke view tersebut
-            
             try {
                 Mail::send('emails.password_changed', [
                     'user' => $user,
@@ -66,7 +54,6 @@ class ProfileController extends Controller
                             ->subject('Pemberitahuan Ganti Password - Lab PTIK');
                 });
             } catch (\Exception $e) {
-                // Jika email gagal kirim (misal internet mati), jangan error, lanjut saja
                 Log::error($e->getMessage());
                 return redirect()->route('student.dashboard')
                     ->with('success', 'Profil diperbarui, namun Gagal mengirim email notifikasi.');

@@ -29,31 +29,20 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; }
 
-        /* --- ANIMASI KUCING --- */
         .cat-head { transition: transform 0.3s ease-out; }
         .cat-paw {
             transition: transform 0.4s ease-out; 
             transform-box: fill-box;
             transform-origin: center bottom;
         }
-        
-        /* POSISI AWAL TANGAN (Sembunyi) */
         #paw-left, #paw-right { transform: translateY(180px); }
-
-        /* Transisi Saat Malu */
         .shy .cat-paw { 
             transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
-        
-        /* Posisi Tangan Menutup Mata (Shy) */
         .shy #paw-left { transform: translateY(-70px) translateX(10px) rotate(-10deg); }
         .shy #paw-right { transform: translateY(-70px) translateX(-10px) rotate(10deg); }
-
-        /* Mata & Pupil */
         .pupil { transition: transform 0.1s ease-out; }
         .typing .pupil { transition: transform 0.05s linear; }
-
-        /* Chat Bubble */
         .chat-bubble {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             opacity: 0;
@@ -64,8 +53,6 @@
             opacity: 1;
             transform: translateY(0) scale(1);
         }
-        
-        /* Hilangkan spinner input number */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { 
             -webkit-appearance: none; 
@@ -74,15 +61,10 @@
     </style>
 </head>
 <body class="bg-white min-h-screen font-poppins flex">
-
-    {{-- BAGIAN KIRI: KUCING & DEKORASI --}}
     <div class="hidden lg:flex lg:w-1/2 bg-lab-pink relative flex-col justify-center items-center overflow-hidden">
         <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-white rounded-full mix-blend-overlay opacity-40 blur-3xl animate-pulse"></div>
         <div class="absolute bottom-[-10%] left-[-10%] w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply opacity-20 blur-3xl animate-pulse"></div>
-
         <div class="relative z-10 mb-6 transform scale-110 flex flex-col items-center"> 
-            
-            {{-- LOGO PTIK KIRI (Agar Resmi & Konsisten dengan Login) --}}
             <img src="{{ asset('templates/logo_ptik.png') }}" alt="Logo PTIK" class="w-24 h-auto mb-8 drop-shadow-xl hover:scale-110 transition-transform duration-300">
 
             <div id="bubble" class="chat-bubble absolute top-20 -right-24 bg-white px-4 py-2 rounded-xl rounded-bl-none shadow-lg border border-lab-pink-btn z-30 w-48 select-none">
@@ -138,13 +120,10 @@
             <p class="text-gray-600 font-medium">Daftarkan akunmu untuk mulai meminjam alat.</p>
         </div>
     </div>
-
-    {{-- BAGIAN KANAN: FORM REGISTER --}}
     <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white overflow-y-auto">
         <div class="w-full max-w-md">
             
             <div class="text-left mb-6">
-                {{-- LOGO PTIK KANAN (Hanya muncul di Mobile/Responsif Kecil, di Desktop pakai Kiri) --}}
                 <div class="lg:hidden mb-4 flex justify-center">
                     <img src="{{ asset('templates/logo_ptik.png') }}" alt="Logo PTIK" class="h-16 w-auto drop-shadow-md">
                 </div>
@@ -152,8 +131,6 @@
                 <h1 class="text-3xl font-extrabold text-lab-text">Buat Akun Baru</h1>
                 <p class="text-sm text-gray-400 font-medium uppercase tracking-wider mt-1">Sistem Inventaris Lab PTIK</p>
             </div>
-
-            {{-- ALERT BOX NOTIFIKASI ERROR --}}
             @if($errors->any())
                 <div class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm animate-pulse">
                     <div class="flex">
@@ -179,24 +156,18 @@
 
             <form method="POST" action="{{ route('register') }}" class="space-y-4">
                 @csrf
-
-                {{-- Nama Lengkap --}}
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">NAMA LENGKAP</label>
                     <input type="text" name="name" id="name" value="{{ old('name') }}" required
                         class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('name') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="John Doe">
                 </div>
-
-                {{-- Email --}}
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">EMAIL KAMPUS</label>
                     <input type="email" name="email" id="email" value="{{ old('email') }}" required
                         class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('email') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="nim@student.uns.ac.id">
                 </div>
-
-                {{-- Contact / No HP --}}
                 <div class="group relative">
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-bold text-gray-400 ml-1 tracking-wide">NO. WHATSAPP / HP</label>
@@ -207,8 +178,6 @@
                         class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('contact') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="08123456789">
                 </div>
-
-                {{-- Role Selection --}}
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">DAFTAR SEBAGAI</label>
                     <div class="relative">
@@ -222,8 +191,6 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Input NIM (Mahasiswa) --}}
                 <div id="input-nim" class="group {{ old('role') == 'dosen' ? 'hidden' : '' }}">
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-bold text-gray-400 ml-1 tracking-wide">NIM</label>
@@ -234,16 +201,12 @@
                         class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('identity_number_mhs') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="M05...">
                 </div>
-
-                {{-- Input NIP (Dosen) --}}
                 <div id="input-nip" class="group {{ old('role') == 'dosen' ? '' : 'hidden' }}">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">NIP</label>
                     <input type="text" name="identity_number_dosen" id="identity_number_dosen" value="{{ old('identity_number_dosen') }}"
                         class="block w-full px-4 py-3 bg-gray-50 border-2 {{ $errors->has('identity_number_dosen') ? 'border-red-400' : 'border-gray-100 focus:border-lab-pink-btn' }} rounded-xl focus:ring-0 outline-none transition font-semibold text-gray-700 placeholder-gray-300"
                         placeholder="199...">
                 </div>
-
-                {{-- Password --}}
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 mb-1 ml-1 tracking-wide">PASSWORD</label>
                     <div class="relative">
@@ -263,8 +226,6 @@
                         </button>
                     </div>
                 </div>
-
-                {{-- Tombol Register --}}
                 <button type="submit" id="btn-register"
                     class="w-full bg-lab-pink-btn hover:bg-pink-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-pink-200 transform transition hover:-translate-y-0.5 active:scale-95 duration-200 mt-4">
                     Daftar Sekarang
@@ -298,11 +259,8 @@
         const nipInput = document.getElementById('identity_number_dosen');
         const passwordInput = document.getElementById('password');
 
-        // Counters
         const contactCounter = document.getElementById('contact-counter');
         const nimCounter = document.getElementById('nim-counter');
-
-        // --- 1. COUNTER LOGIC ---
         function updateContactUI() {
             let val = contactInput.value;
             if (val.length > 13) {
@@ -339,8 +297,6 @@
 
         contactInput.addEventListener('input', updateContactUI);
         nimInput.addEventListener('input', updateNimUI);
-
-        // --- 2. CHAT BUBBLE HELPER ---
         let bubbleTimeout;
         const messages = ["Miaw! 😽", "Isi yang lengkap ya!", "Semangat daftarnya! 🔥", "Aku siap menjaga lab! 🛡️"];
 
@@ -350,8 +306,6 @@
             bubble.classList.add('visible');
             bubbleTimeout = setTimeout(() => bubble.classList.remove('visible'), 3000);
         }
-
-        // --- 3. INTERAKSI PER KOLOM ---
         nameInput.addEventListener('focus', () => say("Siapa namamu? 🤔"));
         nameInput.addEventListener('input', () => {
             catContainer.classList.add('typing');
@@ -374,7 +328,6 @@
             setTimeout(() => catContainer.style.transform = "scale(1.1)", 150);
         });
 
-        // --- 4. TOGGLE ROLE ---
         function toggleInputs() {
             const role = roleInput.value;
             const inputNim = document.getElementById('input-nim');
@@ -391,8 +344,6 @@
                 say("Halo Pak/Bu Dosen! 🎓");
             }
         }
-
-        // --- 5. MATA IKUT KURSOR ---
         const eyeRadius = 8;
         document.addEventListener('mousemove', (e) => {
             if (catContainer.classList.contains('shy')) return;
@@ -409,8 +360,6 @@
         });
 
         let typingTimer;
-
-        // --- 6. LOGIKA PASSWORD (SHY) ---
         passwordInput.addEventListener('focus', () => {
             catContainer.classList.add('shy');
             say("Ssstt.. Rahasia! 🙈");
@@ -439,8 +388,6 @@
                 catContainer.classList.add('shy');
             }
         }
-
-        // --- 7. JALANKAN LOGIKA UI SAAT LOAD ---
         updateContactUI();
         updateNimUI();
         toggleInputs(); 

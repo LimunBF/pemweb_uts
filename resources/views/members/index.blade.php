@@ -109,10 +109,8 @@
                     </tr>
                 </thead>
 
-                {{-- BODY 1: DATA ASLI (Akan disembunyikan saat loading) --}}
                 <tbody class="bg-white divide-y divide-gray-200 transition-opacity duration-300" id="table-body">
                     @forelse($members as $index => $member)
-                        {{-- ... ISI LOOP DATA SEPERTI SEBELUMNYA ... --}}
                         <tr class="hover:bg-pink-50 transition duration-150 ease-in-out group animate-element" style="animation-delay: {{ $index * 0.05 }}s;">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -150,7 +148,6 @@
                             <td colspan="6" class="px-6 py-16 text-center text-gray-500 animate-fade-in-up">
                                 
                                 <div class="flex flex-col items-center justify-center">
-                                    {{-- ILUSTRASI SVG: Data Not Found --}}
                                     <div class="w-48 h-48 mb-6 relative">
                                         <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-pink-100">
                                             <circle cx="100" cy="100" r="80" fill="currentColor" opacity="0.3"/>
@@ -172,7 +169,6 @@
                                         Kami tidak dapat menemukan anggota dengan kata kunci tersebut. Coba ubah pencarian Anda.
                                     </p>
 
-                                    {{-- Tombol Reset Search (Opsional, pakai JS untuk clear input) --}}
                                     <button onclick="document.getElementById('searchInput').value=''; fetchData();" class="mt-6 px-6 py-2 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition font-bold text-sm">
                                         Bersihkan Pencarian
                                     </button>
@@ -183,7 +179,6 @@
                     @endforelse
                 </tbody>
 
-                {{-- BODY 2: SKELETON LOADER (Muncul saat loading) --}}
                 <tbody id="table-skeleton" class="bg-white divide-y divide-gray-200 hidden">
                     @for ($i = 0; $i < 5; $i++)
                     <tr>
@@ -215,7 +210,6 @@
     </div>
 </div>
 
-{{-- CSS --}}
 <style>
     @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(15px); }
@@ -262,15 +256,13 @@
 
     async function fetchData() {
         const search = document.getElementById('searchInput').value;
-        // Ganti loadingOverlay dengan skeleton
         const tableBody = document.getElementById('table-body');
         const tableSkeleton = document.getElementById('table-skeleton');
         const spinner = document.getElementById('search-spinner');
 
-        // STATE LOADING: Sembunyikan Data Asli, Tampilkan Skeleton
         tableBody.classList.add('hidden');
         tableSkeleton.classList.remove('hidden');
-        spinner.classList.remove('hidden'); // Spinner di input search tetap oke
+        spinner.classList.remove('hidden'); 
         
         const params = new URLSearchParams();
         if(currentRole) params.append('role', currentRole);
@@ -290,19 +282,16 @@
                 const doc = parser.parseFromString(html, 'text/html');
                 const newRows = doc.getElementById('table-body').innerHTML;
 
-                // Simulasi delay sedikit (opsional, biar skeleton kelihatan)
                 setTimeout(() => {
                     tableBody.innerHTML = newRows;
                     
-                    // STATE SELESAI: Tampilkan Data Asli, Sembunyikan Skeleton
                     tableSkeleton.classList.add('hidden');
                     tableBody.classList.remove('hidden');
                     spinner.classList.add('hidden');
                     
-                    // Re-run animasi masuk
                     document.querySelectorAll('.animate-element').forEach(el => {
                         el.style.animation = 'none';
-                        el.offsetHeight; /* trigger reflow */
+                        el.offsetHeight; 
                         el.style.animation = null; 
                     });
                 }, 300); 

@@ -17,26 +17,17 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // 1. Validasi Input
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
-
-        // 2. Cek Kredensial
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            
-            // Redirect berdasarkan role (mahasiswa/dosen ke dashboard student)
             if (in_array(Auth::user()->role, ['mahasiswa', 'dosen'])) {
                 return redirect()->route('student.dashboard');
             }
-            
-            // Jika bukan keduanya (berarti Admin), ke dashboard admin
             return redirect()->route('dashboard_admin');
         }
-
-        // 3. Jika Gagal
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
@@ -53,20 +44,18 @@ class AuthController extends Controller
         $request->validate([
             'name'     => 'required|string|max:255|unique:users,name',
             'email'    => 'required|email|unique:users,email',
-            
-            // VALIDASI KONTAK (10-13 DIGIT)
+        
             'contact'  => [
                 'required',
                 'numeric',
                 'digits_between:10,13',
-                'regex:/^08[0-9]+$/', // <--- INI YANG MENJAMIN AWALAN 08
+                'regex:/^08[0-9]+$/',
                 'unique:users,contact'
             ],
             
             'password' => 'required|min:6',
             'role'     => 'required|in:mahasiswa,dosen',
         ], [
-            // Pesan Error Spesifik untuk Alert Box Atas
             'name.unique'             => 'Nama ini sudah terdaftar.',
             'email.unique'            => 'Email Ini sudah digunakan.',
             'contact.required'        => 'Nomor WhatsApp/HP wajib diisi.',
@@ -76,8 +65,6 @@ class AuthController extends Controller
             'contact.unique'          => 'Nomor WhatsApp/HP ini sudah terdaftar.',
             'password.min'            => 'Password minimal 6 karakter.',
         ]);
-
-        // Validasi NIM/NIP (Wajib 8 Karakter)
         $identityNumber = null;
         $role = $request->role;
 
@@ -104,7 +91,6 @@ class AuthController extends Controller
             $identityNumber = $request->identity_number_dosen;
         }
 
-        // Simpan User
         $user = User::create([
             'name'            => $request->name,
             'email'           => $request->email,
@@ -113,13 +99,9 @@ class AuthController extends Controller
             'role'            => $role,
             'identity_number' => $identityNumber,
         ]);
-
-        // Auto Login & Redirect
         Auth::login($user);
                 return redirect()->route('student.dashboard')->with('success', 'Registrasi berhasil! Selamat datang.');
     }
-
-    // --- LOGOUT ---
     public function logout(Request $request)
     {
         Auth::logout();

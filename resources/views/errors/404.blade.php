@@ -13,7 +13,6 @@
 </head>
 <body class="bg-gray-50 h-screen flex items-center justify-center overflow-hidden relative">
 
-    {{-- Elemen Dekorasi Background (Blob Animasi) --}}
     <div class="absolute top-0 left-0 w-64 h-64 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
     <div class="absolute top-0 right-0 w-64 h-64 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
     <div class="absolute -bottom-32 left-20 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
@@ -31,14 +30,12 @@
             Sepertinya halaman yang kamu cari tidak ada di sistem inventaris kami.
         </p>
 
-        {{-- Tombol Kembali --}}
         <a href="{{ url('/') }}" class="inline-flex items-center px-8 py-3 rounded-full bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-300">
             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Kembali ke Dashboard
         </a>
     </div>
 
-    {{-- Konfigurasi Animasi Tailwind --}}
     <script>
         tailwind.config = {
             theme: {

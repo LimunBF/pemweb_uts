@@ -12,15 +12,11 @@ class MemberController extends Controller
 {
     public function index(Request $request)
     {
-        // Mulai Query
         $query = User::query();
-
-        // A. Logika Filter Role (Mahasiswa/Dosen)
         if ($request->has('role') && in_array($request->role, ['mahasiswa', 'dosen'])) {
             $query->where('role', $request->role);
         }
 
-        // B. Logika Search (Pencarian) - BAGIAN INI YANG PENTING
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -30,11 +26,7 @@ class MemberController extends Controller
                   ->orWhere('contact', 'LIKE', "%{$search}%");       // No HP
             });
         }
-
-        // Ambil data (urutkan terbaru)
         $members = $query->latest()->get();
-
-        // Kembalikan ke View
         return view('members.index', compact('members'));
     }
 
