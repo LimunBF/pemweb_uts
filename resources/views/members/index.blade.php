@@ -1,115 +1,319 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 mt-6">
+<div class="container mx-auto font-poppins">
     
-    <div class="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
+   {{-- Header Banner --}}
+   <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-6 md:p-8 mb-6 text-white shadow-lg relative overflow-hidden animate-element">
+        <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="w-full md:flex-1 text-center md:text-left">
+                <h1 class="text-3xl md:text-4xl font-bold">Daftar Anggota Laboratorium</h1>
+                <p class="mt-1 text-pink-100 opacity-90">Kelola semua data mahasiswa dan dosen disini.</p>
+            </div>
         
-        <div class="bg-lab-pink-dark px-6 py-4 flex flex-col md:flex-row justify-between items-center">
-            <div class="text-white">
-                <h2 class="text-xl font-bold flex items-center gap-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    Daftar Anggota
-                </h2>
-                <p class="text-sm text-pink-100 mt-1 opacity-90">Kelola data mahasiswa aktif di sini.</p>
-            </div>
-
-            <a href="#" class="mt-4 md:mt-0 bg-white text-lab-pink-dark hover:bg-gray-50 font-semibold py-2 px-4 rounded-lg shadow-sm flex items-center transition duration-200">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
-                Tambah Anggota
-            </a>
-        </div>
-
-        @if(session('success'))
-        <div class="px-6 pt-4">
-            <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-md shadow-sm flex items-center justify-between" role="alert">
-                <div class="flex items-center">
-                    <svg class="h-5 w-5 mr-2 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span>{{ session('success') }}</span>
-                </div>
-                <button onclick="this.parentElement.remove()" class="text-green-500 hover:text-green-700 font-bold">&times;</button>
+            <div class="w-full md:w-auto flex justify-center md:justify-end">
+                <a href="{{ route('members.create') }}" 
+                   class="inline-flex items-center bg-white text-pink-700 font-bold px-5 py-3 rounded-xl shadow-lg hover:bg-pink-50 transition ease-in-out duration-150 transform hover:-translate-y-1">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Tambah Anggota Baru
+                </a>    
             </div>
         </div>
-        @endif
+    </div>
 
-        <div class="p-0 overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead class="bg-gray-50 text-gray-600 uppercase text-xs font-bold tracking-wider border-b border-gray-200">
+    {{-- Controls: Filter & Search --}}
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 px-1 animate-element" style="animation-delay: 0.1s;">
+        
+        <div class="flex flex-wrap items-center gap-2">
+            <button onclick="filterRole('')" id="btn-all"
+               class="filter-btn px-5 py-2 text-sm rounded-full shadow-sm border transition duration-300 transform hover:scale-105
+               {{ !request('role') 
+                    ? 'active bg-pink-600 text-white border-pink-600 font-bold shadow-pink-200' 
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 font-medium' }}">
+                Semua
+            </button>
+
+            <button onclick="filterRole('mahasiswa')" id="btn-mahasiswa"
+               class="filter-btn px-5 py-2 text-sm rounded-full shadow-sm border transition duration-300 transform hover:scale-105
+               {{ request('role') == 'mahasiswa' 
+                    ? 'active bg-pink-600 text-white border-pink-600 font-bold shadow-pink-200' 
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 font-medium' }}">
+                Mahasiswa
+            </button>
+
+            <button onclick="filterRole('dosen')" id="btn-dosen"
+               class="filter-btn px-5 py-2 text-sm rounded-full shadow-sm border transition duration-300 transform hover:scale-105
+               {{ request('role') == 'dosen' 
+                    ? 'active bg-pink-600 text-white border-pink-600 font-bold shadow-pink-200' 
+                    : 'bg-white text-gray-600 border-gray-300 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 font-medium' }}">
+                Dosen
+            </button>
+        </div>
+
+        {{-- Search Input --}}
+        <div class="relative w-full md:w-[500px]">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-pink-400 group-focus-within:text-pink-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" id="searchInput" onkeyup="debounceSearch()" 
+                   class="block w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:placeholder-gray-300 focus:border-pink-500 focus:ring-1 focus:ring-pink-500 sm:text-sm transition shadow-sm" 
+                   placeholder="Cari nama, email, nip/nim..." 
+                   value="{{ request('search') }}">
+            
+            <div id="search-spinner" class="absolute inset-y-0 right-0 pr-3 flex items-center hidden">
+                <svg class="animate-spin h-4 w-4 text-pink-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    @if(session('success'))
+    <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded shadow-sm animate-element" role="alert">
+        <div class="flex items-center">
+            <svg class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <p><strong class="font-bold">Berhasil!</strong> {{ session('success') }}</p>
+        </div>
+    </div>
+    @endif
+
+    {{-- Tabel Data Container --}}
+    <div class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden animate-element relative min-h-[300px]" style="animation-delay: 0.2s;">
+        
+        <div id="table-loading" class="absolute inset-0 bg-white bg-opacity-70 z-20 hidden flex justify-center items-center backdrop-blur-sm transition-all duration-300">
+            <div class="flex flex-col items-center">
+                <svg class="animate-spin h-10 w-10 text-pink-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="text-sm font-semibold text-pink-600">Memuat Data...</span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto relative min-h-[300px]">
+            {{-- TABEL UTAMA --}}
+            <table class="min-w-full divide-y divide-gray-200" id="members-table">
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-4 text-center w-16">No</th>
-                        <th class="px-6 py-4">Nama Lengkap</th>
-                        <th class="px-6 py-4">NIM</th>
-                        <th class="px-6 py-4">No HP</th>
-                        <th class="px-6 py-4">Email</th>
-                        <th class="px-6 py-4 text-center w-40">Aksi</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider w-16">No</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Nama Lengkap</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Role</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Identitas</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Kontak & Email</th>
+                        <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Aksi</th>
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-gray-100">
-                    {{-- PERHATIKAN: Variabel di sini adalah $members, bukan $items --}}
+                {{-- BODY 1: DATA ASLI (Akan disembunyikan saat loading) --}}
+                <tbody class="bg-white divide-y divide-gray-200 transition-opacity duration-300" id="table-body">
                     @forelse($members as $index => $member)
-                    <tr class="hover:bg-pink-50 transition duration-150 group">
-                        <td class="px-6 py-4 text-center font-medium text-gray-500">
-                            {{ $loop->iteration }}
-                        </td>
-
-                        <td class="px-6 py-4">
-                            <div class="font-semibold text-gray-800">{{ $member->name }}</div>
-                            <div class="text-xs text-gray-400 mt-0.5">Bergabung: {{ $member->created_at->format('d M Y') }}</div>
-                        </td>
-
-                        <td class="px-6 py-4">
-                            @if($member->identity_number)
-                                <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-mono font-semibold border border-gray-200">
-                                    {{ $member->identity_number }}
-                                </span>
-                            @else
-                                <span class="text-gray-400 text-sm italic">-</span>
-                            @endif
-                        </td>
-
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            {{ $member->contact ?? '-' }}
-                        </td>
-
-                        <td class="px-6 py-4 text-sm text-gray-600">
-                            {{ $member->email }}
-                        </td>
-
-                        <td class="px-6 py-4 text-center">
-                            <div class="flex justify-center items-center space-x-2">
-                                <a href="#" class="p-2 text-yellow-600 hover:bg-yellow-100 rounded-lg transition" title="Edit">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 00 2 2h11a2 2 0 00 2-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </a>
-
-                                <form action="#" method="POST" onsubmit="return confirm('Yakin ingin menghapus anggota ini?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="p-2 text-red-600 hover:bg-red-100 rounded-lg transition" title="Hapus">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
+                        {{-- ... ISI LOOP DATA SEPERTI SEBELUMNYA ... --}}
+                        <tr class="hover:bg-pink-50 transition duration-150 ease-in-out group animate-element" style="animation-delay: {{ $index * 0.05 }}s;">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-8 w-8">
+                                        <img class="h-8 w-8 rounded-full bg-gray-200" src="https://ui-avatars.com/api/?name={{ urlencode($member->name) }}&background=random" alt="">
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-bold text-gray-900">{{ $member->name }}</div>
+                                        <div class="text-xs text-gray-400 mt-0.5">{{ $member->created_at->format('d M Y') }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                                {{-- Logika Role --}}
+                                @if($member->identity_number)
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded bg-gray-100 text-gray-800 border border-gray-200">{{ $member->identity_number }}</span>
+                                @else
+                                    <span class="px-2.5 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 border border-blue-200">Mahasiswa</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ucfirst($member->role) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div>{{ $member->email }}</div>
+                                <div class="text-xs text-gray-400">{{ $member->contact ?? '-' }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <a href="{{ route('members.edit', $member->id) }}" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-lg transition">Edit</a>
+                                <button type="button" onclick="confirmDelete('{{ $member->id }}')" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg transition">Hapus</button>
+                                <form id="delete-form-{{ $member->id }}" action="{{ route('members.destroy', $member->id) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
+                            </td>
+                        </tr>
                     @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-16 text-center text-gray-500 animate-fade-in-up">
+                                
+                                <div class="flex flex-col items-center justify-center">
+                                    {{-- ILUSTRASI SVG: Data Not Found --}}
+                                    <div class="w-48 h-48 mb-6 relative">
+                                        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-pink-100">
+                                            <circle cx="100" cy="100" r="80" fill="currentColor" opacity="0.3"/>
+                                            <path d="M65 85H135C140.523 85 145 89.4772 145 95V145C145 150.523 140.523 155 135 155H65C59.4772 155 55 150.523 55 145V95C55 89.4772 59.4772 85 65 85Z" fill="white" stroke="#DB2777" stroke-width="4"/>
+                                            <path d="M55 95L100 120L145 95" stroke="#DB2777" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M85 70L65 85H135L115 70H85Z" fill="white" stroke="#DB2777" stroke-width="4" stroke-linejoin="round"/>
+                                            {{-- Magnifying Glass --}}
+                                            <g transform="translate(110, 110)">
+                                                <circle cx="35" cy="35" r="25" fill="white" stroke="#590D22" stroke-width="4"/>
+                                                <path d="M55 55L75 75" stroke="#590D22" stroke-width="6" stroke-linecap="round"/>
+                                                <path d="M25 25L45 45" stroke="#DB2777" stroke-width="3" stroke-linecap="round"/>
+                                                <path d="M45 25L25 45" stroke="#DB2777" stroke-width="3" stroke-linecap="round"/>
+                                            </g>
+                                        </svg>
+                                    </div>
+
+                                    <h3 class="text-xl font-bold text-gray-800">Data Tidak Ditemukan</h3>
+                                    <p class="text-gray-500 mt-2 max-w-sm mx-auto">
+                                        Kami tidak dapat menemukan anggota dengan kata kunci tersebut. Coba ubah pencarian Anda.
+                                    </p>
+
+                                    {{-- Tombol Reset Search (Opsional, pakai JS untuk clear input) --}}
+                                    <button onclick="document.getElementById('searchInput').value=''; fetchData();" class="mt-6 px-6 py-2 bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition font-bold text-sm">
+                                        Bersihkan Pencarian
+                                    </button>
+                                </div>
+
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
+                {{-- BODY 2: SKELETON LOADER (Muncul saat loading) --}}
+                <tbody id="table-skeleton" class="bg-white divide-y divide-gray-200 hidden">
+                    @for ($i = 0; $i < 5; $i++)
                     <tr>
-                        <td colspan="6" class="px-6 py-10 text-center text-gray-400 bg-gray-50">
-                            <div class="flex flex-col items-center">
-                                <svg class="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"></path></svg>
-                                <p class="text-lg font-medium text-gray-500">Data anggota kosong.</p>
-                                <p class="text-sm">Silakan tambahkan data mahasiswa baru.</p>
+                        <td class="px-6 py-4"><div class="h-4 w-4 skeleton"></div></td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="h-8 w-8 rounded-full skeleton mr-4"></div>
+                                <div class="space-y-1">
+                                    <div class="h-4 w-24 skeleton"></div>
+                                    <div class="h-3 w-16 skeleton"></div>
+                                </div>
                             </div>
                         </td>
+                        <td class="px-6 py-4"><div class="h-5 w-20 skeleton rounded"></div></td>
+                        <td class="px-6 py-4"><div class="h-4 w-16 skeleton"></div></td>
+                        <td class="px-6 py-4 space-y-1">
+                            <div class="h-4 w-32 skeleton"></div>
+                            <div class="h-3 w-20 skeleton"></div>
+                        </td>
+                        <td class="px-6 py-4 text-right flex justify-end gap-2">
+                            <div class="h-8 w-12 skeleton rounded-lg"></div>
+                            <div class="h-8 w-14 skeleton rounded-lg"></div>
+                        </td>
                     </tr>
-                    @endforelse
+                    @endfor
                 </tbody>
             </table>
         </div>
-
-        <div class="px-6 py-4 bg-white border-t border-gray-100 text-right text-sm text-gray-500">
-            Total Anggota: <strong>{{ $members->count() }}</strong> Mahasiswa
-        </div>
     </div>
 </div>
+
+{{-- CSS --}}
+<style>
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-element { opacity: 0; animation: fadeInUp 0.5s ease-out forwards; }
+    
+    .fade-out { opacity: 0.4; pointer-events: none; }
+    .fade-in { opacity: 1; pointer-events: auto; }
+</style>
+
+<script>
+    let currentRole = "{{ request('role') }}";
+    let searchTimeout;
+
+    function filterRole(role) {
+        currentRole = role;
+        
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active', 'bg-pink-600', 'text-white', 'border-pink-600', 'font-bold', 'shadow-pink-200');
+            btn.classList.add('bg-white', 'text-gray-600', 'border-gray-300', 'font-medium', 'hover:bg-pink-50', 'hover:text-pink-600', 'hover:border-pink-200');
+        });
+
+        const activeBtnId = role ? 'btn-' + role : 'btn-all';
+        const activeBtn = document.getElementById(activeBtnId);
+        if(activeBtn) {
+            activeBtn.classList.remove('bg-white', 'text-gray-600', 'border-gray-300', 'font-medium', 'hover:bg-pink-50', 'hover:text-pink-600', 'hover:border-pink-200');
+            activeBtn.classList.add('active', 'bg-pink-600', 'text-white', 'border-pink-600', 'font-bold', 'shadow-pink-200');
+        }
+
+        fetchData();
+    }
+
+    function debounceSearch() {
+        const spinner = document.getElementById('search-spinner');
+        spinner.classList.remove('hidden');
+        
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            fetchData();
+        }, 100); 
+    }
+
+
+    async function fetchData() {
+        const search = document.getElementById('searchInput').value;
+        // Ganti loadingOverlay dengan skeleton
+        const tableBody = document.getElementById('table-body');
+        const tableSkeleton = document.getElementById('table-skeleton');
+        const spinner = document.getElementById('search-spinner');
+
+        // STATE LOADING: Sembunyikan Data Asli, Tampilkan Skeleton
+        tableBody.classList.add('hidden');
+        tableSkeleton.classList.remove('hidden');
+        spinner.classList.remove('hidden'); // Spinner di input search tetap oke
+        
+        const params = new URLSearchParams();
+        if(currentRole) params.append('role', currentRole);
+        if(search) params.append('search', search);
+        
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        window.history.pushState({}, '', newUrl);
+
+        try {
+            const response = await fetch(newUrl, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+
+            if(response.ok) {
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newRows = doc.getElementById('table-body').innerHTML;
+
+                // Simulasi delay sedikit (opsional, biar skeleton kelihatan)
+                setTimeout(() => {
+                    tableBody.innerHTML = newRows;
+                    
+                    // STATE SELESAI: Tampilkan Data Asli, Sembunyikan Skeleton
+                    tableSkeleton.classList.add('hidden');
+                    tableBody.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                    
+                    // Re-run animasi masuk
+                    document.querySelectorAll('.animate-element').forEach(el => {
+                        el.style.animation = 'none';
+                        el.offsetHeight; /* trigger reflow */
+                        el.style.animation = null; 
+                    });
+                }, 300); 
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            // Jika error, kembalikan tampilan
+            tableSkeleton.classList.add('hidden');
+            tableBody.classList.remove('hidden');
+            spinner.classList.add('hidden');
+        }
+    }
+</script>
 @endsection

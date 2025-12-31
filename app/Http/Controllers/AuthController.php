@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Tampilkan Halaman Login
+    // --- LOGIN ---
     public function showLoginForm()
     {
-        // Pastikan file view ada di resources/views/auth/login.blade.php
         return view('auth.login');
     }
 
-    // Proses Login
     public function login(Request $request)
     {
         // 1. Validasi Input
@@ -23,35 +23,108 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        // 2. Cek kredensial
+        // 2. Cek Kredensial
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             
-            // 3. CEK ROLE & REDIRECT SESUAI HAK AKSES
-            $user = Auth::user();
-
-            if ($user->role == 'admin') {
-                return redirect()->route('dashboard_admin');
-            } else {
-                // Asumsi role selain admin adalah mahasiswa
+            // Redirect berdasarkan role (mahasiswa/dosen ke dashboard student)
+            if (in_array(Auth::user()->role, ['mahasiswa', 'dosen'])) {
                 return redirect()->route('student.dashboard');
             }
+            
+            // Jika bukan keduanya (berarti Admin), ke dashboard admin
+            return redirect()->route('dashboard_admin');
         }
 
-        // 4. Jika salah
+        // 3. Jika Gagal
         return back()->withErrors([
             'email' => 'Email atau password salah.',
         ])->onlyInput('email');
     }
 
-    // Logout
+    // --- REGISTER ---
+    public function showRegisterForm()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:255|unique:users,name',
+            'email'    => 'required|email|unique:users,email',
+            
+            // VALIDASI KONTAK (10-13 DIGIT)
+            'contact'  => [
+                'required',
+                'numeric',
+                'digits_between:10,13',
+                'regex:/^08[0-9]+$/', // <--- INI YANG MENJAMIN AWALAN 08
+                'unique:users,contact'
+            ],
+            
+            'password' => 'required|min:6',
+            'role'     => 'required|in:mahasiswa,dosen',
+        ], [
+            // Pesan Error Spesifik untuk Alert Box Atas
+            'name.unique'             => 'Nama ini sudah terdaftar.',
+            'email.unique'            => 'Email Ini sudah digunakan.',
+            'contact.required'        => 'Nomor WhatsApp/HP wajib diisi.',
+            'contact.numeric'         => 'Nomor WhatsApp/HP harus berupa angka.',
+            'contact.digits_between'  => 'Nomor WhatsApp/HP tidak valid (Harus 10-13 digit).',
+            'contact.regex'           => 'Format nomor tidak valid. Harus diawali "08" (Contoh: 0812345...).',
+            'contact.unique'          => 'Nomor WhatsApp/HP ini sudah terdaftar.',
+            'password.min'            => 'Password minimal 6 karakter.',
+        ]);
+
+        // Validasi NIM/NIP (Wajib 8 Karakter)
+        $identityNumber = null;
+        $role = $request->role;
+
+        if ($role === 'mahasiswa') {
+            $request->validate([
+                'identity_number_mhs' => 'required|string|size:8|unique:users,identity_number'
+            ], [
+                'identity_number_mhs.required' => 'NIM wajib diisi.',
+                'identity_number_mhs.size'     => 'Format NIM salah (Wajib 8 digit/karakter).',
+                'identity_number_mhs.unique'   => 'NIM ini sudah terdaftar sebelumnya.',
+            ]);
+            
+            $identityNumber = $request->identity_number_mhs;
+            
+        } elseif ($role === 'dosen') {
+            $request->validate([
+                'identity_number_dosen' => 'required|string|min:8|unique:users,identity_number'
+            ], [
+                'identity_number_dosen.required' => 'NIP wajib diisi.',
+                'identity_number_dosen.min'      => 'NIP terlalu pendek (Minimal 8 digit).',
+                'identity_number_dosen.unique'   => 'NIP ini sudah terdaftar.',
+            ]);
+            
+            $identityNumber = $request->identity_number_dosen;
+        }
+
+        // Simpan User
+        $user = User::create([
+            'name'            => $request->name,
+            'email'           => $request->email,
+            'contact'         => $request->contact,
+            'password'        => Hash::make($request->password),
+            'role'            => $role,
+            'identity_number' => $identityNumber,
+        ]);
+
+        // Auto Login & Redirect
+        Auth::login($user);
+                return redirect()->route('student.dashboard')->with('success', 'Registrasi berhasil! Selamat datang.');
+    }
+
+    // --- LOGOUT ---
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        
-        // Setelah logout, kembali ke halaman login
-        return redirect()->route('login');
+        return redirect('/login');
     }
 }
