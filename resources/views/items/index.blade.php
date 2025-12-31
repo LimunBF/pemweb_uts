@@ -275,15 +275,20 @@
                                     <span class="custom-tooltip-text">Edit Barang</span>
                                 </div>
 
-                                <form action="{{ route('barang.destroy', $item->id) }}" method="POST" class="contents" onsubmit="return confirm('Apakah Anda yakin ingin menghapus barang ini?');">
+                                {{-- HAPUS BUTTON (SWEETALERT) --}}
+                                {{-- 1. Tombol Trigger --}}
+                                <div class="custom-tooltip-container tooltip-right">
+                                    {{-- Perhatikan onclick="confirmDelete" --}}
+                                    <button type="button" onclick="confirmDelete('{{ $item->id }}')" class="text-red-500 hover:text-red-900 p-2 hover:bg-red-50 rounded-full transition duration-150 block">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                    <span class="custom-tooltip-text bg-red-800">Hapus Permanen</span>
+                                </div>
+
+                                {{-- 2. Form Tersembunyi (Dipanggil via JS) --}}
+                                <form id="delete-form-{{ $item->id }}" action="{{ route('barang.destroy', $item->id) }}" method="POST" class="hidden">
                                     @csrf
                                     @method('DELETE')
-                                    <div class="custom-tooltip-container tooltip-right">
-                                        <button type="submit" class="text-red-500 hover:text-red-900 p-2 hover:bg-red-50 rounded-full transition duration-150 block">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
-                                        <span class="custom-tooltip-text bg-red-800">Hapus Permanen</span>
-                                    </div>
                                 </form>
                             </div>
                         </td>
@@ -291,10 +296,39 @@
                     @empty
                     <tr>
                         <td colspan="6" class="px-6 py-16 text-center text-gray-500 bg-gray-50 animate-row">
+                            
                             <div class="flex flex-col items-center justify-center">
-                                <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                                <p class="text-lg font-medium text-gray-600">Belum ada data barang.</p>
-                                <p class="text-sm mt-1">Silakan tambahkan barang inventaris baru.</p>
+                                {{-- ILUSTRASI SVG: Data Not Found (Sama kayak Member) --}}
+                                <div class="w-48 h-48 mb-6 relative">
+                                    <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-pink-100">
+                                        <circle cx="100" cy="100" r="80" fill="currentColor" opacity="0.3"/>
+                                        <path d="M65 85H135C140.523 85 145 89.4772 145 95V145C145 150.523 140.523 155 135 155H65C59.4772 155 55 150.523 55 145V95C55 89.4772 59.4772 85 65 85Z" fill="white" stroke="#DB2777" stroke-width="4"/>
+                                        <path d="M55 95L100 120L145 95" stroke="#DB2777" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M85 70L65 85H135L115 70H85Z" fill="white" stroke="#DB2777" stroke-width="4" stroke-linejoin="round"/>
+                                        <g transform="translate(110, 110)">
+                                            <circle cx="35" cy="35" r="25" fill="white" stroke="#590D22" stroke-width="4"/>
+                                            <path d="M55 55L75 75" stroke="#590D22" stroke-width="6" stroke-linecap="round"/>
+                                            <path d="M25 25L45 45" stroke="#DB2777" stroke-width="3" stroke-linecap="round"/>
+                                            <path d="M45 25L25 45" stroke="#DB2777" stroke-width="3" stroke-linecap="round"/>
+                                        </g>
+                                    </svg>
+                                </div>
+
+                                <h3 class="text-xl font-bold text-gray-800">Barang Tidak Ditemukan</h3>
+                                <p class="text-gray-500 mt-2 max-w-sm mx-auto">
+                                    Sepertinya barang yang kamu cari belum ditambahkan atau kata kuncinya tidak cocok.
+                                </p>
+
+                                <div class="mt-6 flex gap-3">
+                                    @if(request('search') || request('status'))
+                                        <a href="{{ route('items.index') }}" class="px-6 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition font-bold text-sm">
+                                            Reset Filter
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('barang.create') }}" class="px-6 py-2 bg-lab-pink-btn text-white rounded-full hover:bg-pink-700 transition font-bold text-sm shadow-lg">
+                                        + Tambah Baru
+                                    </a>
+                                </div>
                             </div>
                         </td>
                     </tr>
