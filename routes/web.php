@@ -24,7 +24,6 @@ use App\Models\User;
 // Halaman Utama Pintar (Cek Login & Role)
 Route::get('/', function () {
     if (Auth::check()) {
-        // PERBAIKAN DI SINI:
         // Cek apakah role user ada di dalam daftar ['mahasiswa', 'dosen']
         if (in_array(Auth::user()->role, ['mahasiswa', 'dosen'])) {
             return redirect()->route('student.dashboard');
@@ -59,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/inventaris', [ItemController::class, 'index'])->name('inventaris.index');
     
     // Route spesifik barang
+    // PENTING: Route cetak harus didefinisikan sebelum route parameter {id}
+    Route::get('/barang/cetak', [ItemController::class, 'cetak'])->name('barang.cetak');
+    
     Route::get('/barang', [ItemController::class, 'index'])->name('barang.index');
     Route::get('/barang/create', [ItemController::class, 'create'])->name('barang.create');
     Route::post('/barang', [ItemController::class, 'store'])->name('barang.store');
