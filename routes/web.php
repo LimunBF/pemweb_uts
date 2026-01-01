@@ -94,6 +94,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/dashboard', [UserDashboardController::class, 'index'])->name('dashboard');
         Route::get('/inventory', [UserDashboardController::class, 'inventory'])->name('inventory');
         Route::get('/my-loans', [UserDashboardController::class, 'myLoans'])->name('loans');
+
+        // Di dalam group prefix 'student'
+        Route::get('/guide', [UserDashboardController::class, 'guide'])->name('guide');
         
         // Form Peminjaman
         Route::get('/loan-form', [UserDashboardController::class, 'loanForm'])->name('loan.form');
@@ -101,9 +104,6 @@ Route::middleware(['auth'])->group(function () {
         
         // Print Surat
         Route::get('/my-loans/{id}/print', [UserDashboardController::class, 'printSurat'])->name('loan.print');
-
-        // [BARU] Route Preview PDF
-        Route::get('/my-loans/{id}/preview', [UserDashboardController::class, 'previewSurat'])->name('loan.preview');
 
         // EDIT PROFIL
         Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');

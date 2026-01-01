@@ -162,55 +162,8 @@ class UserDashboardController extends Controller
         return response()->download($tempPath, $fileName)->deleteFileAfterSend(true);
     }
 
-    public function previewSurat($id)
+    public function guide()
     {
-        $currentLoan = Peminjaman::with(['item', 'user'])->findOrFail($id);
-        
-        if (!empty($currentLoan->kode_peminjaman)) {
-            $groupLoans = Peminjaman::with('item')
-                            ->where('kode_peminjaman', $currentLoan->kode_peminjaman)
-                            ->get();
-        } else {
-            $groupLoans = collect([$currentLoan]);
-        }
-
-        $userRole = strtolower($currentLoan->user->role ?? 'mahasiswa');
-        $label = ($userRole === 'dosen') ? 'NIP' : 'NIM';
-        
-        Carbon::setLocale('id'); 
-
-        $data = [
-            'user'       => $currentLoan->user,
-            'label_id'   => $label,
-            'peminjaman' => $groupLoans, 
-            'items'      => $groupLoans, 
-            'today'      => Carbon::now()->translatedFormat('d F Y'),
-        ];
-
-        $currentLoan = Peminjaman::with(['item', 'user'])->findOrFail($id);
-        
-        if (!empty($currentLoan->kode_peminjaman)) {
-            $groupLoans = Peminjaman::with('item')
-                            ->where('kode_peminjaman', $currentLoan->kode_peminjaman)
-                            ->get();
-        } else {
-            $groupLoans = collect([$currentLoan]);
-        }
-
-        $userRole = strtolower($currentLoan->user->role ?? 'mahasiswa');
-        $label = ($userRole === 'dosen') ? 'NIP' : 'NIM';
-        
-        // PENTING: Gunakan Carbon untuk format tanggal Indonesia
-        \Carbon\Carbon::setLocale('id');
-
-        $data = [
-            'user'       => $currentLoan->user,
-            'label_id'   => $label,
-            'peminjaman' => $groupLoans, 
-            'items'      => $groupLoans, 
-            'today'      => \Carbon\Carbon::now()->translatedFormat('d F Y'),
-        ];
-
-        return view('user.surat_preview', $data);
+        return view('user.guide');
     }
 }

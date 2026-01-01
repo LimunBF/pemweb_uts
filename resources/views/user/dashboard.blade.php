@@ -96,142 +96,152 @@
                 </div>
             </a>
 
-            <a href="{{ route('student.loans') }}" class="group bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex items-center hover:shadow-lg hover:border-blue-300 transition-all duration-300">
-                <div class="p-4 bg-blue-50 rounded-xl text-blue-600 mr-5 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <div>
-                    <h3 class="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors">Riwayat Peminjaman</h3>
-                    <p class="text-sm text-gray-500">Lihat status barang dan deadline.</p>
-                </div>
-                <div class="ml-auto text-gray-300 group-hover:text-blue-500 transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </div>
-            </a>
+            {{-- GRID BAWAH --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Tombol Riwayat (Tetap Sama) --}}
+                <a href="{{ route('student.loans') }}" class="group bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex flex-col justify-between hover:shadow-lg hover:border-blue-300 transition-all duration-300 h-full">
+                   <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-blue-50 rounded-xl text-blue-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                   </div>
+                   <div>
+                        <h3 class="text-lg font-bold text-gray-800 group-hover:text-blue-700">Riwayat Peminjaman</h3>
+                        <p class="text-xs text-gray-500 mt-1">Cek status & cetak surat.</p>
+                   </div>
+                </a>
+                {{-- [BARU] Tombol ke Halaman Panduan --}}
+                <a href="{{ route('student.guide') }}" class="group bg-white rounded-2xl shadow-md border border-gray-100 p-6 flex flex-col justify-between hover:shadow-lg hover:border-yellow-400 transition-all duration-300 h-full">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="p-3 bg-yellow-50 rounded-xl text-yellow-600">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-300 group-hover:text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </div>
+                    <div>
+                         <h3 class="text-lg font-bold text-gray-800 group-hover:text-yellow-700">Panduan & SOP</h3>
+                         <p class="text-xs text-gray-500 mt-1">Bingung? Baca cara meminjam.</p>
+                    </div>
+                 </a>
+            </div>
         </div>
     </div>
 </div>
 
 {{-- ========================================== --}}
-{{-- MODAL EDIT PROFIL (ANIMATED & 2-STEP) --}}
+{{-- MODAL EDIT PROFIL (FIXED POSITION)         --}}
 {{-- ========================================== --}}
-<div id="profileModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+
+<div id="profileModal" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     
-    {{-- Backdrop dengan Blur --}}
-    <div class="absolute inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm transition-opacity opacity-0" id="modalBackdrop"></div>
+    {{-- Backdrop Hitam (Overlay) --}}
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-70 transition-opacity opacity-0 backdrop-blur-sm" id="modalBackdrop"></div>
 
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-        
-        {{-- Konten Modal --}}
-        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full scale-95 opacity-0" id="modalContent">
+    {{-- Container Tengah --}}
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
             
-            {{-- Header --}}
-            <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn px-6 py-4 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 00 2-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                    Edit Profil Saya
-                </h3>
-                <button type="button" onclick="closeModal()" class="text-pink-200 hover:text-white transition-colors focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
+            {{-- Konten Modal --}}
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg opacity-0 scale-95" id="modalContent">
+                
+                {{-- Header Modal --}}
+                <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 00 2-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Edit Profil Saya
+                    </h3>
+                    <button type="button" onclick="closeModal()" class="text-pink-200 hover:text-white transition-colors focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
 
-            <form action="{{ route('student.profile.update') }}" method="POST" class="p-6" id="profileForm">
-                @csrf
-                @method('PUT')
+                <form action="{{ route('student.profile.update') }}" method="POST" class="p-6" id="profileForm">
+                    @csrf
+                    @method('PUT')
 
-                <div class="space-y-5">
-                    {{-- Input Email --}}
-                    <div>
-                        <label for="email" class="block text-sm font-bold text-gray-700 mb-1">Email Kampus</label>
-                        <input type="email" name="email" id="email" value="{{ old('email', Auth::user()->email) }}" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent outline-none transition text-gray-800">
-                    </div>
-
-                    {{-- Input Kontak (HP) --}}
-                    <div class="relative">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-sm font-bold text-gray-700">No. WhatsApp / HP</label>
-                            <span id="contact-counter" class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">0/13</span>
+                    <div class="space-y-5">
+                        {{-- Input Email --}}
+                        <div>
+                            <label for="email" class="block text-sm font-bold text-gray-700 mb-1">Email Kampus</label>
+                            <input type="email" name="email" id="email" value="{{ old('email', Auth::user()->email) }}" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent outline-none transition text-gray-800">
                         </div>
-                        <input type="number" name="contact" id="contact" value="{{ old('contact', Auth::user()->contact) }}" required
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent outline-none transition text-gray-800"
-                            placeholder="08xxxxxxxxxx">
-                        <p class="text-xs text-gray-400 mt-1">Gunakan format 08...</p>
-                    </div>
 
-                    {{-- Divider --}}
-                    <div class="border-t border-dashed border-gray-200 my-2"></div>
-
-                    {{-- Input Password Baru --}}
-                    <div class="bg-pink-50 p-4 rounded-xl border border-pink-100 transition-all duration-300" id="passwordSection">
-                        <label for="password" class="block text-sm font-bold text-gray-700 mb-1 flex items-center">
-                            <svg class="w-4 h-4 mr-1 text-lab-pink-btn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                            Ganti Password (Opsional)
-                        </label>
-                        
+                        {{-- Input Kontak (HP) --}}
                         <div class="relative">
-                            <input type="password" name="password" id="passwordInput" 
-                                class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent outline-none transition text-gray-800 bg-white"
-                                placeholder="Isi hanya jika ingin mengganti">
-                            
-                            {{-- TOMBOL LIHAT PASSWORD --}}
-                            <button type="button" onclick="togglePasswordVisibility('passwordInput', 'eyeIcon1')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-lab-pink-btn transition focus:outline-none">
-                                <svg id="eyeIcon1" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                            </button>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-sm font-bold text-gray-700">No. WhatsApp / HP</label>
+                                <span id="contact-counter" class="text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">0/13</span>
+                            </div>
+                            <input type="number" name="contact" id="contact" value="{{ old('contact', Auth::user()->contact) }}" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent outline-none transition text-gray-800"
+                                placeholder="08xxxxxxxxxx">
                         </div>
-                        
-                        {{-- Notifikasi Kecil --}}
-                        <div class="mt-2 flex items-start text-xs text-blue-700 bg-blue-50 p-2 rounded-lg border border-blue-200">
-                            <svg class="w-4 h-4 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            <p>Jika password diganti, password baru akan dikirimkan ke <strong>Email Kampus</strong> Anda sebagai cadangan.</p>
-                        </div>
-                    </div>
 
-                    {{-- Konfirmasi Password (Hidden Awalnya) --}}
-                    <div id="confirmPasswordSection" class="hidden overflow-hidden transition-all duration-500 ease-in-out">
-                        <div class="bg-lab-text p-4 rounded-xl text-white shadow-lg animate-fade-in-up">
-                            <label class="block text-sm font-bold text-pink-200 mb-1">Konfirmasi Password Baru</label>
+                        {{-- Divider --}}
+                        <div class="border-t border-dashed border-gray-200 my-2"></div>
+
+                        {{-- Input Password Baru --}}
+                        <div class="bg-pink-50 p-4 rounded-xl border border-pink-100 transition-all duration-300" id="passwordSection">
+                            <label for="password" class="block text-sm font-bold text-gray-700 mb-1 flex items-center">
+                                <svg class="w-4 h-4 mr-1 text-lab-pink-btn" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                Ganti Password (Opsional)
+                            </label>
                             
                             <div class="relative">
-                                <input type="password" name="password_confirmation" id="passwordConfirmInput"
-                                    class="w-full px-4 py-2 pr-10 border-2 border-pink-500 bg-gray-800 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none transition text-white"
-                                    placeholder="Ketik ulang password baru">
+                                <input type="password" name="password" id="passwordInput" 
+                                    class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-lab-pink-btn focus:border-transparent outline-none transition text-gray-800 bg-white"
+                                    placeholder="Isi hanya jika ingin mengganti">
                                 
-                                {{-- TOMBOL LIHAT PASSWORD KONFIRMASI --}}
-                                <button type="button" onclick="togglePasswordVisibility('passwordConfirmInput', 'eyeIcon2')" class="absolute inset-y-0 right-0 px-3 flex items-center text-pink-300 hover:text-white transition focus:outline-none">
-                                    <svg id="eyeIcon2" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <button type="button" onclick="togglePasswordVisibility('passwordInput', 'eyeIcon1')" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-lab-pink-btn transition focus:outline-none">
+                                    <svg id="eyeIcon1" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                     </svg>
                                 </button>
                             </div>
+                        </div>
 
-                            <p class="text-xs text-pink-300 mt-2">Demi keamanan, silakan verifikasi password baru Anda sebelum menyimpan.</p>
+                        {{-- Konfirmasi Password --}}
+                        <div id="confirmPasswordSection" class="hidden overflow-hidden transition-all duration-500 ease-in-out">
+                            <div class="bg-lab-text p-4 rounded-xl text-white shadow-lg animate-fade-in-up">
+                                <label class="block text-sm font-bold text-pink-200 mb-1">Konfirmasi Password Baru</label>
+                                <div class="relative">
+                                    <input type="password" name="password_confirmation" id="passwordConfirmInput"
+                                        class="w-full px-4 py-2 pr-10 border-2 border-pink-500 bg-gray-800 rounded-xl focus:ring-2 focus:ring-pink-400 focus:border-transparent outline-none transition text-white"
+                                        placeholder="Ketik ulang password baru">
+                                    
+                                    <button type="button" onclick="togglePasswordVisibility('passwordConfirmInput', 'eyeIcon2')" class="absolute inset-y-0 right-0 px-3 flex items-center text-pink-300 hover:text-white transition focus:outline-none">
+                                        <svg id="eyeIcon2" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <p class="text-xs text-pink-300 mt-2">Demi keamanan, silakan verifikasi password baru Anda.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                {{-- Footer Tombol --}}
-                <div class="mt-8 flex justify-end gap-3">
-                    <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition font-bold text-sm">
-                        Batal
-                    </button>
-                    <button type="submit" id="saveButton" class="px-5 py-2.5 bg-lab-pink-btn text-white rounded-xl hover:bg-pink-700 transition font-bold text-sm shadow-md hover:shadow-lg transform active:scale-95 flex items-center">
-                        <span>Simpan Perubahan</span>
-                    </button>
-                </div>
-            </form>
+                    {{-- Footer Tombol --}}
+                    <div class="mt-8 flex justify-end gap-3">
+                        <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 transition font-bold text-sm">
+                            Batal
+                        </button>
+                        <button type="submit" id="saveButton" class="px-5 py-2.5 bg-lab-pink-btn text-white rounded-xl hover:bg-pink-700 transition font-bold text-sm shadow-md hover:shadow-lg transform active:scale-95 flex items-center">
+                            <span>Simpan Perubahan</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 {{-- JAVASCRIPT --}}
 <script>
-    // --- 1. MODAL ANIMATION ---
+    // --- MODAL ANIMATION ---
     const modal = document.getElementById('profileModal');
     const backdrop = document.getElementById('modalBackdrop');
     const content = document.getElementById('modalContent');
@@ -257,7 +267,7 @@
         }, 300);
     }
 
-    // --- 2. COUNTER NO HP ---
+    // --- COUNTER NO HP ---
     const contactInput = document.getElementById('contact');
     const contactCounter = document.getElementById('contact-counter');
 
@@ -324,7 +334,7 @@
         }
     });
 
-    // --- 4. TOGGLE PASSWORD VISIBILITY ---
+    // --- TOGGLE PASSWORD VISIBILITY ---
     function togglePasswordVisibility(inputId, iconId) {
         const input = document.getElementById(inputId);
         const icon = document.getElementById(iconId);
