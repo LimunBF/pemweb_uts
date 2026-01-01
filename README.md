@@ -16,14 +16,14 @@ Projek ini dikembangkan sebagai bagian dari tugas **Pemrograman Web (UAS)**.
 
 ## 👥 Tim Pengembang (Limun United)
 
-Berikut adalah anggota tim yang berkontribusi dalam pengembangan aplikasi ini:
+Berikut adalah anggota tim yang berkontribusi dalam pengembangan aplikasi ini, dengan pembagian tugas berdasarkan *layer* aplikasi dan manajemen proyek:
 
-| Nama Mahasiswa | NIM | Peran / Kontribusi |
-| :--- | :--- | :--- |
-| **Lintang Mukti Nugroho** | K3522040 | Fullstack / Backend / Setup Awal |
-| **Zahra 'Arf Walidain** | K3522084 | Frontend / UI Design / Illustration |
-| **Dita Nofiana** | K3522022 | Database / Testing / Validation |
-| **Dian Fitri Utami** | K3522019 | Dokumentasi / Fitur Laporan / QA |
+| Nama Mahasiswa | NIM | Peran Utama | Fokus Kontribusi & Tanggung Jawab |
+| :--- | :--- | :--- | :--- |
+| **Lintang Mukti Nugroho** | K3522040 | **Project Manager & User Module Fullstack** |  • **Inisialisasi:** Setup Repository, Environment, & Server. <br>• **Database:** Inisialisasi struktur database awal. <br> • **Fullstack User:** Mengembangkan seluruh fitur mahasiswa (Dashboard, Form Peminjaman, Riwayat) baik Backend & Frontend.<br>• **Quality Assurance:** Menulis *Feature Testing* (PHPUnit) untuk validasi sistem.|
+| **Zahra 'Arf Walidain** | K3522084 | **UI/UX Designer & Frontend Stylist** | • **Visual Identity:** Mendesain aset visual, logo, dan pemilihan palet warna.<br>• **Global Styling:** Implementasi Tailwind CSS untuk *Landing Page* dan *Authentication Pages*.<br>• **Interactivity:** Membuat animasi UI yang ramah pengguna. |
+| **Dita Nofiana** | K3522022 | **Backend Lead (Admin Module)** | • **Core Logic Admin:** Mengembangkan logika CRUD Inventaris, Approval Peminjaman, dan Manajemen Member.<br>• **Security:** Implementasi *Middleware* dan logika bisnis peminjaman yang kompleks.<br>• **System Architecture:** Menangani relasi model dan optimasi query. |
+| **Dian Fitri Utami** | K3522019 | **Admin Module Frontend & Reporting** | • **Admin Interface:** Mengintegrasikan logika backend admin ke tampilan (Blade Views).<br>• **Reporting:** Mengembangkan fitur cetak laporan inventaris dan rekap peminjaman (PDF).<br>• **Bug Fixing:** Membantu testing manual dan perbaikan tampilan admin. |
 
 ## 🚀 Fitur Unggulan
 
@@ -49,6 +49,7 @@ Berikut adalah anggota tim yang berkontribusi dalam pengembangan aplikasi ini:
 2.  **Pengajuan Peminjaman:** Form peminjaman yang mudah dengan validasi otomatis.
 3.  **Riwayat Peminjaman:** Pantau status pengajuan dan histori peminjaman.
 4.  **Cetak Bukti:** Unduh surat bukti peminjaman untuk pengambilan barang.
+5.  **Panduan & SOP:** Halaman khusus berisi panduan alur peminjaman, aturan, sanksi, dan FAQ yang interaktif.
 
 ## 🛠️ Teknologi yang Digunakan
 
