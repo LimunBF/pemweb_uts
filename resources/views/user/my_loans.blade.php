@@ -23,20 +23,32 @@
         </div>
     @endif
 
-    {{-- Header --}}
-    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <div>
-            <h2 class="text-3xl font-bold text-lab-text">Pinjaman Saya</h2>
-            <p class="text-gray-500 text-sm mt-1">Riwayat dan status pengajuan alat laboratorium.</p>
+    {{-- HEADER BANNER (REVISI) --}}
+    <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between relative overflow-hidden min-h-[150px] gap-6">
+        
+        {{-- 1. Konten Teks --}}
+        <div class="relative z-10 text-center md:text-left">
+            <h1 class="text-3xl md:text-4xl font-bold flex items-center justify-center md:justify-start gap-2">
+                Riwayat Peminjaman 📋
+            </h1>
+            <p class="mt-2 text-pink-100 opacity-90 max-w-xl">
+                Pantau status pengajuan, cetak surat bukti, dan cek tenggat waktu pengembalian alat.
+            </p>
         </div>
 
-        <a href="{{ route('student.loan.form') }}" class="group bg-lab-pink-btn hover:bg-pink-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg transition transform hover:-translate-y-1 flex items-center">
-            {{-- Tambahkan class animasi di sini: group-hover:rotate-180 --}}
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 transition-transform duration-500 ease-in-out group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Ajukan Baru
-        </a>
+        {{-- 2. Tombol Ajukan Baru (Tetap Ada & Dipercantik) --}}
+        <div class="relative z-10">
+            <a href="{{ route('student.loan.form') }}" class="group bg-white text-lab-pink-btn hover:bg-pink-50 font-bold py-3 px-6 rounded-xl shadow-lg transition-all duration-300 flex items-center transform hover:-translate-y-1 border border-pink-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 transition-transform duration-500 ease-in-out group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Ajukan Baru
+            </a>
+        </div>
+
+        {{-- 3. Dekorasi Background --}}
+        <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10 pointer-events-none"></div>
+        <div class="absolute -bottom-6 right-20 w-32 h-32 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 pointer-events-none animate-pulse"></div>
     </div>
 
     {{-- ========================================== --}}

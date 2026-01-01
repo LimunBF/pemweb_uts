@@ -1,10 +1,27 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container mx-auto">
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold text-lab-text">Stok Gudang Inventaris</h2>
-            <p class="text-sm text-gray-500 mt-1">Pantau ketersediaan alat secara real-time.</p>
+    <div class="container mx-auto max-w-7xl pb-24">
+
+        {{-- 1. HEADER BANNER (Konsisten dengan Dashboard) --}}
+        <div class="bg-gradient-to-r from-lab-text to-lab-pink-btn rounded-2xl p-8 mb-8 text-white shadow-lg flex items-center justify-between relative overflow-hidden min-h-[160px]">
+            {{-- Konten Teks --}}
+            <div class="relative z-10">
+                <h1 class="text-3xl md:text-4xl font-bold flex items-center gap-2">
+                    Katalog Inventaris 📦
+                </h1>
+                <p class="mt-2 text-pink-100 opacity-90 max-w-xl">
+                    Pantau ketersediaan alat, spesifikasi, dan stok gudang secara real-time.
+                </p>
+            </div>
+
+            {{-- Dekorasi --}}
+            <div class="absolute right-0 top-0 h-full w-1/3 bg-white opacity-10 transform skew-x-12 translate-x-10"></div>
+            
+            {{-- Ilustrasi 3D --}}
+            <div class="absolute right-8 -bottom-4 z-20 hidden md:block">
+                <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Card%20File%20Box.png" alt="Inventory Icon" class="w-36 h-auto filter drop-shadow-xl animate-fade-in-up">
+            </div>
         </div>
 
         <div class="bg-white rounded-xl shadow-lg border border-pink-100 overflow-hidden">
